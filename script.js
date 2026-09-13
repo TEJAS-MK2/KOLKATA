@@ -28,7 +28,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener(
 }));
 
 const pandals = [
-  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg',rating:4.8},
+  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A5%8D%E0%A4%97%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg',rating:4.8},
   {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.59913,lng:88.36157,tag:'Artisan quarter',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg',rating:0},
   {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Shobhabazar_Rajbari_Durga_Puja.jpg',rating:0},
   {name:'College Square',zone:'Central',area:'College Street',lat:22.57453,lng:88.36447,tag:'Central Kolkata',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg',rating:4.9},
@@ -42,7 +42,6 @@ let activeZone='all', map, markers=[], routeStops=[], travelMode='walking';
 const routeMax=8;
 let nightIndex=0, completedStops=new Set();
 
-// Expose shared state for the details modal without duplicating state.
 window.pandals = pandals;
 Object.defineProperty(window, 'routeStops', { configurable: true, get: () => routeStops });
 window.addToRoute = addToRoute;
@@ -51,12 +50,16 @@ try { routeStops=JSON.parse(localStorage.getItem('kolkata-pujo-route')||'[]').ma
 try { completedStops=new Set(JSON.parse(localStorage.getItem('kolkata-pujo-completed')||'[]')); } catch {}
 
 function persistNight(){localStorage.setItem('kolkata-pujo-route',JSON.stringify(routeStops.map(p=>({name:p.name}))));localStorage.setItem('kolkata-pujo-completed',JSON.stringify([...completedStops]));}
-function renderStars(value){return `<span class="stars" aria-label="${value?' '+value.toFixed(1)+' out of 5':'Not rated'}">${value?'★★★★★':'☆☆☆☆☆'}</span> ${value?value.toFixed(1):'Not rated'}`;}
+function renderStars(value){return `<span class="stars" aria-label="${value?value.toFixed(1)+' out of 5':'Not rated'}">${value?'★★★★★':'☆☆☆☆☆'}</span> ${value?value.toFixed(1):'Not rated'}`;}
 function filteredPandals(){const query=(document.querySelector('#pandal-search')?.value||'').trim().toLowerCase();return pandals.filter(p=>(activeZone==='all'||p.zone===activeZone)&&(!query||`${p.name} ${p.area} ${p.zone} ${p.tag}`.toLowerCase().includes(query)));}
 function selectPandal(p){if(!p)return;if(map){map.flyTo([p.lat,p.lng],15,{duration:.7});markers.find(m=>m.pandal===p)?.marker.openPopup();}document.querySelectorAll('.pandal-card').forEach(c=>c.classList.toggle('selected',c.dataset.name===p.name));}
-function isInRoute(p){return routeStops.some(x=>x.name===p.name);}
+function isInRoute(p){return !!p&&routeStops.some(x=>x.name===p.name);}
 function addToRoute(p){if(!p||isInRoute(p)||routeStops.length>=routeMax)return;routeStops.push(p);persistNight();renderRoute();renderNightMode();}
 function removeFromRoute(name){routeStops=routeStops.filter(p=>p.name!==name);completedStops.delete(name);nightIndex=Math.min(nightIndex,Math.max(routeStops.length-1,0));persistNight();renderRoute();renderNightMode();}
+
+// Google Maps Directions URLs support walking, driving, bicycling and transit.
+// Keep the site's two-wheeler option, but safely map it to driving for the external URL.
+function mapsTravelMode(){return travelMode==='two-wheeler'?'driving':travelMode;}
 function routeUrl(){
   if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';
   const mobile=window.matchMedia('(max-width: 800px)').matches;
@@ -64,11 +67,11 @@ function routeUrl(){
   const stops=mobile?routeStops.slice(start,start+4):routeStops;
   const destination=`${stops[stops.length-1].lat},${stops[stops.length-1].lng}`;
   const waypoints=stops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');
-  let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(travelMode)}`;
+  let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(mapsTravelMode())}`;
   if(waypoints)url+=`&waypoints=${encodeURIComponent(waypoints)}`;
   return url;
 }
-function singleDirectionsUrl(p){return p?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(travelMode)}`:'https://www.google.com/maps/dir/?api=1';}
+function singleDirectionsUrl(p){return p?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mapsTravelMode())}`:'https://www.google.com/maps/dir/?api=1';}
 function updateRouteLink(){const link=document.querySelector('#open-route');if(link){link.href=routeUrl();link.setAttribute('aria-disabled',String(!routeStops.length));}}
 function renderRoute(){
   const wrap=document.querySelector('#route-stops'), count=document.querySelector('#route-count');
@@ -81,12 +84,12 @@ function renderRoute(){
 }
 function renderPandalExplorer(){
   const list=document.querySelector('#pandal-list');if(!list)return;const items=filteredPandals();
-  list.innerHTML=items.length?items.map(p=>`<article class="pandal-card" data-name="${p.name.replaceAll('"','&quot;')}" tabindex="0" aria-label="Explore ${p.name}"><img src="${p.photo}" alt="Archive photo associated with ${p.name}" loading="lazy" onerror="this.style.display='none'"><div class="pandal-card-body"><div class="pandal-meta">${p.zone} · ${p.area}</div><h3>${p.name}</h3><div class="rating">${renderStars(p.rating)}${p.rating?' · Visitor rating':''}</div><div class="pandal-actions"><button class="view-map" type="button">View map</button><button class="add-route" type="button" data-name="${p.name.replaceAll('"','&quot;')}">${isInRoute(p)?'Added ✓':routeStops.length>=routeMax?'Route full':'Add to route +'}</button><a class="route" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`).join(''):`<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
+  list.innerHTML=items.length?items.map(p=>`<article class="pandal-card" data-name="${p.name.replaceAll('"','&quot;')}" tabindex="0" aria-label="Explore ${p.name}"><img src="${p.photo}" alt="Archive photo associated with ${p.name}" loading="lazy" onerror="this.style.display='none'"><div class="pandal-card-body"><div class="pandal-meta">${p.zone} · ${p.area}</div><h3>${p.name}</h3><div class="rating">${renderStars(p.rating)}${p.rating?' · Historical visitor rating':''}</div><div class="pandal-actions"><button class="view-map" type="button">View map</button><button class="add-route" type="button" data-name="${p.name.replaceAll('"','&quot;')}">${isInRoute(p)?'Added ✓':routeStops.length>=routeMax?'Route full':'Add to route +'}</button><a class="route" href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`).join(''):`<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
   list.querySelectorAll('.pandal-card').forEach(card=>{const p=pandals.find(x=>x.name===card.dataset.name);card.addEventListener('click',e=>{if(!e.target.closest('a,button'))selectPandal(p);});card.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){e.preventDefault();selectPandal(p);}});});
   list.querySelectorAll('.view-map').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();selectPandal(pandals.find(p=>p.name===btn.closest('.pandal-card').dataset.name));}));
   list.querySelectorAll('.add-route').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=pandals.find(x=>x.name===btn.dataset.name);if(isInRoute(p))removeFromRoute(p.name);else addToRoute(p);renderPandalExplorer();}));
 }
-function initMap(){if(!window.L||!document.querySelector('#pandal-map'))return;map=L.map('pandal-map',{scrollWheelZoom:false}).setView([22.5726,88.3639],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);markers=pandals.map(p=>{const marker=L.marker([p.lat,p.lng]).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.area} · ${p.zone}<br><button type="button" class="popup-add" data-pandal="${p.name.replaceAll('"','&quot;')}">Add to route</button> · <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener">Directions ↗</a>`);marker.on('popupopen',()=>document.querySelector('.popup-add[data-pandal]')?.addEventListener('click',()=>{const q=document.querySelector('.popup-add[data-pandal]').dataset.pandal;const item=pandals.find(x=>x.name===q);if(item&&!isInRoute(item)){addToRoute(item);renderPandalExplorer();}}));return{pandal:p,marker};});}
+function initMap(){if(!window.L||!document.querySelector('#pandal-map'))return;map=L.map('pandal-map',{scrollWheelZoom:false}).setView([22.5726,88.3639],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);markers=pandals.map(p=>{const marker=L.marker([p.lat,p.lng]).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.area} · ${p.zone}<br><button type="button" class="popup-add" data-pandal="${p.name.replaceAll('"','&quot;')}">Add to route</button> · <a href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a>`);marker.on('popupopen',()=>document.querySelector('.popup-add[data-pandal]')?.addEventListener('click',()=>{const q=document.querySelector('.popup-add[data-pandal]').dataset.pandal;const item=pandals.find(x=>x.name===q);if(item&&!isInRoute(item)){addToRoute(item);renderPandalExplorer();}}));return{pandal:p,marker};});}
 
 document.querySelector('#pandal-search')?.addEventListener('input',renderPandalExplorer);
 document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn=>btn.addEventListener('click',()=>{activeZone=btn.dataset.zone;document.querySelectorAll('#pandal-filters .filter-btn').forEach(b=>b.classList.toggle('active',b===btn));renderPandalExplorer();}));
@@ -120,7 +123,7 @@ document.querySelector('#night-next')?.addEventListener('click',()=>{if(!routeSt
 document.querySelector('#night-route')?.addEventListener('click',()=>{window.open(routeUrl(),'_blank','noopener');});
 document.querySelector('#night-reset')?.addEventListener('click',()=>{completedStops.clear();nightIndex=0;persistNight();renderNightMode();});
 
-function initLightbox(){const box=document.querySelector('#lightbox'),image=document.querySelector('#lightbox-image');const close=()=>box?.classList.remove('open');document.querySelectorAll('.gallery-grid .tile').forEach(tile=>tile.addEventListener('click',()=>{const bg=getComputedStyle(tile).backgroundImage,match=bg.match(/url\\([\"']?(.*?)[\"']?\\)/);if(!match)return;image.src=match[1];box.classList.add('open');}));document.querySelector('#lightbox-close')?.addEventListener('click',close);box?.addEventListener('click',e=>{if(e.target===box)close();});document.addEventListener('keydown',e=>{if(e.key==='Escape'){close();closeNightMode();}});}
+function initLightbox(){const box=document.querySelector('#lightbox'),image=document.querySelector('#lightbox-image');const close=()=>box?.classList.remove('open');document.querySelectorAll('.gallery-grid .tile').forEach(tile=>tile.addEventListener('click',()=>{const bg=getComputedStyle(tile).backgroundImage,match=bg.match(/url\([\"']?(.*?)[\"']?\)/);if(!match)return;image.src=match[1];box.classList.add('open');}));document.querySelector('#lightbox-close')?.addEventListener('click',close);box?.addEventListener('click',e=>{if(e.target===box)close();});document.addEventListener('keydown',e=>{if(e.key==='Escape'){close();closeNightMode();}});}
 
 const routeModeConfig={walking:{label:'Walk',speed:4.5,roadFactor:1.28},driving:{label:'Drive',speed:22,roadFactor:1.18},transit:{label:'Transit',speed:16,roadFactor:1.22},'two-wheeler':{label:'Two-wheeler',speed:25,roadFactor:1.18}};
 function routeDistance(a,b){const R=6371,rad=Math.PI/180,dLat=(b.lat-a.lat)*rad,dLon=(b.lng-a.lng)*rad,x=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
