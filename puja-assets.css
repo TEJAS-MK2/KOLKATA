@@ -1,0 +1,11 @@
+:root{
+  --hero-puja:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg');
+  --culture-puja:url('https://commons.wikimedia.org/wiki/Special:FilePath/Maa_Durga_Idol_at_Kumartuli.jpg');
+  --gallery-1:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_02.jpg');
+  --gallery-2:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_03.jpg');
+  --gallery-3:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_04.jpg');
+  --gallery-4:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Nandaram_Sen_Street_in_Kolkata_07.jpg')
+}
+.hero-image{background-image:var(--hero-puja)!important;background-position:center!important}
+.culture-photo{background-image:var(--culture-puja)!important;background-position:center!important}
+.tall{background-image:var(--gallery-1)!important}.wide{background-image:var(--gallery-2)!important}.square{background-image:var(--gallery-3)!important}.square.second{background-image:var(--gallery-4)!important}
