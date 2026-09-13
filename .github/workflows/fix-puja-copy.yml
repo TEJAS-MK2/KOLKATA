@@ -1,0 +1,48 @@
+name: Final Puja copy and routing fixes
+
+on:
+  push:
+    paths:
+      - .github/workflows/fix-puja-copy.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply verified fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          s=s.replace('Five days. A thousand stories. One city that feels like home.','Five core days. A thousand stories. One city that feels like home.')
+          s=s.replace('Free electricity and fire-licence fee waiver','Free electricity and fire-licence fee waiver for eligible committees')
+          Path('index.html').write_text(s,encoding='utf-8')
+
+          p=Path('script.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("function mapsTravelMode(){return travelMode==='two-wheeler'?'driving':travelMode;}","function mapsTravelMode(){return travelMode;}")
+          p.write_text(s,encoding='utf-8')
+          PY
+          grep -q 'Five core days' index.html
+          grep -q "function mapsTravelMode(){return travelMode;}" script.js
+      - name: Commit fixes
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html script.js
+          git commit -m 'Polish Puja copy and preserve two-wheeler routing' || exit 0
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        shell: bash
+        run: |
+          git rm .github/workflows/fix-puja-copy.yml
+          git commit -m 'Remove temporary Puja copy workflow'
+          git push
