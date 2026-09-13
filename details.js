@@ -76,7 +76,8 @@
     if(!p)return; current=p; previousFocus=document.activeElement;
     image.src=p.photo; image.alt=`Archive photo associated with ${p.name}`; image.onerror=()=>{image.removeAttribute('src');image.alt='Archive image unavailable';};
     zone.textContent=`${p.zone} Kolkata · ${p.tag}`; title.textContent=p.name; summary.textContent=descriptions[p.name]||`Explore ${p.name} in ${p.area}, ${p.zone} Kolkata.`; area.textContent=p.area; zoneFact.textContent=p.zone; rating.textContent=p.rating?`${p.rating.toFixed(1)} / 5`:'Not rated';
-    directions.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}`;
+    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';
+    directions.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;
     const inRoute=window.routeStops?.some?.(x=>x.name===p.name); route.textContent=inRoute?'Added ✓':'Add to Puja Night +'; route.disabled=!!inRoute;
     modal.hidden=false; modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; document.querySelector('.pandal-details-close')?.focus();
   }
