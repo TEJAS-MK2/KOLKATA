@@ -14,6 +14,7 @@ A cinematic, mobile-first Durga Puja experience for Kolkata.
 - Responsive visual gallery
 - Mobile navigation and smooth scrolling
 - Bengali typography and subtle festival-inspired visual treatment
+- Kolkata and Durga Puja imagery throughout the experience
 
 ## Live site
 
