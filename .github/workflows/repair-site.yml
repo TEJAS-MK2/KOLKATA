@@ -1,6 +1,8 @@
 name: Repair site
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -27,23 +29,29 @@ jobs:
           second_root = text.find(root, first_root + 1) if first_root >= 0 else -1
           if marker_i >= 0 and second_root >= 0:
               text = text[:second_root] + text[marker_i:]
-          text = text.replace(".map-panel{order:-1}", ".map-panel{order:0}")
-          text = text.replace(".map-panel #pandal-map{min-height:330px}", ".map-panel #pandal-map{min-height:260px}")
-          text = text.replace(".explorer-toolbar{top:62px", ".explorer-toolbar{top:62px")
+          text = text.replace('.map-panel{order:-1}', '.map-panel{order:0}')
+          text = text.replace('.map-panel #pandal-map{min-height:330px}', '.map-panel #pandal-map{min-height:260px}')
           css.write_text(text)
 
           js = Path('script.js')
           text = js.read_text()
-          bad = "https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg"
-          good = "https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A6%AC_%E0%A7%A8%E0%A7%A6%E0%A7%A7%E0%A7%AE.jpg"
-          text = text.replace(bad, good)
+          bad = 'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A8.jpg'
+          good = 'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg'
+          # Replace any malformed Bagbazar Special:FilePath target by matching the dataset line.
+          lines = text.splitlines()
+          for i, line in enumerate(lines):
+              if "name:'Bagbazar Sarbojanin'" in line and 'photo:' in line:
+                  a = line.find("photo:'")
+                  b = line.find("'", a + 7)
+                  if a >= 0 and b > a:
+                      lines[i] = line[:a + 7] + good + line[b:]
+          text = '\n'.join(lines) + ('\n' if text.endswith('\n') else '')
 
           old = '''function routeUrl(){\n  if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';\n  const destination=`${routeStops[routeStops.length-1].lat},${routeStops[routeStops.length-1].lng}`;\n  const waypoints=routeStops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');\n  let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(travelMode)}`;\n  if(waypoints)url+=`&waypoints=${encodeURIComponent(waypoints)}`;\n  return url;\n}'''
           new = '''function routeUrl(){\n  if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';\n  const mobile=window.matchMedia('(max-width: 800px)').matches;\n  const start=mobile?Math.min(nightIndex,Math.max(routeStops.length-1,0)):0;\n  const stops=mobile?routeStops.slice(start,start+4):routeStops;\n  const destination=`${stops[stops.length-1].lat},${stops[stops.length-1].lng}`;\n  const waypoints=stops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');\n  let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(travelMode)}`;\n  if(waypoints)url+=`&waypoints=${encodeURIComponent(waypoints)}`;\n  return url;\n}'''
           if old not in text:
               raise SystemExit('routeUrl block not found')
           text = text.replace(old, new)
-
           js.write_text(text)
 
           Path('.github/workflows/repair-site.yml').unlink()
