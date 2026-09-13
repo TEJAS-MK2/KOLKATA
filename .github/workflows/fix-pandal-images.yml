@@ -1,0 +1,63 @@
+name: Repair pandal image sources
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/fix-pandal-images.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair known archive image sources
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('script.js')
+          s = p.read_text(encoding='utf-8')
+          old_bag = "https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A5%81%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A5%82.jpg"
+          new_bag = "https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg"
+          old_santosh = "https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_04.jpg"
+          new_santosh = "https://commons.wikimedia.org/wiki/Special:FilePath/Santosh_Mitra_square_Durga_Puja_2025_01.jpg"
+          if old_bag not in s:
+              # Also cover the exact malformed source currently present.
+              import re
+              s = re.sub(r"https://commons\.wikimedia\.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%B0_[^']+", new_bag, s, count=1)
+          else:
+              s = s.replace(old_bag, new_bag, 1)
+          # Only replace the image attached to Santosh Mitra Square, not other entries.
+          marker = "{name:'Santosh Mitra Square'"
+          start = s.find(marker)
+          if start >= 0:
+              end = s.find("},", start)
+              chunk = s[start:end if end >= 0 else len(s)]
+              chunk = chunk.replace(old_santosh, new_santosh)
+              s = s[:start] + chunk + s[end if end >= 0 else len(s):]
+          p.write_text(s, encoding='utf-8')
+          PY
+          grep -n "Bagbazar Sarbojanin\|Santosh Mitra Square" script.js
+          if grep -q "Kumartoli_Park_in_Kolkata_04.jpg" script.js; then
+            echo 'ERROR: stale Santosh image reference remains'
+            exit 1
+          fi
+      - name: Commit repair
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add script.js
+          git commit -m 'Repair pandal archive image sources' || exit 0
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        shell: bash
+        run: |
+          git rm .github/workflows/fix-pandal-images.yml
+          git commit -m 'Remove temporary image repair workflow'
+          git push
