@@ -47,14 +47,27 @@ jobs:
           for old,new in replacements.items():
               s=s.replace(old,new)
           p.write_text(s)
+          p=Path('styles.css')
+          s=p.read_text()
+          replacements={
+            "https://images.unsplash.com/photo-1605537964076-3cb0ea3c7c5a?auto=format&fit=crop&w=2200&q=85":"var(--hero-puja)",
+            "https://images.unsplash.com/photo-1597045566677-8cf032ed6634?auto=format&fit=crop&w=1400&q=85":"var(--culture-puja)",
+            "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=85":"var(--gallery-1)",
+            "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1000&q=85":"var(--gallery-2)",
+            "https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?auto=format&fit=crop&w=900&q=85":"var(--gallery-3)",
+            "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=85":"var(--gallery-4)"
+          }
+          for old,new in replacements.items():
+              s=s.replace(old,new)
+          p.write_text(s)
           PY
-          if grep -RniE 'taj mahal|images\.unsplash\.com/photo-1605537964076-3cb0ea3c7c5a|images\.unsplash\.com/photo-1597045566677-8cf032ed6634|images\.unsplash\.com/photo-1548013146-72479768bada|images\.unsplash\.com/photo-1539650116574-75c0c6d73f6e|images\.unsplash\.com/photo-1518709594023-6eab9bab7b23|images\.unsplash\.com/photo-1500534623283-312aade485b7|images\.unsplash\.com/photo-1602774895192-7f4d5c8f8f4a' -- *.html *.css *.js; then
-            echo 'Known unrelated imagery remains in source.'
+          if grep -RniE 'images\.unsplash\.com|taj mahal' -- *.html *.css *.js; then
+            echo 'Unrelated stock imagery remains in source.'
             exit 1
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html script.js puja-assets.css
+          git add index.html script.js styles.css puja-assets.css
           git diff --cached --quiet || git commit -m 'Use Kolkata Durga Puja imagery throughout site'
           git push
       - name: Remove temporary workflow
