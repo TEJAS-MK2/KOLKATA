@@ -14,6 +14,7 @@
     'Naktala Udayan Sangha':'A neighbourhood favourite in Naktala, suited to visitors who want to explore beyond the central headline pandals.'
   };
   function findPandal(name){return window.pandals?.find?.(p=>p.name===name)||null;}
+  function focusables(){return [...modal.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);}
   function openDetails(p){
     if(!p)return; current=p; previousFocus=document.activeElement;
     image.src=p.photo; image.alt=`Archive photo associated with ${p.name}`; image.onerror=()=>{image.removeAttribute('src');image.alt='Archive image unavailable';};
@@ -29,5 +30,14 @@
     if(e.target.matches?.('[data-details-close]'))closeDetails();
   });
   route?.addEventListener('click',()=>{if(!current)return; if(window.addToRoute){window.addToRoute(current); route.textContent='Added ✓'; route.disabled=true;}});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeDetails();});
+  document.addEventListener('keydown',e=>{
+    if(modal.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();closeDetails();return;}
+    if(e.key==='Tab'){
+      const items=focusables();if(!items.length)return;
+      const first=items[0],last=items[items.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+    }
+  });
 })();
