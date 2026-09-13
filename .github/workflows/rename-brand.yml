@@ -1,0 +1,44 @@
+name: Rename KOLKATA branding
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  rename:
+    if: github.event.head_commit.message != 'Rename KOLKATA branding'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Update branding
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          replacements = {
+              'SHARODOTSAV 2026': 'কলকাতা দুর্গাপূজা',
+              '04 / CITY GUIDE': '04 / কলকাতা দুর্গাপূজা',
+              'KOLKATA — Durga Puja 2026': 'কলকাতা দুর্গাপূজা — ২০২৬',
+          }
+          for old, new in replacements.items():
+              s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Rename KOLKATA branding'
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          git rm -f .github/workflows/rename-brand.yml || true
+          git diff --cached --quiet || git commit -m 'Remove temporary branding workflow'
+          git push || true
