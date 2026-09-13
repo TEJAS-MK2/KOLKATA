@@ -27,3 +27,5 @@ Open `index.html` in a browser. No build step is required.
 ## GitHub Pages
 
 This is a static site and is deployed automatically to GitHub Pages from the `main` branch.
+
+<!-- Verified Pages build: 2026-09-13 -->
