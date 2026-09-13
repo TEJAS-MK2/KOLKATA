@@ -30,63 +30,29 @@
     const query = (search?.value || '').trim().toLowerCase();
     const active = document.querySelector('#pandal-filters .filter-btn.active')?.dataset.zone || 'all';
     const visible = items.filter(p => (active === 'all' || p.zone === active) && (!query || `${p.name} ${p.area} ${p.zone}`.toLowerCase().includes(query)));
-
     let count = document.querySelector('#pandal-result-count');
-    if (!count) {
-      count = document.createElement('p');
-      count.id = 'pandal-result-count';
-      count.className = 'catalog-count';
-      list.parentNode.insertBefore(count, list);
-    }
+    if (!count) { count = document.createElement('p'); count.id = 'pandal-result-count'; count.className = 'catalog-count'; list.parentNode.insertBefore(count, list); }
     count.textContent = `${visible.length} pandals in the discovery catalog · ${visible.filter(p => p.lat && p.lng).length} verified map pins`;
-
     list.innerHTML = visible.length ? visible.map(p => {
       const pin = Boolean(p.lat && p.lng);
       const image = p.photo ? `<img src="${escapeHtml(p.photo)}" alt="Archive photo associated with ${escapeHtml(p.name)}" loading="lazy" onerror="this.remove()">` : '';
-      return `<article class="pandal-card catalog-card" data-name="${escapeHtml(p.name)}" tabindex="0" aria-label="Explore ${escapeHtml(p.name)}">
-        ${image}<div class="pandal-card-body"><div class="pandal-meta">${escapeHtml(p.zone)} · ${escapeHtml(p.area)}</div>
-        <h3>${escapeHtml(p.name)}</h3><div class="rating">${pin ? '● Map pin verified' : '○ Discovery listing'}</div>
-        <div class="pandal-actions"><button class="catalog-map" type="button" ${pin?'':'disabled'}>${pin?'View map':'Map pin pending'}</button>
-        ${pin ? `<button class="catalog-route" type="button">Add to route +</button>` : ''}
-        <a class="route" href="${mapsSearch(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`;
+      return `<article class="pandal-card catalog-card" data-name="${escapeHtml(p.name)}" tabindex="0" aria-label="Explore ${escapeHtml(p.name)}">${image}<div class="pandal-card-body"><div class="pandal-meta">${escapeHtml(p.zone)} · ${escapeHtml(p.area)}</div><h3>${escapeHtml(p.name)}</h3><div class="rating">${pin ? '● Map pin verified' : '○ Discovery listing'}</div><div class="pandal-actions"><button class="catalog-map" type="button" ${pin?'':'disabled'}>${pin?'View map':'Map pin pending'}</button>${pin ? `<button class="catalog-route" type="button">Add to route +</button>` : ''}<a class="route" href="${mapsSearch(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`;
     }).join('') : `<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
-
-    list.querySelectorAll('.catalog-map').forEach(btn => btn.addEventListener('click', e => {
-      e.stopPropagation(); const p = items.find(x => x.name === btn.closest('.pandal-card')?.dataset.name);
-      if (p?.lat && p?.lng && window.pandals?.some(x => x.name === p.name)) {
-        const original = window.pandals.find(x => x.name === p.name);
-        document.querySelectorAll('.pandal-card').forEach(c => c.classList.toggle('selected', c.dataset.name === p.name));
-        // Use the existing, already-tested map interaction.
-        if (typeof window.selectPandal === 'function') window.selectPandal(original);
-      }
-    }));
-    list.querySelectorAll('.catalog-route').forEach(btn => btn.addEventListener('click', e => {
-      e.stopPropagation(); const p = items.find(x => x.name === btn.closest('.pandal-card')?.dataset.name);
-      const original = p && window.pandals?.find(x => x.name === p.name);
-      if (original && typeof window.addToRoute === 'function') { window.addToRoute(original); render(); }
-    }));
+    list.querySelectorAll('.catalog-map').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); const p = items.find(x => x.name === btn.closest('.pandal-card')?.dataset.name); if (p?.lat && p?.lng && window.pandals?.some(x => x.name === p.name) && typeof window.selectPandal === 'function') window.selectPandal(window.pandals.find(x => x.name === p.name)); }));
+    list.querySelectorAll('.catalog-route').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); const p = items.find(x => x.name === btn.closest('.pandal-card')?.dataset.name); const original = p && window.pandals?.find(x => x.name === p.name); if (original && typeof window.addToRoute === 'function') { window.addToRoute(original); render(); } }));
   }
 
   function bind() {
     const search = replaceWithCleanControl(document.querySelector('#pandal-search'));
     search?.addEventListener('input', render);
-    document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn => {
-      const clean = replaceWithCleanControl(btn);
-      clean.addEventListener('click', () => {
-        document.querySelectorAll('#pandal-filters .filter-btn').forEach(b => b.classList.toggle('active', b === clean));
-        render();
-      });
-    });
+    document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn => { const clean = replaceWithCleanControl(btn); clean.addEventListener('click', () => { document.querySelectorAll('#pandal-filters .filter-btn').forEach(b => b.classList.toggle('active', b === clean)); render(); }); });
     render();
   }
 
   function addCatalogNote() {
-    const explorer = document.querySelector('#pandal-list')?.closest('section,div');
     const host = document.querySelector('#pandal-list')?.parentElement;
     if (!host || document.querySelector('#catalog-verification-note')) return;
-    const note = document.createElement('div');
-    note.id = 'catalog-verification-note';
-    note.className = 'catalog-note';
+    const note = document.createElement('div'); note.id = 'catalog-verification-note'; note.className = 'catalog-note';
     note.innerHTML = '<strong>Verification-first map</strong><span>The discovery catalog is expanded from current 2026 public listings. A marker is shown only when the exact pin is already verified; we do not invent coordinates. Directions for every listing open a place search.</span>';
     host.insertBefore(note, document.querySelector('#pandal-list'));
   }
@@ -94,8 +60,7 @@
   function addLatest2026Note() {
     const section = document.querySelector('#puja-2026-info');
     if (!section || document.querySelector('#latest-2026-note')) return;
-    const box = document.createElement('div');
-    box.id = 'latest-2026-note'; box.className = 'latest-2026-note';
+    const box = document.createElement('div'); box.id = 'latest-2026-note'; box.className = 'latest-2026-note';
     box.innerHTML = '<strong>Latest 2026 update</strong><p>West Bengal has announced a ₹1 lakh grant for small/low-budget committees, free electricity and fire-licence fee waiver, with DJ use prohibited during Puja and immersion. A grand Mahalaya programme at Eden Gardens has also been reported for 10 October; its programme details remain subject to changes.</p><small>Government of West Bengal · Indian Express, September 2026</small>';
     section.appendChild(box);
   }
@@ -104,6 +69,6 @@
   style.textContent = `.catalog-count{margin:0 0 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.58}.catalog-note{display:grid;gap:5px;margin:0 0 14px;padding:12px 14px;border:1px solid rgba(243,234,217,.14);border-radius:14px;background:rgba(243,234,217,.035);font-size:11px}.catalog-note strong{font-size:12px}.catalog-note span{opacity:.62;line-height:1.5}.catalog-card .pandal-card-body{min-height:145px}.catalog-card:not(:has(img)){min-height:220px}.catalog-map:disabled{opacity:.45;cursor:not-allowed}.latest-2026-note{margin-top:18px;padding:16px;border:1px solid rgba(216,173,98,.35);border-radius:14px;background:rgba(216,173,98,.07)}.latest-2026-note strong{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase}.latest-2026-note p{margin:8px 0;font-size:13px;line-height:1.6}.latest-2026-note small{opacity:.55}`;
   document.head.appendChild(style);
 
-  const boot = () => { addCatalogNote(); addLatest2026Note(); bind(); };
+  const boot = () => { addCatalogNote(); addLatest2026Note(); setTimeout(bind, 1200); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true}); else boot();
 })();
