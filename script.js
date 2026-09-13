@@ -27,7 +27,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener(
 }));
 
 const pandals = [
-  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg',rating:4.8},
+  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A4%82.jpg',rating:4.8},
   {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.59913,lng:88.36157,tag:'Artisan quarter',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg',rating:0},
   {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Kumartuli%2C_Kolkata.jpg',rating:0},
   {name:'College Square',zone:'Central',area:'College Street',lat:22.57453,lng:88.36447,tag:'Central Kolkata',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg',rating:4.9},
@@ -53,8 +53,11 @@ function addToRoute(p){if(!p||isInRoute(p)||routeStops.length>=routeMax)return;r
 function removeFromRoute(name){routeStops=routeStops.filter(p=>p.name!==name);completedStops.delete(name);nightIndex=Math.min(nightIndex,Math.max(routeStops.length-1,0));persistNight();renderRoute();renderNightMode();}
 function routeUrl(){
   if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';
-  const destination=`${routeStops[routeStops.length-1].lat},${routeStops[routeStops.length-1].lng}`;
-  const waypoints=routeStops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');
+  const mobile=window.matchMedia('(max-width: 800px)').matches;
+  const start=mobile?Math.min(nightIndex,Math.max(routeStops.length-1,0)):0;
+  const stops=mobile?routeStops.slice(start,start+4):routeStops;
+  const destination=`${stops[stops.length-1].lat},${stops[stops.length-1].lng}`;
+  const waypoints=stops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');
   let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(travelMode)}`;
   if(waypoints)url+=`&waypoints=${encodeURIComponent(waypoints)}`;
   return url;
