@@ -2,11 +2,12 @@ const header = document.querySelector('.site-header');
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
-  header.style.background = y > 40 ? 'rgba(18,10,8,.82)' : 'transparent';
-  header.style.backdropFilter = y > 40 ? 'blur(14px)' : 'none';
-  header.style.transition = 'background .25s ease, backdrop-filter .25s ease';
+  if (header) {
+    header.classList.toggle('is-scrolled', y > 40);
+    header.style.transition = 'background .25s ease, box-shadow .25s ease';
+  }
   const hero = document.querySelector('.hero-image');
-  if (hero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) hero.style.transform = `translateY(${Math.min(y * 0.16, 90)}px) scale(1.04)`;
+  if (hero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) hero.style.transform = `translateY(${Math.min(y * 0.08, 50)}px) scale(1.02)`;
 }, { passive: true });
 
 const nav = document.querySelector('nav');
