@@ -27,7 +27,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener(
 }));
 
 const pandals = [
-  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A6%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A5%AE.jpg',rating:4.8},
+  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A6%AC_%E0%A5%A8%E0%A5%A6%E0%A1%A8%E0%A1%A8.jpg',rating:4.8},
   {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.59913,lng:88.36157,tag:'Artisan quarter',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg',rating:0},
   {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Kumartuli%2C_Kolkata.jpg',rating:0},
   {name:'College Square',zone:'Central',area:'College Street',lat:22.57453,lng:88.36447,tag:'Central Kolkata',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg',rating:4.9},
@@ -68,6 +68,7 @@ function renderRoute(){
   wrap?.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>removeFromRoute(btn.dataset.remove)));
   updateRouteLink();
   document.querySelectorAll('.add-route').forEach(btn=>{const p=pandals.find(x=>x.name===btn.dataset.name);const added=isInRoute(p);btn.textContent=added?'Added ✓':(routeStops.length>=routeMax?'Route full':'Add to route +');btn.disabled=added||routeStops.length>=routeMax;});
+  refreshRouteIntelligence();
 }
 function renderPandalExplorer(){
   const list=document.querySelector('#pandal-list');if(!list)return;const items=filteredPandals();
@@ -80,7 +81,7 @@ function initMap(){if(!window.L||!document.querySelector('#pandal-map'))return;m
 
 document.querySelector('#pandal-search')?.addEventListener('input',renderPandalExplorer);
 document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn=>btn.addEventListener('click',()=>{activeZone=btn.dataset.zone;document.querySelectorAll('#pandal-filters .filter-btn').forEach(b=>b.classList.toggle('active',b===btn));renderPandalExplorer();}));
-document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>{travelMode=btn.dataset.mode;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b===btn));updateRouteLink();renderNightMode();}));
+document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>{travelMode=btn.dataset.mode;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b===btn));updateRouteLink();renderNightMode();refreshRouteIntelligence();}));
 document.querySelector('#clear-route')?.addEventListener('click',()=>{routeStops=[];completedStops.clear();nightIndex=0;persistNight();renderRoute();renderPandalExplorer();renderNightMode();});
 
 function renderNightMode(){
@@ -98,6 +99,7 @@ function renderNightMode(){
   if(prev)prev.disabled=nightIndex===0;
   if(next)next.textContent=nightIndex===total-1?'Finish stop ✓':'Next stop →';
   if(directions)directions.href=singleDirectionsUrl(current);
+  refreshRouteIntelligence();
 }
 function openNightMode(){const panel=document.querySelector('#night-mode');if(!panel)return;panel.classList.remove('hidden');renderNightMode();panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function closeNightMode(){document.querySelector('#night-mode')?.classList.add('hidden');}
@@ -111,8 +113,17 @@ document.querySelector('#night-reset')?.addEventListener('click',()=>{completedS
 
 function initLightbox(){const box=document.querySelector('#lightbox'),image=document.querySelector('#lightbox-image');const close=()=>box?.classList.remove('open');document.querySelectorAll('.gallery-grid .tile').forEach(tile=>tile.addEventListener('click',()=>{const bg=getComputedStyle(tile).backgroundImage,match=bg.match(/url\(["']?(.*?)["']?\)/);if(!match)return;image.src=match[1];box.classList.add('open');}));document.querySelector('#lightbox-close')?.addEventListener('click',close);box?.addEventListener('click',e=>{if(e.target===box)close();});document.addEventListener('keydown',e=>{if(e.key==='Escape'){close();closeNightMode();}});}
 
+const routeModeConfig={walking:{label:'Walk',speed:4.5,roadFactor:1.28},driving:{label:'Drive',speed:22,roadFactor:1.18},transit:{label:'Transit',speed:16,roadFactor:1.22},'two-wheeler':{label:'Two-wheeler',speed:25,roadFactor:1.18}};
+function routeDistance(a,b){const R=6371,rad=Math.PI/180,dLat=(b.lat-a.lat)*rad,dLon=(b.lng-a.lng)*rad,x=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+function routeEstimate(stops=routeStops){if(stops.length<2)return{distance:0,minutes:0};const mode=routeModeConfig[travelMode]||routeModeConfig.walking;let distance=0;for(let i=1;i<stops.length;i++)distance+=routeDistance(stops[i-1],stops[i])*mode.roadFactor;return{distance,minutes:distance/mode.speed*60};}
+function formatRouteDistance(km){return km<1?`${Math.round(km*1000)} m`:`${km.toFixed(1)} km`;}
+function formatRouteTime(mins){if(!mins)return'—';const m=Math.max(1,Math.round(mins));return m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;}
+function ensureRouteIntelligence(){const planner=document.querySelector('#route-planner');if(!planner||document.querySelector('#route-intelligence'))return;const style=document.createElement('style');style.textContent=`.route-intelligence{margin:0 0 15px;padding:14px;border:1px solid rgba(243,234,217,.12);border-radius:15px;background:rgba(8,5,4,.16)}.route-intel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.route-intel-stat{padding:10px 12px;border-radius:11px;background:rgba(243,234,217,.045)}.route-intel-stat strong{display:block;font:600 19px/1.1 'Playfair Display',serif}.route-intel-stat span{display:block;margin-top:4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.52}.route-intel-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap}.optimize-route{border:1px solid rgba(243,234,217,.2);background:#f3ead9;color:#140c0a;border-radius:999px;padding:9px 13px;font:inherit;font-size:12px;cursor:pointer}.route-intel-note{font-size:10px!important;opacity:.45!important;margin:0!important}.route-stop-distance{display:block;margin-top:3px;font-size:10px;opacity:.48}.route-stop.next-stop{border-color:rgba(243,234,217,.38)}@media(max-width:800px){.route-intel-grid{grid-template-columns:1fr 1fr}.route-intel-stat:last-child{grid-column:1/-1}}`;document.head.appendChild(style);const intel=document.createElement('div');intel.id='route-intelligence';intel.className='route-intelligence';intel.innerHTML=`<div class="route-intel-grid"><div class="route-intel-stat"><strong id="route-distance">—</strong><span>estimated distance</span></div><div class="route-intel-stat"><strong id="route-time">—</strong><span>travel time</span></div><div class="route-intel-stat"><strong id="route-mode-label">Walk</strong><span>travel mode</span></div></div><div class="route-intel-actions"><button id="optimize-route" class="optimize-route" type="button">Optimize stop order ↗</button><p class="route-intel-note">Approximate city travel estimate, not live traffic.</p></div>`;planner.insertBefore(intel,planner.querySelector('#route-stops'));intel.querySelector('#optimize-route').addEventListener('click',optimizeRoute);}
+function refreshRouteIntelligence(){ensureRouteIntelligence();const {distance,minutes}=routeEstimate();const d=document.querySelector('#route-distance'),t=document.querySelector('#route-time'),m=document.querySelector('#route-mode-label');if(d)d.textContent=formatRouteDistance(distance);if(t)t.textContent=formatRouteTime(minutes);if(m)m.textContent=(routeModeConfig[travelMode]||routeModeConfig.walking).label;document.querySelectorAll('.route-stop').forEach((card,i)=>{card.classList.toggle('next-stop',i===nightIndex);card.querySelector('.route-stop-distance')?.remove();if(i>0){const leg=routeDistance(routeStops[i-1],routeStops[i])*(routeModeConfig[travelMode]||routeModeConfig.walking).roadFactor;const body=card.querySelector('div:nth-child(2)');if(body){const detail=document.createElement('span');detail.className='route-stop-distance';detail.textContent=`≈ ${formatRouteDistance(leg)} from previous stop`;body.appendChild(detail);}}});}
+function optimizeRoute(){if(routeStops.length<3)return;const remaining=routeStops.slice(1),ordered=[routeStops[0]];while(remaining.length){const last=ordered[ordered.length-1];let best=0,dist=Infinity;remaining.forEach((candidate,i)=>{const d=routeDistance(last,candidate);if(d<dist){dist=d;best=i;}});ordered.push(remaining.splice(best,1)[0]);}routeStops.splice(0,routeStops.length,...ordered);persistNight();renderRoute();renderPandalExplorer();renderNightMode();}
+
 window.addEventListener('load',()=>{
-  initMap();renderPandalExplorer();renderRoute();renderNightMode();initLightbox();
+  initMap();renderPandalExplorer();renderRoute();renderNightMode();initLightbox();refreshRouteIntelligence();
   if(!window.anime||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   anime({targets:'.hero-content .eyebrow,.hero-content h1,.hero-copy,.hero-actions',opacity:[0,1],translateY:[28,0],duration:1100,delay:anime.stagger(140),easing:'easeOutExpo'});
   anime({targets:'.hero-mark',opacity:[0,.8],scale:[.7,1],rotate:[-8,0],duration:1400,delay:650,easing:'easeOutElastic(1,.65)'});
