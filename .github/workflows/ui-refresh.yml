@@ -1,10 +1,13 @@
 name: UI refresh
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   update:
+    if: github.event.head_commit.message != 'Apply product UI refresh'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +27,8 @@ jobs:
           css='''
     /* Product UI refresh. Navigation labels intentionally remain English. */
     :root{--paper:#f6f2eb;--paper2:#eee8de;--ink:#171513;--muted:#6f6961;--line:#d9d1c5;--accent:#b73524}
-    body{background:var(--paper);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}
-    .grain{display:none!important}.site-header{position:sticky!important;top:0;z-index:100;background:rgba(246,242,235,.95)!important;color:var(--ink)!important;border-bottom:1px solid var(--line)!important;backdrop-filter:blur(14px);padding:14px clamp(18px,4vw,52px)!important}.brand{color:var(--ink)!important}.brand span{font-family:'Noto Serif Bengali',serif!important;font-size:21px!important;letter-spacing:0!important}.brand small{color:var(--muted)!important}.site-header nav a{color:var(--ink)!important;font-size:13px!important;font-weight:600!important}.site-header nav a:hover{color:var(--accent)!important}.menu span{background:var(--ink)!important}
+    body{background:var(--paper);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}.grain{display:none!important}
+    .site-header{position:sticky!important;top:0;z-index:100;background:rgba(246,242,235,.95)!important;color:var(--ink)!important;border-bottom:1px solid var(--line)!important;backdrop-filter:blur(14px);padding:14px clamp(18px,4vw,52px)!important}.brand{color:var(--ink)!important}.brand span{font-family:'Noto Serif Bengali',serif!important;font-size:21px!important;letter-spacing:0!important}.brand small{color:var(--muted)!important}.site-header nav a{color:var(--ink)!important;font-size:13px!important;font-weight:600!important}.site-header nav a:hover{color:var(--accent)!important}.menu span{background:var(--ink)!important}
     .hero{min-height:min(700px,78vh)!important;border-radius:0!important;align-items:flex-end!important}.hero-image{filter:saturate(.7)!important}.hero-overlay{background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.78))!important}.hero-content{max-width:900px!important;padding:clamp(28px,6vw,72px)!important}.hero-content h1{font-family:'Noto Serif Bengali',serif!important;font-size:clamp(54px,9vw,108px)!important;line-height:.94!important;letter-spacing:-.04em!important}.hero-content h1 em{font-style:normal!important;color:#f2dfb7!important}.hero-copy{max-width:500px!important;font-size:16px!important;line-height:1.6!important}.button.primary{background:#fff!important;color:var(--ink)!important;border-radius:9px!important}.scroll-note,.hero-mark{display:none!important}
     .section{padding:clamp(58px,8vw,100px) clamp(18px,5vw,64px)!important;max-width:1320px;margin:auto}.section-label{color:var(--accent)!important;font-weight:700!important;letter-spacing:.14em!important}.intro h2,.timeline h2,.guide h2{font-family:'DM Sans',sans-serif!important;font-weight:700!important;letter-spacing:-.045em!important;font-size:clamp(38px,5vw,64px)!important;line-height:.98!important}.intro h2 span,.timeline h2 i,.guide h2 i{font-family:'Noto Serif Bengali',serif!important;color:var(--accent)!important}.intro-text p,.timeline-head p,.guide-head p{color:var(--muted)!important;line-height:1.7!important}.stats{border-color:var(--line)!important}.stats div{border-color:var(--line)!important}.stats strong{color:var(--ink)!important}
     .days{gap:0!important;border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;background:#fff!important}.days article{padding:24px!important;border-color:var(--line)!important}.days article:hover{background:var(--paper2)!important}.days small{color:var(--accent)!important}
