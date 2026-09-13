@@ -25,6 +25,22 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Prepare site
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+from pathlib import Path
+p = Path('index.html')
+s = p.read_text()
+tag = '<script src="intro-upgrade.js" defer></script>'
+if tag not in s:
+    needle = '</body>'
+    if needle not in s:
+        raise SystemExit('index.html is missing its closing body tag')
+    s = s.replace(needle, f'  {tag}\n{needle}', 1)
+    p.write_text(s)
+PY
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
