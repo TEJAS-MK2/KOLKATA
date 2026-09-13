@@ -1,20 +1,16 @@
 name: Verified Puja Explorer Polish
-
 on:
   push:
     paths:
       - '.github/workflows/polish-explorer.yml'
   workflow_dispatch:
-
 permissions:
   contents: write
   pages: write
   id-token: write
-
 concurrency:
   group: polish-explorer
   cancel-in-progress: true
-
 jobs:
   polish-and-deploy:
     runs-on: ubuntu-latest
@@ -23,104 +19,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Patch and validate
         shell: bash
         run: |
           python3 <<'PY'
           from pathlib import Path
-          import re
-
-          script = Path('script.js').read_text()
-          original = script
-
-          # Replace the known malformed Bagbazar asset by matching the pandal record itself.
-          script, count = re.subn(
-              r"(name:'Bagbazar Sarbojanin'.*?photo:')[^']*('",
-              r"\1https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg\2",
-              script,
-              count=1,
-              flags=re.S,
-          )
-          if count != 1:
-              raise SystemExit('Could not locate the Bagbazar pandal photo field')
-
-          # Give Leaflet markers stable titles so Explorer filtering can also filter the map.
-          script = script.replace(
-              "L.marker([p.lat,p.lng]).addTo(map)",
-              "L.marker([p.lat,p.lng],{title:p.name,alt:p.name}).addTo(map)",
-              1,
-          )
-          if "L.marker([p.lat,p.lng],{title:p.name,alt:p.name})" not in script:
-              raise SystemExit('Leaflet marker patch was not applied')
-
+          script=Path('script.js').read_text()
+          old="https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A5%8D%E0%A4%97%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A5%82.jpg"
+          new="https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg"
+          if old not in script: raise SystemExit('Verified old Bagbazar URL not found')
+          script=script.replace(old,new,1)
+          marker_old="L.marker([p.lat,p.lng]).addTo(map)"
+          marker_new="L.marker([p.lat,p.lng],{title:p.name,alt:p.name}).addTo(map)"
+          if marker_old in script: script=script.replace(marker_old,marker_new,1)
+          elif marker_new not in script: raise SystemExit('Leaflet marker expression not found')
           Path('script.js').write_text(script)
 
-          css = Path('details.css').read_text()
-          css += r'''
-
-          /* Mobile-first details sheet and Explorer polish. */
-          @media(max-width:700px){
-            .pandal-details{padding:0;align-items:end}
-            .pandal-details-dialog{width:100%;max-height:92vh;border-radius:22px 22px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.28);animation:detailsSheetIn .24s ease-out}
-            .pandal-details-media,.pandal-details-media img{height:210px;min-height:210px}
-            .pandal-details-content{padding:22px 20px 28px}
-            .pandal-details-content h2{font-size:38px}
-            .pandal-details-close{right:12px;top:12px}
-          }
-          @keyframes detailsSheetIn{from{transform:translateY(18px);opacity:.85}to{transform:translateY(0);opacity:1}}
-          @media(prefers-reduced-motion:reduce){.pandal-details-dialog{animation:none}}
-          '''
+          css=Path('details.css').read_text()
+          if 'detailsSheetIn' not in css:
+            css += '''\n\n@media(max-width:700px){.pandal-details{padding:0;align-items:end}.pandal-details-dialog{width:100%;max-height:92vh;border-radius:22px 22px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.28);animation:detailsSheetIn .24s ease-out}.pandal-details-media,.pandal-details-media img{height:210px;min-height:210px}.pandal-details-content{padding:22px 20px 28px}.pandal-details-content h2{font-size:38px}.pandal-details-close{right:12px;top:12px}}@keyframes detailsSheetIn{from{transform:translateY(18px);opacity:.85}to{transform:translateY(0);opacity:1}}@media(prefers-reduced-motion:reduce){.pandal-details-dialog{animation:none}}\n'''
           Path('details.css').write_text(css)
 
-          details = Path('details.js').read_text()
-          enhancement = r'''
-
-          // Explorer UX layer: keep filters, map markers and Directions links in sync.
-          (()=>{
-            const list=document.querySelector('#pandal-list');
-            const mapHost=document.querySelector('#pandal-map');
-            if(!list)return;
-            const sync=()=>{
-              const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));
-              document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{
-                const name=icon.getAttribute('title')||icon.getAttribute('alt');
-                if(name)icon.style.display=visible.has(name)?'':'none';
-              });
-              const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';
-              list.querySelectorAll('.pandal-card').forEach(card=>{
-                const p=window.pandals?.find?.(x=>x.name===card.dataset.name);
-                const link=card.querySelector('.route');
-                if(p&&link)link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;
-              });
-              let status=document.querySelector('.explorer-status');
-              if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}
-              const count=list.querySelectorAll('.pandal-card').length;
-              status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;
-            };
-            new MutationObserver(sync).observe(list,{childList:true});
-            document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));
-            setTimeout(sync,80);
-            if(mapHost)new MutationObserver(sync).observe(mapHost,{childList:true,subtree:true});
-          })();
-          '''
-          if 'Explorer UX layer: keep filters, map markers and Directions links in sync.' not in details:
-              details += enhancement
+          details=Path('details.js').read_text()
+          marker='// Explorer UX layer: keep filters, map markers and Directions links in sync.'
+          if marker not in details:
+            details += '''\n\n// Explorer UX layer: keep filters, map markers and Directions links in sync.\n(()=>{\n  const list=document.querySelector('#pandal-list');\n  if(!list)return;\n  const sync=()=>{\n    const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));\n    document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{const name=icon.getAttribute('title')||icon.getAttribute('alt');if(name)icon.style.display=visible.has(name)?'':'none';});\n    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';\n    list.querySelectorAll('.pandal-card').forEach(card=>{const p=window.pandals?.find?.(x=>x.name===card.dataset.name),link=card.querySelector('.route');if(p&&link)link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;});\n    let status=document.querySelector('.explorer-status');if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}\n    const count=list.querySelectorAll('.pandal-card').length;status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;\n  };\n  new MutationObserver(sync).observe(list,{childList:true});\n  document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));\n  setTimeout(sync,80);\n})();\n'''
           Path('details.js').write_text(details)
 
-          # Keep the public HTML language declaration appropriate for the site's English UI/Bengali branding.
-          index = Path('index.html').read_text()
-          index = index.replace('<html lang="en">','<html lang="en-IN">',1)
+          index=Path('index.html').read_text().replace('<html lang="en">','<html lang="en-IN">',1)
           Path('index.html').write_text(index)
           PY
-
           node --check script.js
           node --check details.js
           grep -q 'Bagbazar_Sarbojonin_Durgotsov.jpg' script.js
           grep -q 'title:p.name,alt:p.name' script.js
           grep -q 'Explorer UX layer' details.js
           grep -q '<html lang="en-IN">' index.html
-
       - name: Commit site changes
         shell: bash
         run: |
@@ -132,15 +66,12 @@ jobs:
           git rm .github/workflows/polish-explorer.yml
           git commit -m 'Remove temporary polish workflow'
           git push
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
