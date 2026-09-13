@@ -1,6 +1,8 @@
 name: Install intro animation upgrade
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
