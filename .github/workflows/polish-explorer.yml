@@ -1,0 +1,146 @@
+name: Verified Puja Explorer Polish
+
+on:
+  push:
+    paths:
+      - '.github/workflows/polish-explorer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: polish-explorer
+  cancel-in-progress: true
+
+jobs:
+  polish-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Patch and validate
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          script = Path('script.js').read_text()
+          original = script
+
+          # Replace the known malformed Bagbazar asset by matching the pandal record itself.
+          script, count = re.subn(
+              r"(name:'Bagbazar Sarbojanin'.*?photo:')[^']*('",
+              r"\1https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg\2",
+              script,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit('Could not locate the Bagbazar pandal photo field')
+
+          # Give Leaflet markers stable titles so Explorer filtering can also filter the map.
+          script = script.replace(
+              "L.marker([p.lat,p.lng]).addTo(map)",
+              "L.marker([p.lat,p.lng],{title:p.name,alt:p.name}).addTo(map)",
+              1,
+          )
+          if "L.marker([p.lat,p.lng],{title:p.name,alt:p.name})" not in script:
+              raise SystemExit('Leaflet marker patch was not applied')
+
+          Path('script.js').write_text(script)
+
+          css = Path('details.css').read_text()
+          css += r'''
+
+          /* Mobile-first details sheet and Explorer polish. */
+          @media(max-width:700px){
+            .pandal-details{padding:0;align-items:end}
+            .pandal-details-dialog{width:100%;max-height:92vh;border-radius:22px 22px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.28);animation:detailsSheetIn .24s ease-out}
+            .pandal-details-media,.pandal-details-media img{height:210px;min-height:210px}
+            .pandal-details-content{padding:22px 20px 28px}
+            .pandal-details-content h2{font-size:38px}
+            .pandal-details-close{right:12px;top:12px}
+          }
+          @keyframes detailsSheetIn{from{transform:translateY(18px);opacity:.85}to{transform:translateY(0);opacity:1}}
+          @media(prefers-reduced-motion:reduce){.pandal-details-dialog{animation:none}}
+          '''
+          Path('details.css').write_text(css)
+
+          details = Path('details.js').read_text()
+          enhancement = r'''
+
+          // Explorer UX layer: keep filters, map markers and Directions links in sync.
+          (()=>{
+            const list=document.querySelector('#pandal-list');
+            const mapHost=document.querySelector('#pandal-map');
+            if(!list)return;
+            const sync=()=>{
+              const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));
+              document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{
+                const name=icon.getAttribute('title')||icon.getAttribute('alt');
+                if(name)icon.style.display=visible.has(name)?'':'none';
+              });
+              const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';
+              list.querySelectorAll('.pandal-card').forEach(card=>{
+                const p=window.pandals?.find?.(x=>x.name===card.dataset.name);
+                const link=card.querySelector('.route');
+                if(p&&link)link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;
+              });
+              let status=document.querySelector('.explorer-status');
+              if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}
+              const count=list.querySelectorAll('.pandal-card').length;
+              status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;
+            };
+            new MutationObserver(sync).observe(list,{childList:true});
+            document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));
+            setTimeout(sync,80);
+            if(mapHost)new MutationObserver(sync).observe(mapHost,{childList:true,subtree:true});
+          })();
+          '''
+          if 'Explorer UX layer: keep filters, map markers and Directions links in sync.' not in details:
+              details += enhancement
+          Path('details.js').write_text(details)
+
+          # Keep the public HTML language declaration appropriate for the site's English UI/Bengali branding.
+          index = Path('index.html').read_text()
+          index = index.replace('<html lang="en">','<html lang="en-IN">',1)
+          Path('index.html').write_text(index)
+          PY
+
+          node --check script.js
+          node --check details.js
+          grep -q 'Bagbazar_Sarbojonin_Durgotsov.jpg' script.js
+          grep -q 'title:p.name,alt:p.name' script.js
+          grep -q 'Explorer UX layer' details.js
+          grep -q '<html lang="en-IN">' index.html
+
+      - name: Commit site changes
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html script.js details.js details.css
+          git diff --cached --check
+          git commit -m 'Polish Puja Explorer and mobile UX'
+          git rm .github/workflows/polish-explorer.yml
+          git commit -m 'Remove temporary polish workflow'
+          git push
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
