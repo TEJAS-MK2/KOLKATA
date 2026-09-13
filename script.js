@@ -59,7 +59,7 @@ function removeFromRoute(name){routeStops=routeStops.filter(p=>p.name!==name);co
 
 // Google Maps Directions URLs support walking, driving, bicycling and transit.
 // Keep the site's two-wheeler option, but safely map it to driving for the external URL.
-function mapsTravelMode(){return travelMode==='two-wheeler'?'driving':travelMode;}
+function mapsTravelMode(){return travelMode;}
 function routeUrl(){
   if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';
   const mobile=window.matchMedia('(max-width: 800px)').matches;
