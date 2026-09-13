@@ -25,10 +25,14 @@ jobs:
           python3 <<'PY'
           from pathlib import Path
           script=Path('script.js').read_text()
-          old="https://commons.wikimedia.org/wiki/Special:FilePath/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A5%8D%E0%A4%97%E0%A5%8B%E0%A4%A4%E0%A5%8D%E0%A4%B8%E0%A4%AC_%E0%A5%A8%E0%A5%A6%E0%A5%A7%E0%A5%82.jpg"
+          start=script.find("name:'Bagbazar Sarbojanin'")
+          if start < 0: raise SystemExit('Bagbazar record not found')
+          photo=script.find("photo:'",start)
+          if photo < 0: raise SystemExit('Bagbazar photo field not found')
+          end=script.find("'",photo+7)
+          if end < 0: raise SystemExit('Bagbazar photo terminator not found')
           new="https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg"
-          if old not in script: raise SystemExit('Verified old Bagbazar URL not found')
-          script=script.replace(old,new,1)
+          script=script[:photo+7]+new+script[end:]
           marker_old="L.marker([p.lat,p.lng]).addTo(map)"
           marker_new="L.marker([p.lat,p.lng],{title:p.name,alt:p.name}).addTo(map)"
           if marker_old in script: script=script.replace(marker_old,marker_new,1)
@@ -45,7 +49,6 @@ jobs:
           if marker not in details:
             details += '''\n\n// Explorer UX layer: keep filters, map markers and Directions links in sync.\n(()=>{\n  const list=document.querySelector('#pandal-list');\n  if(!list)return;\n  const sync=()=>{\n    const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));\n    document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{const name=icon.getAttribute('title')||icon.getAttribute('alt');if(name)icon.style.display=visible.has(name)?'':'none';});\n    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';\n    list.querySelectorAll('.pandal-card').forEach(card=>{const p=window.pandals?.find?.(x=>x.name===card.dataset.name),link=card.querySelector('.route');if(p&&link)link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;});\n    let status=document.querySelector('.explorer-status');if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}\n    const count=list.querySelectorAll('.pandal-card').length;status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;\n  };\n  new MutationObserver(sync).observe(list,{childList:true});\n  document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));\n  setTimeout(sync,80);\n})();\n'''
           Path('details.js').write_text(details)
-
           index=Path('index.html').read_text().replace('<html lang="en">','<html lang="en-IN">',1)
           Path('index.html').write_text(index)
           PY
