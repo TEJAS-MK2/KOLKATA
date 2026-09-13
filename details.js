@@ -99,3 +99,20 @@
     }
   });
 })();
+
+// Explorer UX layer: keep filters, map markers and Directions links in sync.
+(()=>{
+  const list=document.querySelector('#pandal-list');
+  if(!list)return;
+  const sync=()=>{
+    const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));
+    document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{const name=icon.getAttribute('title')||icon.getAttribute('alt');if(name)icon.style.display=visible.has(name)?'':'none';});
+    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||'walking';
+    list.querySelectorAll('.pandal-card').forEach(card=>{const p=window.pandals?.find?.(x=>x.name===card.dataset.name),link=card.querySelector('.route');if(p&&link)link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;});
+    let status=document.querySelector('.explorer-status');if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}
+    const count=list.querySelectorAll('.pandal-card').length;status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;
+  };
+  new MutationObserver(sync).observe(list,{childList:true});
+  document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));
+  setTimeout(sync,80);
+})();

@@ -10,3 +10,6 @@
 .gallery .square.second{background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Nandaram_Sen_Street_in_Kolkata_07.jpg')!important}
 .pandal-card[data-name="Santosh Mitra Square"] img{content:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_04.jpg')}
 .pandal-card[data-name="Shobhabazar Rajbari"] img{content:url('https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Nandaram_Sen_Street_in_Kolkata_07.jpg')}
+
+
+@media(max-width:700px){.pandal-details{padding:0;align-items:end}.pandal-details-dialog{width:100%;max-height:92vh;border-radius:22px 22px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.28);animation:detailsSheetIn .24s ease-out}.pandal-details-media,.pandal-details-media img{height:210px;min-height:210px}.pandal-details-content{padding:22px 20px 28px}.pandal-details-content h2{font-size:38px}.pandal-details-close{right:12px;top:12px}}@keyframes detailsSheetIn{from{transform:translateY(18px);opacity:.85}to{transform:translateY(0);opacity:1}}@media(prefers-reduced-motion:reduce){.pandal-details-dialog{animation:none}}
