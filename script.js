@@ -35,15 +35,58 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
+// Curated 2026 guide data. Ratings are directory visitor ratings, not official
+// committee scores. Archive photos are explicitly dated so they cannot be
+// mistaken for 2026 photographs.
 const pandals = [
-  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.6016,lng:88.3718,tag:'Heritage favourite',photo:'https://images.unsplash.com/photo-1603899122634-f086ca5f5ddd?auto=format&fit=crop&w=900&q=80'},
-  {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.5967,lng:88.3629,tag:'Artisan quarter',photo:'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=900&q=80'},
-  {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://images.unsplash.com/photo-1606293926249-edc3d2b7a1d1?auto=format&fit=crop&w=900&q=80'},
-  {name:'College Square',zone:'Central',area:'College Street',lat:22.5733,lng:88.3654,tag:'Central Kolkata',photo:'https://images.unsplash.com/photo-1609252509105-3c0f2b2e8b2d?auto=format&fit=crop&w=900&q=80'},
-  {name:'Santosh Mitra Square',zone:'Central',area:'Sealdah',lat:22.5658,lng:88.3685,tag:'Theme-driven',photo:'https://images.unsplash.com/photo-1602774895192-7f4d5c8f8f4a?auto=format&fit=crop&w=900&q=80'},
-  {name:'Maddox Square',zone:'South',area:'Ballygunge',lat:22.5407,lng:88.3514,tag:'Classic adda',photo:'https://images.unsplash.com/photo-1604514628550-37477afdf4e3?auto=format&fit=crop&w=900&q=80'},
-  {name:'Deshapriya Park',zone:'South',area:'Deshapriya Park',lat:22.5186,lng:88.3542,tag:'South Kolkata',photo:'https://images.unsplash.com/photo-1604608672516-f1b9c5d4d1a4?auto=format&fit=crop&w=900&q=80'},
-  {name:'Naktala Udayan Sangha',zone:'South',area:'Naktala',lat:22.4643,lng:88.3715,tag:'Neighbourhood favourite',photo:'https://images.unsplash.com/photo-1609947017136-9daf32a5eb16?auto=format&fit=crop&w=900&q=80'}
+  {
+    name:'Bagbazar Sarbojanin', zone:'North', area:'Bagbazar', lat:22.60121, lng:88.36682,
+    tag:'Heritage · traditional', rating:4.8, ratingSource:'Durga Puja Kolkata directory',
+    photo:'https://upload.wikimedia.org/wikipedia/commons/e/e7/%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A6%AC_%E0%A7%A8%E0%A7%A6%E0%A7%A7%E0%A7%AE.jpg',
+    photoLabel:'Archive photo · 2018', photoSource:'https://commons.wikimedia.org/wiki/File:%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%AC%E0%A6%9C%E0%A6%BE%E0%A6%B0_%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%AC%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A8_%E0%A6%A6%E0%A7%81%E0%A6%B0%E0%A7%8D%E0%A6%97%E0%A7%8B%E0%A7%8E%E0%A6%B8%E0%A6%AC_%E0%A7%A8%E0%A7%A6%E0%A7%A7%E0%A7%AE.jpg',
+    source:'https://www.durgapujakolkata.in/paras/bagbazar-sarbojanin-durgotsav-exhibition'
+  },
+  {
+    name:'Kumartuli Park', zone:'North', area:'Kumartuli', lat:22.5967, lng:88.3629,
+    tag:'Artisan quarter',
+    photo:'https://www.durgapujopandals.com/pandals/?region=North+Kolkata', photoLabel:'Pandal directory photo', photoSource:'https://www.durgapujopandals.com/pandals/?region=North+Kolkata',
+    source:'https://www.durgapujopandals.com/pandals/?region=North+Kolkata'
+  },
+  {
+    name:'Shobhabazar Rajbari', zone:'North', area:'Shobhabazar', lat:22.5974, lng:88.3672,
+    tag:'Historic puja',
+    source:'https://www.durgapujakolkata.in/paras'
+  },
+  {
+    name:'College Square', zone:'Central', area:'College Street', lat:22.57453, lng:88.36447,
+    tag:'Lighting · waterfront', rating:4.9, ratingSource:'Durga Puja Kolkata directory',
+    photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg', photoLabel:'Archive photo · 2019', photoSource:'https://commons.wikimedia.org/wiki/File:College_square_puja.jpg',
+    source:'https://www.durgapujakolkata.in/paras/college-square-sarbojanin-durgotsab-committee'
+  },
+  {
+    name:'Santosh Mitra Square', zone:'Central', area:'Lebutala / Sealdah', lat:22.5686, lng:88.3648,
+    tag:'Theme-driven',
+    photo:'https://files.prokerala.com/news/photos/imgs/1024/durga-idol-at-santosh-mitra-square-durga-puja-910549.jpg', photoLabel:'Archive photo · 2019', photoSource:'https://www.prokerala.com/news/photos/santosh-mitra-square-durga-puja-1378507.html',
+    source:'https://www.durgapujakolkata.in/paras/santosh-mitra-square-lebutala'
+  },
+  {
+    name:'Maddox Square', zone:'South', area:'Ballygunge', lat:22.52656, lng:88.35465,
+    tag:'Classic adda',
+    photo:'https://www.flickr.com/photos/23985194%40N06/9723469757/', photoLabel:'Archive photo · 2012', photoSource:'https://www.flickr.com/photos/23985194%40N06/9723469757/',
+    source:'https://www.agamoni.in/pandals/pandal-maddox-square-durga-pujo'
+  },
+  {
+    name:'Deshapriya Park', zone:'South', area:'Kalighat', lat:22.51858, lng:88.35346,
+    tag:'Large-scale theme art',
+    photo:'https://upload.wikimedia.org/wikipedia/commons/f/fe/Durga_Puja_Pandal_-_Ballygunge_Sarbojanin_Durgotsab_-_Deshapriya_Park_-_Kolkata_2017-09-27_4501.JPG', photoLabel:'Archive photo · 2017', photoSource:'https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Ballygunge_Sarbojanin_Durgotsab_-_Deshapriya_Park_-_Kolkata_2017-09-27_4501.JPG',
+    source:'https://www.agamoni.in/pandals/pandal-deshapriya-park'
+  },
+  {
+    name:'Naktala Udayan Sangha', zone:'South', area:'Naktala', lat:22.4643, lng:88.3715,
+    tag:'Theme-based · community', rating:4.5, ratingSource:'Durga Puja Kolkata directory',
+    photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Idol_Naktala_Udayan_Sangha.jpg', photoLabel:'Archive photo · 2013', photoSource:'https://commons.wikimedia.org/wiki/File:Durga_Idol_Naktala_Udayan_Sangha.jpg',
+    source:'https://www.durgapujakolkata.in/paras/naktala-udayan-sangha'
+  }
 ];
 
 let activeZone = 'all';
@@ -51,7 +94,8 @@ let map;
 let markers = [];
 
 function renderStars(value) {
-  return `<span class="stars" aria-label="${value ? value.toFixed(1) + ' out of 5' : 'Not rated'}">${value ? '★★★★★' : '☆☆☆☆☆'}</span> ${value ? value.toFixed(1) : 'Not rated'}`;
+  if (!value) return '<span class="stars" aria-label="Not rated">☆☆☆☆☆</span> Not rated';
+  return `<span class="stars" aria-label="${value.toFixed(1)} out of 5">★★★★★</span> ${value.toFixed(1)}`;
 }
 
 function filteredPandals() {
@@ -64,7 +108,7 @@ function filteredPandals() {
 }
 
 function selectPandal(pandal) {
-  if (!map) return;
+  if (!map || !pandal) return;
   map.flyTo([pandal.lat, pandal.lng], 15, { duration: 0.7 });
   const marker = markers.find(m => m.pandal === pandal)?.marker;
   marker?.openPopup();
@@ -77,8 +121,19 @@ function renderPandalExplorer() {
   const items = filteredPandals();
   list.innerHTML = items.length ? items.map(p => `
     <article class="pandal-card" data-name="${p.name.replaceAll('"','&quot;')}" tabindex="0" aria-label="Explore ${p.name}">
-      <img src="${p.photo}" alt="Festival atmosphere near ${p.name}" loading="lazy" onerror="this.style.display='none'">
-      <div class="pandal-card-body"><div class="pandal-meta">${p.zone} · ${p.area}</div><h3>${p.name}</h3><div class="rating">${renderStars(0)}</div><div class="pandal-actions"><button class="view-map" type="button">View map</button><a class="route" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener">Directions ↗</a></div></div>
+      ${p.photo ? `<img src="${p.photo}" alt="${p.photoLabel || 'Archive photo'} of ${p.name}" loading="lazy" onerror="this.closest('.pandal-card').classList.add('no-photo');this.remove()">` : '<div class="pandal-photo-placeholder">PHOTO ARCHIVE<br><small>Not yet linked</small></div>'}
+      <div class="pandal-card-body">
+        <div class="pandal-meta">${p.zone} · ${p.area}</div>
+        <h3>${p.name}</h3>
+        <div class="rating">${renderStars(p.rating)}${p.ratingSource ? ` <small>· ${p.ratingSource}</small>` : ''}</div>
+        <div class="pandal-meta" style="margin-top:8px">${p.tag}</div>
+        <div class="pandal-actions">
+          <button class="view-map" type="button">View map</button>
+          ${p.source ? `<a href="${p.source}" target="_blank" rel="noopener">2026 details ↗</a>` : ''}
+          ${p.photoSource ? `<a href="${p.photoSource}" target="_blank" rel="noopener">Photo ↗</a>` : ''}
+          <a class="route" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener">Directions ↗</a>
+        </div>
+      </div>
     </article>`).join('') : '<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>';
 
   list.querySelectorAll('.pandal-card').forEach(card => {
