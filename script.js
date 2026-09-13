@@ -42,6 +42,11 @@ let activeZone='all', map, markers=[], routeStops=[], travelMode='walking';
 const routeMax=8;
 let nightIndex=0, completedStops=new Set();
 
+// Expose shared state for the details modal without duplicating state.
+window.pandals = pandals;
+Object.defineProperty(window, 'routeStops', { configurable: true, get: () => routeStops });
+window.addToRoute = addToRoute;
+
 try { routeStops=JSON.parse(localStorage.getItem('kolkata-pujo-route')||'[]').map(saved=>pandals.find(p=>p.name===saved.name)).filter(Boolean); } catch {}
 try { completedStops=new Set(JSON.parse(localStorage.getItem('kolkata-pujo-completed')||'[]')); } catch {}
 
