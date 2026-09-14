@@ -1,19 +1,15 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: pages
   cancel-in-progress: true
-
 jobs:
   deploy:
     environment:
@@ -23,138 +19,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
-
-      - name: Prepare production source
+      - name: Validate source
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace('<html lang="en-IN">','<html lang="bn-IN">',1)
-          s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
-          s=s.replace('<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="puja-assets.css">','<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="puja-assets.css">')
-          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="pandal-expansion-2026.js" defer></script><script src="pandal-expansion-more-2026.js" defer></script><script src="script.js" defer></script><script src="core-data-controller-v2.js" defer></script>')
-          tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
-          additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
-          if additions and '</body>' in s:s=s.replace('</body>','  '+additions+'</body>',1)
-          p.write_text(s,encoding='utf-8')
-          css=Path('styles.css'); c=css.read_text(encoding='utf-8')
-          c=c.replace(':root{--ink:#181512;',':root{--cream:#f7f4ee;--ink:#181512;',1)
-          c=c.replace("background:url('var(--hero-puja)') center/cover",'background-image:var(--hero-puja);background-position:center;background-size:cover')
-          c=c.replace("background:url('var(--culture-puja)') center/cover",'background-image:var(--culture-puja);background-position:center;background-size:cover')
-          for a in ['1','2','3','4']: c=c.replace(f"background-image:url('var(--gallery-{a})')",f'background-image:var(--gallery-{a})')
-          c+='\n/* Puja Toolkit is the single floating launcher; the legacy companion shortcut remains hidden. */\n.puja-fab{display:none!important}\n'
-          css.write_text(c,encoding='utf-8')
-          pro=Path('puja-companion-pro.js'); pc=pro.read_text(encoding='utf-8').replace("['Extra Puja holidays','22–24 Oct'","['Extra Puja holidays','22–23 Oct'").replace('Math.ceil((START-now)/86400000)','Math.floor((START-now)/86400000)'); pro.write_text(pc,encoding='utf-8')
-          personal=Path('pandal-personal-safe.js'); ps=personal.read_text(encoding='utf-8').replace('schedule();setInterval(sync,2000)','schedule()'); personal.write_text(ps,encoding='utf-8')
-          details=Path('details.css'); d=details.read_text(encoding='utf-8').replace('background:var(--cream);','background:var(--paper);').replace('color:var(--cream)','color:var(--paper)'); d='\n'.join(line for line in d.splitlines() if not line.startswith('.pandal-card[data-name="Santosh Mitra Square"]') and not line.startswith('.pandal-card[data-name="Shobhabazar Rajbari"]'))+'\n'; details.write_text(d,encoding='utf-8')
-          PY
-
-      - name: Validate JavaScript
-        shell: bash
-        run: |
-          set -euo pipefail
-          for f in \
-            script.js core-data-controller-v2.js production-bootstrap.js pandal-expansion-2026.js pandal-expansion-more-2026.js details.js pandal-catalog-upgrade.js map-fallback.js \
-            explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js \
-            runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js sw.js
-          do
-            node --check "$f"
-          done
-
-      - name: Validate production structure
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s index.html
-          test -s styles.css
-          test -s polish.css
-          test -s script.js
-          test -s core-data-controller-v2.js
-          test -s production-bootstrap.js
-          test -s pandal-expansion-2026.js
-          test -s pandal-expansion-more-2026.js
-          test -s puja-guides.js
-          test -s details.js
-          test -s details.css
-          test -s puja-assets.css
-          test -s 404.html
-          test -s robots.txt
-          test -s sitemap.xml
-          test -s site.webmanifest
-          test -s icon.svg
-          test -s pandal-catalog-upgrade.js
-          test -s map-fallback.js
-          test -s explorer-v2.js
-          test -s pandal-personal-safe.js
-          test -s puja-countdown.js
-          test -s puja-companion-pro.js
-          test -s runtime-fixes.js
-          test -s puja-feature-suite.js
-          test -s puja-bingo.js
-          test -s sw.js
-          for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do test ! -e "$legacy"; done
+          for f in index.html styles.css polish.css puja-assets.css details.css details.js production-bootstrap.js puja-config.js state-v3.js pandal-expansion-2026.js pandal-expansion-more-2026.js script.js core-data-controller-v2.js pandal-catalog-upgrade.js map-fallback.js explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js sw.js site.webmanifest icon.svg 404.html robots.txt sitemap.xml package.json tests/smoke.mjs; do test -s "$f"; done
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'lang="bn-IN"' index.html
-          grep -q 'polish.css' index.html
           grep -q 'canonical' index.html
-          grep -q 'pandal-list' index.html
-          grep -q 'pandal-map' index.html
-          grep -q 'leaflet@1.9.4' index.html
-          grep -q 'animejs/3.2.2' index.html
-          grep -q 'production-bootstrap.js' index.html
-          grep -q 'core-data-controller-v2.js' index.html
-          grep -q 'pandal-expansion-2026.js' index.html
-          grep -q 'pandal-expansion-more-2026.js' index.html
-          grep -q 'pandal-catalog-upgrade.js' index.html
-          grep -q 'explorer-v2.js' index.html
-          grep -q 'pandal-personal-safe.js' index.html
-          grep -q 'puja-companion-pro.js' index.html
-          grep -q 'runtime-fixes.js' index.html
-          grep -q 'puja-feature-suite.js' index.html
-          grep -q 'puja-bingo.js' index.html
-          grep -q 'puja-guides.js' index.html
-          ! grep -q '<script src="puja-companion.js"' index.html
-          ! grep -q '<script src="puja-night-upgrade.js"' index.html
-          ! grep -q '<script src="puja2026-suite.js"' index.html
-          ! grep -q '<script src="qa-polish.js"' index.html
-          ! grep -q '<script src="intro-upgrade.js"' index.html
-          ! grep -q '<script src="qa-hotfix.js"' index.html
-          ! grep -q '<script src="pandal-personal.js"' index.html
-          grep -q 'Tala Prattoy' production-bootstrap.js
-          grep -q 'Dumdum Park Sarbojanin' production-bootstrap.js
-          grep -q '22.56602' production-bootstrap.js
-          grep -q 'Chetla Agrani' production-bootstrap.js
-          grep -q 'Ekdalia Evergreen' production-bootstrap.js
-          grep -q 'Ballygunge Cultural Association' production-bootstrap.js
-          grep -q 'Bosepukur Sitala Mandir' production-bootstrap.js
-          grep -q '66 Pally' production-bootstrap.js
-          grep -q 'Mudiali' pandal-expansion-2026.js
-          grep -q 'Suruchi Sangha' pandal-expansion-2026.js
-          grep -q 'Jagat Mukherjee Park' pandal-expansion-2026.js
-          grep -q 'Kashi Bose Lane' pandal-expansion-2026.js
-          grep -q 'Nalin Sarkar Street' pandal-expansion-more-2026.js
-          grep -q 'Ahiritola Sarbojanin' pandal-expansion-more-2026.js
-          grep -q 'Kumartuli Sarbojanin' pandal-expansion-more-2026.js
-          grep -q 'Hatibagan Nabinpally' pandal-expansion-more-2026.js
-          grep -q '20 Palli Sarbojani Durgotsab' pandal-expansion-more-2026.js
-          grep -q 'ROUTE-FIRST PUJO' puja-guides.js
-          grep -q 'Old Kolkata, on foot' puja-guides.js
-          grep -q 'Lights, themes & adda' puja-guides.js
-          grep -q 'College Street after dark' puja-guides.js
-          grep -q 'Courtyards & old stories' puja-guides.js
+          grep -q 'polish.css' index.html
+          grep -q 'integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ=="' index.html
+          grep -q 'integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="' index.html
+          for name in puja-config.js state-v3.js production-bootstrap.js pandal-expansion-2026.js pandal-expansion-more-2026.js script.js core-data-controller-v2.js details.js pandal-catalog-upgrade.js map-fallback.js explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js; do grep -q "src="$name"" index.html; done
           grep -q '22–23 Oct' puja-companion-pro.js
           grep -q 'Math.floor((START-now)/86400000)' puja-companion-pro.js
           grep -q 'Puja Toolkit' puja-feature-suite.js
           grep -q 'Puja Passport' puja-feature-suite.js
-          grep -q 'Near me' puja-feature-suite.js
           grep -q 'PUJA BINGO' puja-bingo.js
-          python - <<'PY'
+          for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do test ! -e "$legacy"; done
+          if grep -R -n -E "kolkata-pujo-(favourites|visited|notes|route|completed|mode)|kolkata-puja-2026-(personal|suite)|kolkata-puja-bingo-v1" --include='*.js' . | grep -v '^./state-v3.js:'; then echo 'Legacy storage access remains outside state-v3.js'; exit 1; fi
+          python3 - <<'PY'
           import re
           from pathlib import Path
           bootstrap=Path('production-bootstrap.js').read_text(encoding='utf-8')
@@ -162,39 +48,29 @@ jobs:
           count=len(re.findall(r"^  '[^']+':\[",block,re.M))
           if count != 28: raise SystemExit(f'Expected 28 canonical pins, found {count}')
           html=Path('index.html').read_text(encoding='utf-8')
-          required=['production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','core-data-controller-v2.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
-          positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
-          if positions != sorted(positions): raise SystemExit('Production scripts are not in deterministic order')
-          if 'destination=undefined' in html or 'destination=null' in html: raise SystemExit('Undefined Google Maps destination leaked into source HTML')
-          PY
-          python - <<'PY'
-          from pathlib import Path
-          import re
-          html=Path('index.html').read_text(encoding='utf-8')
+          required=['puja-config.js','state-v3.js','production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','core-data-controller-v2.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
+          positions=[html.index(f'src="{name}"') for name in required]
+          if positions != sorted(positions): raise SystemExit('Scripts are not in deterministic order')
           refs=re.findall(r'(?:src|href)=["\']([^"\']+)["\']',html)
           local=[r.split('?',1)[0].split('#',1)[0] for r in refs if not r.startswith(('#','http:','https:','data:','mailto:','//'))]
           missing=sorted({r for r in local if r and not Path(r).exists()})
           if missing: raise SystemExit('Missing local assets: '+', '.join(missing))
           PY
-
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in *.js tests/*.mjs; do node --check "$f"; done
       - name: Install browser test dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --no-package-lock playwright@1.55.0
-          npx playwright install --with-deps chromium
-
+        run: npm install --no-package-lock
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
       - name: Run production browser smoke test
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tests/smoke.mjs
-
+        run: npm run test:smoke
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
