@@ -1,50 +1,31 @@
-(() => {
-  const intro = document.querySelector('.site-intro');
-  const inner = intro?.querySelector('.site-intro-inner');
-  if (!intro || !inner) return;
-
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const style = document.createElement('style');
-  style.id = 'intro-upgrade-style';
-  style.textContent = `
-    .site-intro{animation:none!important;opacity:1!important;visibility:visible!important;overflow:hidden;background:#140c0a}
-    .site-intro::before,.site-intro::after{content:"";position:absolute;inset:0;pointer-events:none}
-    .site-intro::before{background:radial-gradient(circle at 50% 48%,rgba(216,173,98,.11),transparent 34%),linear-gradient(115deg,transparent 0 45%,rgba(243,234,217,.025) 50%,transparent 55%);transform:scale(1.15);opacity:0;animation:introGlow 1.25s ease-out .1s forwards}
-    .site-intro::after{background:linear-gradient(90deg,transparent,rgba(216,173,98,.16),transparent);height:1px;inset:50% 12%;transform:scaleX(0);animation:introSweep .9s cubic-bezier(.76,0,.24,1) .32s forwards}
-    .site-intro-inner{position:relative;z-index:1;animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
-    .site-intro-kicker{opacity:0!important;transform:translateY(10px);animation:introUp .55s cubic-bezier(.2,.75,.25,1) .12s forwards}
-    .site-intro-title{opacity:0!important;transform:translateY(18px) scale(.97);filter:blur(6px);animation:introTitle .85s cubic-bezier(.2,.75,.25,1) .24s forwards}
-    .site-intro-year{opacity:0!important;transform:translateY(8px);animation:introUp .55s ease .58s forwards}
-    .site-intro-line{width:0!important;animation:introLineUpgrade .7s cubic-bezier(.76,0,.24,1) .68s forwards!important}
-    .site-intro.is-leaving .site-intro-inner{animation:introLeave .42s cubic-bezier(.76,0,.24,1) forwards!important}
-    .site-intro.is-leaving{animation:introExit .72s cubic-bezier(.76,0,.24,1) forwards!important;pointer-events:none}
-    @keyframes introGlow{to{opacity:1;transform:scale(1)}}
-    @keyframes introSweep{to{transform:scaleX(1)}}
-    @keyframes introUp{to{opacity:.62;transform:translateY(0)}}
-    @keyframes introTitle{to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-    @keyframes introLineUpgrade{to{width:72px}}
-    @keyframes introLeave{to{opacity:0;transform:translateY(-10px) scale(.985);filter:blur(4px)}}
-    @keyframes introExit{0%{opacity:1;clip-path:inset(0 0 0 0)}100%{opacity:0;clip-path:inset(0 0 100% 0);visibility:hidden}}
-    @media(prefers-reduced-motion:reduce){.site-intro{opacity:0!important;visibility:hidden!important}.site-intro *{animation:none!important}}
-  `;
-  document.head.appendChild(style);
-
-  if (reduced) return;
-
-  let finished = false;
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    intro.classList.add('is-leaving');
-    window.setTimeout(() => {
-      intro.remove();
-      document.documentElement.classList.remove('intro-active');
-    }, 760);
-  };
-
-  document.documentElement.classList.add('intro-active');
-  window.setTimeout(finish, 2100);
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') finish();
-  }, { once: false, passive: true });
+(()=>{
+'use strict';
+const intro=document.querySelector('.site-intro');
+if(!intro)return;
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const s=document.createElement('style');
+s.id='intro-stable-style';
+s.textContent=`
+.site-intro{animation:none!important;opacity:1!important;visibility:visible!important;pointer-events:none!important;overflow:hidden!important;background:#140c0a!important}
+.site-intro-inner{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
+.site-intro::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(216,173,98,.12),transparent 36%);opacity:0;animation:introGlowStable .8s ease .05s forwards}
+.site-intro-kicker{opacity:0!important;transform:translateY(8px)!important;animation:introKickerStable .45s ease .08s forwards!important}
+.site-intro-title{opacity:0!important;transform:translateY(12px) scale(.985)!important;filter:blur(4px)!important;animation:introTitleStable .62s cubic-bezier(.2,.75,.25,1) .18s forwards!important}
+.site-intro-year{opacity:0!important;transform:translateY(6px)!important;animation:introYearStable .4s ease .48s forwards!important}
+.site-intro-line{width:0!important;animation:introLineStable .45s ease .56s forwards!important}
+.site-intro.is-leaving{animation:introExitStable .48s cubic-bezier(.76,0,.24,1) forwards!important}
+@keyframes introGlowStable{to{opacity:1}}
+@keyframes introKickerStable{to{opacity:.62;transform:none}}
+@keyframes introTitleStable{to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes introYearStable{to{opacity:1;transform:none}}
+@keyframes introLineStable{to{width:72px}}
+@keyframes introExitStable{to{opacity:0;transform:translateY(-10px)}}
+@media(prefers-reduced-motion:reduce){.site-intro{display:none!important}}
+`;
+document.head.appendChild(s);
+if(reduced){intro.remove();return;}
+let done=false;
+const finish=()=>{if(done)return;done=true;intro.classList.add('is-leaving');window.setTimeout(()=>intro.remove(),500)};
+window.setTimeout(finish,1500);
+window.addEventListener('keydown',e=>{if(e.key==='Escape')finish()},{passive:true});
 })();
