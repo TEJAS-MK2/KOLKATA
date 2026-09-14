@@ -27,7 +27,7 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare site
+      - name: Prepare production source
         shell: bash
         run: |
           set -euo pipefail
@@ -35,24 +35,22 @@ jobs:
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          tags=[
-            '<script src="pandal-catalog-upgrade.js" defer></script>',
-            '<script src="map-fallback.js" defer></script>',
-            '<script src="explorer-v2.js" defer></script>',
-            '<script src="puja-companion.js" defer></script>',
-            '<script src="puja-night-upgrade.js" defer></script>',
-            '<script src="pandal-personal-safe.js" defer></script>',
-            '<script src="menu-fix.js" defer></script>',
-            '<script src="filter-fix.js" defer></script>',
-            '<script src="puja-countdown.js" defer></script>',
-            '<script src="puja-companion-pro.js" defer></script>',
-            '<script src="runtime-fixes.js" defer></script>',
-          ]
-          needle='</body>'
-          additions=''.join('  '+t+'\n' for t in tags if t not in s)
-          if needle not in s:
-              raise SystemExit('index.html has no closing body tag')
-          p.write_text(s.replace(needle, additions+needle, 1), encoding='utf-8')
+          s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
+          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="script.js" defer></script>')
+          tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js']
+          additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
+          if additions and '</body>' in s:s=s.replace('</body>','  '+additions+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          css=Path('styles.css'); c=css.read_text(encoding='utf-8')
+          c=c.replace(':root{--ink:#181512;',':root{--cream:#f7f4ee;--ink:#181512;',1)
+          c=c.replace("background:url('var(--hero-puja)') center/cover",'background-image:var(--hero-puja);background-position:center;background-size:cover')
+          c=c.replace("background:url('var(--culture-puja)') center/cover",'background-image:var(--culture-puja);background-position:center;background-size:cover')
+          for a in ['1','2','3','4']: c=c.replace(f"background-image:url('var(--gallery-{a})')",f'background-image:var(--gallery-{a})')
+          css.write_text(c,encoding='utf-8')
+          pro=Path('puja-companion-pro.js'); pc=pro.read_text(encoding='utf-8').replace("['Extra Puja holidays','22–24 Oct'","['Extra Puja holidays','22–23 Oct'"); pro.write_text(pc,encoding='utf-8')
+          personal=Path('pandal-personal-safe.js'); ps=personal.read_text(encoding='utf-8').replace('schedule();setInterval(sync,2000)','schedule()'); personal.write_text(ps,encoding='utf-8')
+          details=Path('details.css'); d=details.read_text(encoding='utf-8').replace('background:var(--cream);','background:var(--paper);').replace('color:var(--cream)','color:var(--paper)')
+          d='\n'.join(line for line in d.splitlines() if not line.startswith('.pandal-card[data-name="Santosh Mitra Square"]') and not line.startswith('.pandal-card[data-name="Shobhabazar Rajbari"]'))+'\n'; details.write_text(d,encoding='utf-8')
           PY
 
       - name: Validate JavaScript
@@ -60,20 +58,21 @@ jobs:
         run: |
           set -euo pipefail
           for f in \
-            script.js details.js pandal-catalog-upgrade.js map-fallback.js \
-            explorer-v2.js puja-companion.js puja-night-upgrade.js pandal-personal-safe.js \
-            menu-fix.js filter-fix.js puja-countdown.js puja-companion-pro.js runtime-fixes.js sw.js
+            script.js production-bootstrap.js details.js pandal-catalog-upgrade.js map-fallback.js \
+            explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js \
+            runtime-fixes.js sw.js
           do
             node --check "$f"
           done
 
-      - name: Validate site structure and asset references
+      - name: Validate production structure
         shell: bash
         run: |
           set -euo pipefail
           test -s index.html
           test -s styles.css
           test -s script.js
+          test -s production-bootstrap.js
           test -s details.js
           test -s details.css
           test -s puja-assets.css
@@ -81,32 +80,54 @@ jobs:
           test -s robots.txt
           test -s sitemap.xml
           test -s site.webmanifest
-          test -s puja-companion.js
-          test -s puja-night-upgrade.js
+          test -s icon.svg
+          test -s pandal-catalog-upgrade.js
+          test -s map-fallback.js
+          test -s explorer-v2.js
           test -s pandal-personal-safe.js
-          test -s menu-fix.js
-          test -s filter-fix.js
           test -s puja-countdown.js
           test -s puja-companion-pro.js
           test -s runtime-fixes.js
           test -s sw.js
+          for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do
+            test ! -e "$legacy"
+          done
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'canonical' index.html
           grep -q 'pandal-list' index.html
           grep -q 'pandal-map' index.html
           grep -q 'leaflet@1.9.4' index.html
           grep -q 'animejs/3.2.2' index.html
-          grep -q 'runtime-fixes.js' index.html
-          grep -q 'explorer-v2.js' index.html
+          grep -q 'production-bootstrap.js' index.html
           grep -q 'pandal-catalog-upgrade.js' index.html
+          grep -q 'explorer-v2.js' index.html
           grep -q 'pandal-personal-safe.js' index.html
           grep -q 'puja-companion-pro.js' index.html
+          grep -q 'runtime-fixes.js' index.html
+          ! grep -q 'puja-companion.js' index.html
+          ! grep -q 'puja-night-upgrade.js' index.html
           ! grep -q 'puja2026-suite.js' index.html
           ! grep -q 'qa-polish.js' index.html
           ! grep -q 'intro-upgrade.js' index.html
           ! grep -q 'qa-hotfix.js' index.html
           ! grep -q 'pandal-personal.js' index.html
-          grep -q 'details.js' index.html
+          grep -q 'Tala Prattoy' production-bootstrap.js
+          grep -q 'Dumdum Park Sarbojanin' production-bootstrap.js
+          grep -q '22.56602' production-bootstrap.js
+          grep -q '22–23 Oct' puja-companion-pro.js
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          bootstrap=Path('production-bootstrap.js').read_text(encoding='utf-8')
+          count=len(re.findall(r"^  '[^']+':\[",bootstrap,re.M))
+          if count != 13:
+              raise SystemExit(f'Expected 13 canonical pins, found {count}')
+          html=Path('index.html').read_text(encoding='utf-8')
+          required=['production-bootstrap.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js']
+          positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
+          if positions != sorted(positions):
+              raise SystemExit('Production scripts are not in deterministic order')
+          PY
           python - <<'PY'
           from pathlib import Path
           import re
@@ -114,8 +135,8 @@ jobs:
           refs=re.findall(r'(?:src|href)=["\']([^"\']+)["\']',html)
           local=[]
           for ref in refs:
-              if ref.startswith(('#','http:','https:','data:','mailto:')): continue
-              if ref.startswith('//'): continue
+              if ref.startswith(('#','http:','https:','data:','mailto:')) or ref.startswith('//'):
+                  continue
               local.append(ref.split('?',1)[0].split('#',1)[0])
           missing=sorted({r for r in local if r and not Path(r).exists()})
           if missing:
