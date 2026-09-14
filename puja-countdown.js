@@ -8,8 +8,8 @@ function boot(){
   const wrap=document.createElement('section');
   wrap.id='puja-countdown';
   wrap.className='puja-countdown';
-  wrap.setAttribute('aria-label','Countdown to Durga Puja 2026');
-  wrap.innerHTML='<div class="countdown-kicker">THE COUNTDOWN</div><div class="countdown-title">Durga Puja begins in</div><div class="countdown-grid"><div><strong data-unit="days">--</strong><span>Days</span></div><div><strong data-unit="hours">--</strong><span>Hours</span></div><div><strong data-unit="minutes">--</strong><span>Minutes</span></div><div><strong data-unit="seconds">--</strong><span>Seconds</span></div></div><div class="countdown-date">Maha Chaturthi · 15 October 2026</div>';
+  wrap.setAttribute('aria-label','Countdown to the 2026 Puja holiday window');
+  wrap.innerHTML='<div class="countdown-kicker">THE COUNTDOWN</div><div class="countdown-title">Puja holiday window begins in</div><div class="countdown-grid"><div><strong data-unit="days">--</strong><span>Days</span></div><div><strong data-unit="hours">--</strong><span>Hours</span></div><div><strong data-unit="minutes">--</strong><span>Minutes</span></div><div><strong data-unit="seconds">--</strong><span>Seconds</span></div></div><div class="countdown-date">Holiday window · 15 October 2026</div>';
   hero.insertAdjacentElement('afterend',wrap);
   const style=document.createElement('style');
   style.id='puja-countdown-style';
@@ -30,7 +30,7 @@ function boot(){
     const diff=Math.max(0,target-Date.now());
     const days=Math.floor(diff/86400000);const hours=Math.floor(diff%86400000/3600000);const minutes=Math.floor(diff%3600000/60000);const seconds=Math.floor(diff%60000/1000);
     nodes.days.textContent=String(days).padStart(2,'0');nodes.hours.textContent=String(hours).padStart(2,'0');nodes.minutes.textContent=String(minutes).padStart(2,'0');nodes.seconds.textContent=String(seconds).padStart(2,'0');
-    if(diff===0){wrap.querySelector('.countdown-title').textContent='Durga Puja is here';wrap.querySelector('.countdown-date').textContent='Maha Chaturthi · 15 October 2026';clearInterval(timer)}
+    if(diff===0){wrap.querySelector('.countdown-title').textContent='Puja holiday window is here';wrap.querySelector('.countdown-date').textContent='Holiday window · 15 October 2026';clearInterval(timer)}
   }
   update();const timer=setInterval(update,1000);
 }
