@@ -36,11 +36,8 @@ jobs:
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
           tags=[
-            '<script src="intro-upgrade.js" defer></script>',
             '<script src="pandal-catalog-upgrade.js" defer></script>',
             '<script src="map-fallback.js" defer></script>',
-            '<script src="puja2026-suite.js" defer></script>',
-            '<script src="qa-polish.js" defer></script>',
             '<script src="explorer-v2.js" defer></script>',
             '<script src="puja-companion.js" defer></script>',
             '<script src="puja-night-upgrade.js" defer></script>',
@@ -49,7 +46,6 @@ jobs:
             '<script src="filter-fix.js" defer></script>',
             '<script src="puja-countdown.js" defer></script>',
             '<script src="puja-companion-pro.js" defer></script>',
-            '<script src="qa-hotfix.js" defer></script>',
             '<script src="runtime-fixes.js" defer></script>',
           ]
           needle='</body>'
@@ -64,10 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           for f in \
-            script.js details.js intro-upgrade.js pandal-catalog-upgrade.js map-fallback.js \
-            puja2026-suite.js qa-polish.js explorer-v2.js puja-companion.js \
-            puja-night-upgrade.js pandal-personal.js menu-fix.js filter-fix.js \
-            puja-countdown.js puja-companion-pro.js qa-hotfix.js runtime-fixes.js sw.js
+            script.js details.js pandal-catalog-upgrade.js map-fallback.js \
+            explorer-v2.js puja-companion.js puja-night-upgrade.js pandal-personal.js \
+            menu-fix.js filter-fix.js puja-countdown.js puja-companion-pro.js runtime-fixes.js sw.js
           do
             node --check "$f"
           done
@@ -103,7 +98,12 @@ jobs:
           grep -q 'animejs/3.2.2' index.html
           grep -q 'runtime-fixes.js' index.html
           grep -q 'explorer-v2.js' index.html
+          grep -q 'pandal-catalog-upgrade.js' index.html
           grep -q 'puja-companion-pro.js' index.html
+          ! grep -q 'puja2026-suite.js' index.html
+          ! grep -q 'qa-polish.js' index.html
+          ! grep -q 'intro-upgrade.js' index.html
+          ! grep -q 'qa-hotfix.js' index.html
           grep -q 'details.js' index.html
           python - <<'PY'
           from pathlib import Path
