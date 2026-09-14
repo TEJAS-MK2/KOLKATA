@@ -1,17 +1,6 @@
 (()=>{
 'use strict';
 const modal=document.querySelector('#pandal-details');
-const nav=document.querySelector('.site-header nav');
-const menu=document.querySelector('.site-header .menu');
-if(nav&&menu){
- const style=document.createElement('style');style.textContent=`@media(max-width:800px){.site-header .menu{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px;padding:10px;margin:0;cursor:pointer;z-index:1001;touch-action:manipulation}.site-header .menu span{pointer-events:none;transition:transform .18s ease,opacity .18s ease}.site-header .menu[aria-expanded="true"] span:first-child{transform:translateY(3.5px) rotate(45deg)}.site-header .menu[aria-expanded="true"] span:last-child{transform:translateY(-3.5px) rotate(-45deg)}.site-header nav{display:none!important;position:absolute;top:72px;right:16px;z-index:1000;min-width:190px;flex-direction:column;align-items:stretch;gap:2px;padding:8px;background:rgba(247,244,238,.98);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(24,21,18,.14)}.site-header nav[data-open="true"]{display:flex!important}.site-header nav a{display:block;padding:13px 14px;opacity:1!important;color:var(--ink)!important;border-radius:9px}.site-header nav a::after{display:none}}@media(min-width:801px){.site-header nav{display:flex!important}.site-header .menu{display:none!important}}`;document.head.appendChild(style);
- const setOpen=open=>{nav.dataset.open=String(open);menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close menu':'Open menu')};
- menu.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setOpen(nav.dataset.open!=='true')});
- nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{if(innerWidth<=800)setOpen(false)}));
- document.addEventListener('click',e=>{if(innerWidth<=800&&nav.dataset.open==='true'&&!nav.contains(e.target)&&!menu.contains(e.target))setOpen(false)});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&innerWidth<=800&&nav.dataset.open==='true'){e.preventDefault();setOpen(false);menu.focus()}});
- const sync=()=>{if(innerWidth>800)setOpen(false)};addEventListener('resize',sync,{passive:true});sync();
-}
 if(!modal)return;
 const $=s=>modal.querySelector(s);const find=name=>window.pandals?.find?.(p=>p.name===name)||null;let current=null,lastFocus=null;
 const mode=()=>{const m=window.KolkataState?.get?.().mode||document.querySelector('.mode-btn.active')?.dataset.mode||'walking';return m==='two-wheeler'?'driving':m};
