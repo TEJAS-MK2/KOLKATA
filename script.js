@@ -4,6 +4,22 @@
   // UI-only enhancements. Pandal data, map, routes and explorer state live in
   // core-data-controller-v2.js so every feature consumes the canonical registry.
   const header = document.querySelector('.site-header');
+  const menu = document.querySelector('.site-header .menu');
+  const nav = document.querySelector('.site-header nav');
+
+  function initMobileMenuBridge() {
+    if (!menu || !nav || menu.dataset.kolkataMenuBridge) return;
+    menu.dataset.kolkataMenuBridge = '1';
+    let open = false;
+    menu.addEventListener('click', () => {
+      open = !open;
+      setTimeout(() => {
+        nav.dataset.open = String(open);
+        menu.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      }, 0);
+    });
+  }
 
   function initAnchors() {
     document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -62,6 +78,7 @@
   }
 
   function boot() {
+    initMobileMenuBridge();
     initAnchors();
     initLightbox();
     initScrollState();
