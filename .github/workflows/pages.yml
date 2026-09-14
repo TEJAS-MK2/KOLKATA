@@ -37,7 +37,7 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('<html lang="en-IN">','<html lang="bn-IN">',1)
           s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
-          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="script.js" defer></script>')
+          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="pandal-expansion-2026.js" defer></script><script src="script.js" defer></script>')
           tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js']
           additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
           if additions and '</body>' in s:s=s.replace('</body>','  '+additions+'</body>',1)
@@ -59,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           for f in \
-            script.js production-bootstrap.js details.js pandal-catalog-upgrade.js map-fallback.js \
+            script.js production-bootstrap.js pandal-expansion-2026.js details.js pandal-catalog-upgrade.js map-fallback.js \
             explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js \
             runtime-fixes.js puja-feature-suite.js puja-bingo.js sw.js
           do
@@ -74,6 +74,7 @@ jobs:
           test -s styles.css
           test -s script.js
           test -s production-bootstrap.js
+          test -s pandal-expansion-2026.js
           test -s details.js
           test -s details.css
           test -s puja-assets.css
@@ -102,6 +103,7 @@ jobs:
           grep -q 'leaflet@1.9.4' index.html
           grep -q 'animejs/3.2.2' index.html
           grep -q 'production-bootstrap.js' index.html
+          grep -q 'pandal-expansion-2026.js' index.html
           grep -q 'pandal-catalog-upgrade.js' index.html
           grep -q 'explorer-v2.js' index.html
           grep -q 'pandal-personal-safe.js' index.html
@@ -124,6 +126,14 @@ jobs:
           grep -q 'Ballygunge Cultural Association' production-bootstrap.js
           grep -q 'Bosepukur Sitala Mandir' production-bootstrap.js
           grep -q '66 Pally' production-bootstrap.js
+          grep -q 'Mudiali' pandal-expansion-2026.js
+          grep -q 'Suruchi Sangha' pandal-expansion-2026.js
+          grep -q 'Jagat Mukherjee Park' pandal-expansion-2026.js
+          grep -q 'Kashi Bose Lane' pandal-expansion-2026.js
+          grep -q '22.51008' pandal-expansion-2026.js
+          grep -q '22.50899' pandal-expansion-2026.js
+          grep -q '22.59967' pandal-expansion-2026.js
+          grep -q '22.59100' pandal-expansion-2026.js
           grep -q '22–23 Oct' puja-companion-pro.js
           grep -q 'Math.floor((START-now)/86400000)' puja-companion-pro.js
           grep -q 'Puja Toolkit' puja-feature-suite.js
@@ -138,8 +148,11 @@ jobs:
           count=len(re.findall(r"^  '[^']+':\[",block,re.M))
           if count != 19:
               raise SystemExit(f'Expected 19 canonical pins, found {count}')
+          expansion=Path('pandal-expansion-2026.js').read_text(encoding='utf-8')
+          for name in ['Mudiali','Suruchi Sangha','Jagat Mukherjee Park','Kashi Bose Lane']:
+              if name not in expansion: raise SystemExit(f'Missing expanded pin: {name}')
           html=Path('index.html').read_text(encoding='utf-8')
-          required=['production-bootstrap.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js']
+          required=['production-bootstrap.js','pandal-expansion-2026.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js']
           positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
           if positions != sorted(positions):
               raise SystemExit('Production scripts are not in deterministic order')
