@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
 
-  // Final integration fixes. This pass intentionally owns the last-mile verified-pin
-  // presentation because the catalog has a late finalizer that can rebuild the cards.
+  // Final integration fixes. This pass owns the last-mile verified-pin presentation
+  // because the catalog has a late finalizer that can rebuild the cards.
   const CANONICAL_PINS={
     'Bagbazar Sarbojanin':[22.60121,88.36682],
     'Tala Prattoy':[22.61046,88.38460],
@@ -43,10 +43,12 @@
       const name=card.dataset.name;
       if(!VERIFIED.has(name))return;
 
-      let status=card.querySelector('.pin-status');
+      const statuses=[...card.querySelectorAll('.pin-status')];
+      let status=statuses.shift();
+      statuses.forEach(el=>el.remove());
       if(!status){
         status=document.createElement('div');
-        status.className='pin-status verified';
+        status.className='pin-status';
         const title=card.querySelector('h3');
         title?.after(status);
       }
@@ -55,9 +57,7 @@
       status.textContent='● Map pin verified';
       status.setAttribute('aria-label','Exact map pin verified');
 
-      const pending=card.querySelector('.pending-pin');
-      pending?.classList.remove('pending-pin');
-
+      card.classList.remove('pending-pin');
       const route=card.querySelector('.route');
       const pin=CANONICAL_PINS[name];
       if(route&&pin)route.href=mapsDir(pin[0],pin[1]);
