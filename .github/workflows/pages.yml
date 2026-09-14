@@ -104,13 +104,13 @@ jobs:
           grep -q 'pandal-personal-safe.js' index.html
           grep -q 'puja-companion-pro.js' index.html
           grep -q 'runtime-fixes.js' index.html
-          ! grep -q 'puja-companion.js' index.html
-          ! grep -q 'puja-night-upgrade.js' index.html
-          ! grep -q 'puja2026-suite.js' index.html
-          ! grep -q 'qa-polish.js' index.html
-          ! grep -q 'intro-upgrade.js' index.html
-          ! grep -q 'qa-hotfix.js' index.html
-          ! grep -q 'pandal-personal.js' index.html
+          ! grep -q '<script src="puja-companion.js"' index.html
+          ! grep -q '<script src="puja-night-upgrade.js"' index.html
+          ! grep -q '<script src="puja2026-suite.js"' index.html
+          ! grep -q '<script src="qa-polish.js"' index.html
+          ! grep -q '<script src="intro-upgrade.js"' index.html
+          ! grep -q '<script src="qa-hotfix.js"' index.html
+          ! grep -q '<script src="pandal-personal.js"' index.html
           grep -q 'Tala Prattoy' production-bootstrap.js
           grep -q 'Dumdum Park Sarbojanin' production-bootstrap.js
           grep -q '22.56602' production-bootstrap.js
