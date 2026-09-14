@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>','<script src=\"explorer-v2.js\" defer></script>','<script src=\"puja-companion.js\" defer></script>','<script src=\"puja-night-upgrade.js\" defer></script>','<script src=\"pandal-personal.js\" defer></script>','<script src=\"menu-fix.js\" defer></script>','<script src=\"filter-fix.js\" defer></script>','<script src=\"puja-countdown.js\" defer></script>','<script src=\"qa-hotfix.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
+          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>','<script src=\"explorer-v2.js\" defer></script>','<script src=\"puja-companion.js\" defer></script>','<script src=\"puja-night-upgrade.js\" defer></script>','<script src=\"pandal-personal.js\" defer></script>','<script src=\"menu-fix.js\" defer></script>','<script src=\"filter-fix.js\" defer></script>','<script src=\"puja-countdown.js\" defer></script>','<script src=\"puja-companion-pro.js\" defer></script>','<script src=\"qa-hotfix.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
       - name: Validate JavaScript
         shell: bash
         run: |
@@ -46,6 +46,7 @@ jobs:
           node --check menu-fix.js
           node --check filter-fix.js
           node --check puja-countdown.js
+          node --check puja-companion-pro.js
           node --check qa-hotfix.js
           node --check sw.js
       - name: Validate site structure
@@ -67,6 +68,7 @@ jobs:
           test -s menu-fix.js
           test -s filter-fix.js
           test -s puja-countdown.js
+          test -s puja-companion-pro.js
           test -s sw.js
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'canonical' index.html
@@ -79,6 +81,7 @@ jobs:
           grep -q 'menu-fix.js' index.html
           grep -q 'filter-fix.js' index.html
           grep -q 'puja-countdown.js' index.html
+          grep -q 'puja-companion-pro.js' index.html
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
