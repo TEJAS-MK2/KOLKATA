@@ -117,7 +117,7 @@ try {
 
   await firstCard.click();
   await page.waitForFunction(() => document.querySelector('#pandal-details')?.hidden === false && document.querySelector('#details-title')?.textContent.includes('Bagbazar Sarbojanin'), null, { timeout: 3000 });
-  await page.locator('[data-details-close]').first().click();
+  await page.locator('.pandal-details-close').click();
   await page.waitForFunction(() => document.querySelector('#pandal-details')?.hidden === true, null, { timeout: 3000 });
 
   const menu = page.locator('.menu');
