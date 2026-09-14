@@ -10,9 +10,7 @@
 .culture-photo{background-image:var(--culture-puja)!important;background-position:center!important}
 .tall{background-image:var(--gallery-1)!important}.wide{background-image:var(--gallery-2)!important}.square{background-image:var(--gallery-3)!important}.square.second{background-image:var(--gallery-4)!important}
 
-/* The .site-intro / intro-upgrade.js pair owns the opening sequence. Keep this stylesheet
-   free of a second full-screen curtain so slow/mobile devices never get two overlapping
-   animation stacks. */
+/* Opening overlays are disabled in the production page; this file contains only image variables and reduced-motion rules. */
 @media(prefers-reduced-motion:reduce){
   .hero-content,.hero-mark,.scroll-note{animation:none!important;opacity:1!important;transform:none!important}
 }
