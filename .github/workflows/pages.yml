@@ -41,7 +41,7 @@ jobs:
             '<script src="explorer-v2.js" defer></script>',
             '<script src="puja-companion.js" defer></script>',
             '<script src="puja-night-upgrade.js" defer></script>',
-            '<script src="pandal-personal.js" defer></script>',
+            '<script src="pandal-personal-safe.js" defer></script>',
             '<script src="menu-fix.js" defer></script>',
             '<script src="filter-fix.js" defer></script>',
             '<script src="puja-countdown.js" defer></script>',
@@ -61,7 +61,7 @@ jobs:
           set -euo pipefail
           for f in \
             script.js details.js pandal-catalog-upgrade.js map-fallback.js \
-            explorer-v2.js puja-companion.js puja-night-upgrade.js pandal-personal.js \
+            explorer-v2.js puja-companion.js puja-night-upgrade.js pandal-personal-safe.js \
             menu-fix.js filter-fix.js puja-countdown.js puja-companion-pro.js runtime-fixes.js sw.js
           do
             node --check "$f"
@@ -83,7 +83,7 @@ jobs:
           test -s site.webmanifest
           test -s puja-companion.js
           test -s puja-night-upgrade.js
-          test -s pandal-personal.js
+          test -s pandal-personal-safe.js
           test -s menu-fix.js
           test -s filter-fix.js
           test -s puja-countdown.js
@@ -99,11 +99,13 @@ jobs:
           grep -q 'runtime-fixes.js' index.html
           grep -q 'explorer-v2.js' index.html
           grep -q 'pandal-catalog-upgrade.js' index.html
+          grep -q 'pandal-personal-safe.js' index.html
           grep -q 'puja-companion-pro.js' index.html
           ! grep -q 'puja2026-suite.js' index.html
           ! grep -q 'qa-polish.js' index.html
           ! grep -q 'intro-upgrade.js' index.html
           ! grep -q 'qa-hotfix.js' index.html
+          ! grep -q 'pandal-personal.js' index.html
           grep -q 'details.js' index.html
           python - <<'PY'
           from pathlib import Path
