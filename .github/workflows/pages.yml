@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html styles.css polish.css puja-assets.css details.css details.js production-bootstrap.js puja-config.js state-v3.js pandal-expansion-2026.js pandal-expansion-more-2026.js script.js core-data-controller-v2.js pandal-catalog-upgrade.js map-fallback.js explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js sw.js site.webmanifest icon.svg 404.html robots.txt sitemap.xml package.json tests/smoke.mjs; do test -s "$f"; done
+          for f in index.html styles.css polish.css puja-assets.css details.css details.js production-bootstrap.js puja-config.js state-v3.js pandal-expansion-2026.js pandal-expansion-more-2026.js script.js core-data-controller-v2.js pandal-catalog-upgrade.js map-fallback.js explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js sw.js site.webmanifest icon.svg 404.html robots.txt sitemap.xml package.json tests/smoke.mjs tests/smoke-green.mjs; do test -s "$f"; done
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'lang="bn-IN"' index.html
           grep -q 'canonical' index.html
@@ -65,6 +65,25 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Make third-party scripts non-blocking
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('index.html')
+          html=path.read_text(encoding='utf-8')
+          replacements={
+            'src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer>':'src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" async>',
+            'src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer>':'src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" async>'
+          }
+          for old,new in replacements.items():
+            if old not in html: raise SystemExit('Expected third-party script tag was not found')
+            html=html.replace(old,new,1)
+          path.write_text(html,encoding='utf-8')
+          PY
+          grep -q 'anime.min.js.*async' index.html
+          grep -q 'leaflet.js.*async' index.html
       - name: Run production browser smoke test
         run: npm run test:smoke
       - name: Upload site
