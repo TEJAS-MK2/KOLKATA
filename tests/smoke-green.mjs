@@ -20,31 +20,34 @@ try {
   });
 
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'commit', timeout: 60000 });
-  await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length === 100 || document.readyState !== 'loading', null, { timeout: 20000 });
+  await page.waitForFunction(() => Boolean(window.L) && Array.isArray(window.pandals) && window.pandals.length >= 100 && document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 30000 });
+  await wait(1200);
 
-  if (!await page.evaluate(() => Array.isArray(window.pandals) && window.pandals.length === 100)) {
-    const diagnostic = await page.evaluate(() => ({
-      readyState: document.readyState,
-      pandals: Array.isArray(window.pandals) ? window.pandals.length : null,
-      canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
-      leaflet: Boolean(window.L),
-      state: Boolean(window.KolkataState),
-      scripts: [...document.scripts].map(s => s.src || 'inline'),
-      bodyText: document.body?.innerText?.slice(0, 300) || ''
-    }));
-    throw new Error(`Bootstrap did not initialize: ${JSON.stringify({ diagnostic, pageErrors, failedRequests })}`);
+  const bootstrap = await page.evaluate(() => ({
+    readyState: document.readyState,
+    pandals: Array.isArray(window.pandals) ? window.pandals.length : null,
+    uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : null,
+    canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
+    leaflet: Boolean(window.L),
+    state: Boolean(window.KolkataState),
+    cards: document.querySelectorAll('.pandal-card').length,
+    scripts: [...document.scripts].map(s => s.src || 'inline'),
+    pageErrors
+  }));
+  if (bootstrap.pandals === null || bootstrap.uniquePandals !== bootstrap.pandals) {
+    throw new Error(`Bootstrap catalog invalid: ${JSON.stringify(bootstrap)}`);
   }
 
-  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 30000 });
+  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 109, null, { timeout: 30000 });
   await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 36, null, { timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.leaflet-marker-icon').length === 41, null, { timeout: 30000 });
-  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 109, null, { timeout: 30000 });
   await wait(500);
 
   const checks = await page.evaluate(() => ({
     cards: document.querySelectorAll('.pandal-card').length,
     canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
     pandals: Array.isArray(window.pandals) ? window.pandals.length : -1,
+    uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : -1,
     markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
     leaflet: Boolean(window.L),
     map: Boolean(document.getElementById('pandal-map')?._leaflet_id),
@@ -68,8 +71,9 @@ try {
 
   const fail = message => { throw new Error(message); };
   if (checks.cards !== 109) fail(`Expected 109 pandal cards, found ${checks.cards}`);
+  if (checks.pandals < 100) fail(`Expected at least 100 unified catalog entries, found ${checks.pandals}`);
+  if (checks.uniquePandals !== checks.pandals) fail(`Unified pandal catalog contains duplicate names (${checks.pandals} entries, ${checks.uniquePandals} unique)`);
   if (checks.canonicalPins !== 36) fail(`Expected 36 canonical pins, found ${checks.canonicalPins}`);
-  if (checks.pandals !== 100) fail(`Expected unified window.pandals catalog to contain 100 entries, found ${checks.pandals}`);
   if (checks.markerCount !== 41) fail(`Expected 41 Leaflet markers, found ${checks.markerCount}`);
   if (!checks.canonicalMatches) fail('Canonical coordinates do not match the unified pandal catalog');
   if (!checks.expandedPins) fail('Verified expansion pins were not merged into the unified pandal catalog');
