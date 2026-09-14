@@ -20,7 +20,21 @@ try {
   });
 
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'commit', timeout: 60000 });
-  await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length === 100, null, { timeout: 90000 });
+  await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length === 100 || document.readyState !== 'loading', null, { timeout: 20000 });
+
+  if (!await page.evaluate(() => Array.isArray(window.pandals) && window.pandals.length === 100)) {
+    const diagnostic = await page.evaluate(() => ({
+      readyState: document.readyState,
+      pandals: Array.isArray(window.pandals) ? window.pandals.length : null,
+      canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
+      leaflet: Boolean(window.L),
+      state: Boolean(window.KolkataState),
+      scripts: [...document.scripts].map(s => s.src || 'inline'),
+      bodyText: document.body?.innerText?.slice(0, 300) || ''
+    }));
+    throw new Error(`Bootstrap did not initialize: ${JSON.stringify({ diagnostic, pageErrors, failedRequests })}`);
+  }
+
   await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 30000 });
   await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 36, null, { timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.leaflet-marker-icon').length === 41, null, { timeout: 30000 });
