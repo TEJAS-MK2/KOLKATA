@@ -47,7 +47,7 @@ try{
  const desc=Object.getOwnPropertyDescriptor(window,'pandals');
  if(desc?.get&&desc?.set)stored=normalize(Array.isArray(window.pandals)?window.pandals:stored);
  else if(desc&&!desc.configurable)stored=normalize(window.pandals);
- else Object.defineProperty(window,'pandals',{configurable:true,get(){return stored},set(value){stored=normalize(Array.isArray(stored)?stored:(Array.isArray(value)?value:[]))}});
+ else Object.defineProperty(window,'pandals',{configurable:true,get(){return stored},set(value){stored=normalize(Array.isArray(value)?value:[])}});
 }catch{}
 if(window.L?.map&&!window.L.map.__kolkataWrapped){const originalMap=window.L.map;const wrappedMap=function(...args){const instance=originalMap.apply(this,args);window.kolkataMap=instance;window.map=instance;return instance};wrappedMap.__kolkataWrapped=true;window.L.map=wrappedMap;}
 window.KOLKATA_CANONICAL_PINS=Object.freeze({...CANONICAL});
