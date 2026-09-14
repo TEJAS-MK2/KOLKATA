@@ -35,7 +35,8 @@ const CANONICAL={
   'Jodhpur Park Sarbojanin':[22.50458,88.36560],
   'Ajeya Sanghati':[22.48055,88.33742],
   'Barisha Club':[22.48129,88.31324],
-  'Behala Nutan Dal':[22.50021,88.32029]
+  'Behala Nutan Dal':[22.50021,88.32029],
+  'Chaltabagan Lohapatty':[22.585388,88.372183]
 };
 const PHOTOS={
   'Badamtala Ashar Sangha':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Badamtala_Ashar_Sangha_-_Kolkata_2012-10-23_1159.JPG',
@@ -44,10 +45,11 @@ const PHOTOS={
   'Jodhpur Park Sarbojanin':'https://commons.wikimedia.org/wiki/Special:FilePath/Jodhpur_Park.jpg',
   'Ajeya Sanghati':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Ajeya_Sanghati_-_Kolkata_2017-09-26_4012.JPG',
   'Barisha Club':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Barisha_Club_-_Kolkata_2012-10-23_1142.JPG',
-  'Behala Nutan Dal':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Behala_Natun_Dal_-_Kolkata_2012-10-23_1145.JPG'
+  'Behala Nutan Dal':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Behala_Natun_Dal_-_Kolkata_2012-10-23_1145.JPG',
+  'Chaltabagan Lohapatty':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Chalta_Bagan_Lohapatti_Durga_puja_Committee_01.jpg'
 };
 const META={
-  'Tala Prattoy':['North','Tala'],'Hatibagan Sarbojanin':['North','Hatibagan'],'Sree Bhumi Sporting Club':['North','Sreebhumi'],'Dumdum Park Bharat Chakra':['North','Dum Dum Park'],'Dumdum Park Sarbojanin':['North','Dum Dum Park'],'Kumartuli Park':['North','Kumartuli'],'Shobhabazar Rajbari':['North','Shobhabazar'],'College Square':['Central','College Street'],'Santosh Mitra Square':['Central','Sealdah'],'Maddox Square':['South','Ballygunge'],'Deshapriya Park':['South','Deshapriya Park'],'Naktala Udayan Sangha':['South','Naktala'],'Chetla Agrani':['South','Chetla'],'Ekdalia Evergreen':['South','Gariahat'],'Hindusthan Park':['South','Gariahat'],'Ballygunge Cultural Association':['South','Ballygunge'],'Bosepukur Sitala Mandir':['South','Bosepukur'],'66 Pally':['South','Ballygunge'],'Mudiali':['South','Tollygunge'],'Suruchi Sangha':['South','New Alipore'],'Jagat Mukherjee Park':['North','Shobhabazar'],'Kashi Bose Lane':['North','Hatibagan'],'Nalin Sarkar Street':['North','Hatibagan'],'Ahiritola Sarbojanin':['North','Ahiritola'],'Kumartuli Sarbojanin':['North','Kumartuli'],'Hatibagan Nabinpally':['North','Hatibagan'],'20 Palli Sarbojani Durgotsab':['North','Ahiritola'],'Badamtala Ashar Sangha':['South','Kalighat'],'Tridhara Sammilani':['South','Manoharpukur'],'Simla Byayam Samity':['North','Simla'],'Jodhpur Park Sarbojanin':['South','Jodhpur Park'],'Ajeya Sanghati':['South','Tollygunge'],'Barisha Club':['South','Barisha'],'Behala Nutan Dal':['South','Behala']
+  'Tala Prattoy':['North','Tala'],'Hatibagan Sarbojanin':['North','Hatibagan'],'Sree Bhumi Sporting Club':['North','Sreebhumi'],'Dumdum Park Bharat Chakra':['North','Dum Dum Park'],'Dumdum Park Sarbojanin':['North','Dum Dum Park'],'Kumartuli Park':['North','Kumartuli'],'Shobhabazar Rajbari':['North','Shobhabazar'],'College Square':['Central','College Street'],'Santosh Mitra Square':['Central','Sealdah'],'Maddox Square':['South','Ballygunge'],'Deshapriya Park':['South','Deshapriya Park'],'Naktala Udayan Sangha':['South','Naktala'],'Chetla Agrani':['South','Chetla'],'Ekdalia Evergreen':['South','Gariahat'],'Hindusthan Park':['South','Gariahat'],'Ballygunge Cultural Association':['South','Ballygunge'],'Bosepukur Sitala Mandir':['South','Bosepukur'],'66 Pally':['South','Ballygunge'],'Mudiali':['South','Tollygunge'],'Suruchi Sangha':['South','New Alipore'],'Jagat Mukherjee Park':['North','Shobhabazar'],'Kashi Bose Lane':['North','Hatibagan'],'Nalin Sarkar Street':['North','Hatibagan'],'Ahiritola Sarbojanin':['North','Ahiritola'],'Kumartuli Sarbojanin':['North','Kumartuli'],'Hatibagan Nabinpally':['North','Hatibagan'],'20 Palli Sarbojani Durgotsab':['North','Ahiritola'],'Badamtala Ashar Sangha':['South','Kalighat'],'Tridhara Sammilani':['South','Manoharpukur'],'Simla Byayam Samity':['North','Simla'],'Jodhpur Park Sarbojanin':['South','Jodhpur Park'],'Ajeya Sanghati':['South','Tollygunge'],'Barisha Club':['South','Barisha'],'Behala Nutan Dal':['South','Behala'],'Chaltabagan Lohapatty':['North','Manicktala']
 };
 function normalize(list){
  if(!Array.isArray(list))return [];
