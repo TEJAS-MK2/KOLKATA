@@ -1,6 +1,6 @@
 # কলকাতা দুর্গাপূজা — ২০২৬
 
-A cinematic, mobile-first Durga Puja experience for Kolkata.
+A mobile-first Durga Puja guide and pandal explorer for Kolkata.
 
 ## What's included
 
@@ -16,8 +16,11 @@ A cinematic, mobile-first Durga Puja experience for Kolkata.
 - Mobile navigation and smooth scrolling
 - Bengali typography and subtle festival-inspired visual treatment
 - Kolkata and Durga Puja imagery throughout the experience
-- Graceful Leaflet marker fallback when the optional clustering CDN is unavailable
-- Basic accessibility and external-link hardening
+- Graceful Leaflet fallback when the map provider is unavailable
+- Accessibility and external-link hardening
+- One canonical 13-pin data layer shared by the explorer, map and route planner
+- Network-first service-worker caching to reduce stale production assets
+- Wikimedia Commons image credits in `IMAGE_CREDITS.md`
 
 ## Live site
 
@@ -25,12 +28,12 @@ A cinematic, mobile-first Durga Puja experience for Kolkata.
 
 ## Run locally
 
-Open `index.html` in a browser. No build step is required.
+Open `index.html` in a browser. No build step is required for the core page.
 
 ## GitHub Pages
 
 This is a static site and is deployed automatically to GitHub Pages from the `main` branch.
 
-The deployment workflow validates the JavaScript files and checks the required site structure before publishing.
+The deployment workflow validates JavaScript, canonical pin count, script order, required assets and legacy-file removal before publishing. It also applies the production CDN integrity attributes and final runtime patches during the Pages build.
 
 <!-- Verified Pages build: 2026-09-14 -->
