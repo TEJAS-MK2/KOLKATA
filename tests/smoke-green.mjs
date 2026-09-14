@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 
+// Production smoke test: Leaflet is optional because the app has a documented fallback.
 const server = spawn('python3', ['-m', 'http.server', '4173', '--bind', '127.0.0.1'], { stdio: 'ignore' });
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 let browser;
