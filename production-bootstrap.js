@@ -13,14 +13,26 @@ const CANONICAL={
   'Santosh Mitra Square':[22.56602,88.36565],
   'Maddox Square':[22.52656,88.35465],
   'Deshapriya Park':[22.51858,88.35346],
-  'Naktala Udayan Sangha':[22.47449,88.36658]
+  'Naktala Udayan Sangha':[22.47449,88.36658],
+  'Chetla Agrani':[22.51640,88.33684],
+  'Ekdalia Evergreen':[22.52125,88.36596],
+  'Hindusthan Park':[22.51768,88.36207],
+  'Ballygunge Cultural Association':[22.51646,88.35561],
+  'Bosepukur Sitala Mandir':[22.51915,88.38475],
+  '66 Pally':[22.51824,88.34286]
 };
 const EXTRA={
   'Tala Prattoy':['North','Tala',22.61046,88.38460,'Verified location'],
   'Hatibagan Sarbojanin':['North','Hatibagan',22.59439,88.37200,'Verified location'],
   'Sree Bhumi Sporting Club':['North','Sreebhumi',22.59890,88.40293,'Verified location'],
   'Dumdum Park Bharat Chakra':['North','Dum Dum Park',22.61082,88.41460,'Verified location'],
-  'Dumdum Park Sarbojanin':['North','Dum Dum Park',22.60944,88.41641,'Verified location']
+  'Dumdum Park Sarbojanin':['North','Dum Dum Park',22.60944,88.41641,'Verified location'],
+  'Chetla Agrani':['South','Chetla',22.51640,88.33684,'Verified location'],
+  'Ekdalia Evergreen':['South','Gariahat',22.52125,88.36596,'Verified location'],
+  'Hindusthan Park':['South','Gariahat',22.51768,88.36207,'Verified location'],
+  'Ballygunge Cultural Association':['South','Ballygunge',22.51646,88.35561,'Verified location'],
+  'Bosepukur Sitala Mandir':['South','Bosepukur',22.51915,88.38475,'Verified location'],
+  '66 Pally':['South','Ballygunge',22.51824,88.34286,'Verified location']
 };
 function normalize(list){
   if(!Array.isArray(list))return list;
