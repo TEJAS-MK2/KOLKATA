@@ -6,9 +6,9 @@
   const MODE_KEY = 'kolkata-pujo-mode';
   const ROUTE_KEY = 'kolkata-pujo-route';
   const DONE_KEY = 'kolkata-pujo-completed';
-  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
   const valid = p => p && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng));
-  const mode = () => ['walking','driving','transit'].includes(localStorage.getItem(MODE_KEY)) ? localStorage.getItem(MODE_KEY) : 'walking';
+  const mode = () => { const value=localStorage.getItem(MODE_KEY); return ['walking','driving','transit','two-wheeler'].includes(value) ? (value==='two-wheeler'?'driving':value) : 'walking'; };
   const maps = p => valid(p) ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode())}` : 'https://www.google.com/maps/dir/?api=1';
 
   let route = [];
@@ -70,7 +70,7 @@
     if(!total){if(label)label.textContent='STOP 1 OF 0';if(name)name.textContent='Add stops to begin';if(area)area.textContent='Your selected route will appear here.';if(bar)bar.style.width='0%';if(text)text.textContent='0 / 0 completed';if(prev)prev.disabled=true;if(next)next.disabled=true;return;}
     const complete=route.filter(x=>done.has(x.name)).length;if(label)label.textContent=`STOP ${nightIndex+1} OF ${total}${done.has(p.name)?' · VISITED':''}`;if(name)name.textContent=p.name;if(area)area.textContent=`${p.area} · ${p.zone} · ${done.has(p.name)?'Marked as visited':'Not visited yet'}`;if(bar)bar.style.width=`${Math.round(complete/total*100)}%`;if(text)text.textContent=`${complete} / ${total} completed`;if(prev)prev.disabled=nightIndex===0;if(next){next.disabled=false;next.textContent=nightIndex===total-1?'Finish stop ✓':'Next stop →'}if(dir)dir.href=maps(p);
   }
-  function bind(){document.querySelector('#night-prev')?.addEventListener('click',()=>{nightIndex=Math.max(0,nightIndex-1);renderNight()});document.querySelector('#night-next')?.addEventListener('click',()=>{if(!route.length)return;if(nightIndex<route.length-1)nightIndex++;else done.add(route[nightIndex].name);persist();renderNight()});document.querySelector('#pandal-search')?.addEventListener('input',renderExplorer);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setTimeout(renderExplorer,0)))}
+  function bind(){document.querySelector('#night-prev')?.addEventListener('click',()=>{nightIndex=Math.max(0,nightIndex-1);renderNight()});document.querySelector('#night-next')?.addEventListener('click',()=>{if(!route.length)return;if(nightIndex<route.length-1)nightIndex++;else done.add(route[nightIndex].name);persist();renderNight()});document.querySelector('#pandal-search')?.addEventListener('input',renderExplorer);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-btn').forEach(x=>x.classList.toggle('active',x===b));renderExplorer()}))}
   function start(){
     if(!Array.isArray(window.pandals)||window.pandals.length<28)return;
     restore();try{Object.defineProperty(window,'routeStops',{configurable:true,get:()=>route})}catch{}window.addToRoute=add;window.removeFromRoute=remove;window.routeUrl=routeUrl;rebuildMap();renderExplorer();renderRoute();bind();window.__KOLKATA_CANONICAL_CONTROLLER_READY=true;window.dispatchEvent(new CustomEvent('kolkata:canonical-controller-ready',{detail:{pandals:data().length,markers:markers.length}}));
