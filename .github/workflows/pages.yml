@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>','<script src=\"explorer-v2.js\" defer></script>','<script src=\"puja-companion.js\" defer></script>','<script src=\"qa-hotfix.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
+          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>','<script src=\"explorer-v2.js\" defer></script>','<script src=\"puja-companion.js\" defer></script>','<script src=\"puja-night-upgrade.js\" defer></script>','<script src=\"qa-hotfix.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
       - name: Validate JavaScript
         shell: bash
         run: |
@@ -41,6 +41,7 @@ jobs:
           node --check qa-polish.js
           node --check explorer-v2.js
           node --check puja-companion.js
+          node --check puja-night-upgrade.js
           node --check qa-hotfix.js
           node --check sw.js
       - name: Validate site structure
@@ -57,6 +58,7 @@ jobs:
           test -s sitemap.xml
           test -s site.webmanifest
           test -s puja-companion.js
+          test -s puja-night-upgrade.js
           test -s sw.js
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'canonical' index.html
