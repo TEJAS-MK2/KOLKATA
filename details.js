@@ -3,13 +3,12 @@
   const nav=document.querySelector('.site-header nav');
   const menu=document.querySelector('.site-header .menu');
 
-  // Mobile navigation: explicitly toggle the menu. The previous repair only
-  // synchronized aria state, so tapping the hamburger never opened the nav.
+  // Mobile navigation: explicitly toggle the menu and keep its state accessible.
   if(nav&&menu){
     const style=document.createElement('style');
     style.textContent=`
       @media(max-width:800px){
-        .site-header .menu{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px;padding:10px;margin:0;cursor:pointer;z-index:1001}
+        .site-header .menu{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px;padding:10px;margin:0;cursor:pointer;z-index:1001;touch-action:manipulation}
         .site-header .menu span{pointer-events:none;transition:transform .18s ease,opacity .18s ease}
         .site-header .menu[aria-expanded="true"] span:first-child{transform:translateY(3.5px) rotate(45deg)}
         .site-header .menu[aria-expanded="true"] span:last-child{transform:translateY(-3.5px) rotate(-45deg)}
@@ -18,13 +17,19 @@
         .site-header nav a{display:block;padding:13px 14px;opacity:1!important;color:var(--ink)!important;border-radius:8px}
         .site-header nav a:hover,.site-header nav a:focus-visible{background:var(--paper-2);color:var(--red)!important}
 
-        /* Keep the explorer controls attached to the viewport while the
-           pandal list/page scrolls, without creating a second scroll axis. */
-        .explorer-toolbar{position:sticky!important;top:72px;z-index:90;background:var(--paper);padding:10px 0 12px;margin-top:0!important;margin-bottom:18px!important;border-bottom:1px solid var(--line)}
+        /* One mobile sticky control surface. The secondary sort/filter row must
+           not become a second sticky layer because that causes the controls to
+           drift/stack while the page is being scrolled. */
+        .explorer-toolbar{position:sticky!important;top:72px;z-index:90;background:var(--paper);padding:10px 0 12px;margin-top:0!important;margin-bottom:18px!important;border-bottom:1px solid var(--line);isolation:isolate}
+        .explorer-toolbar .explorer-search{display:block}
         .explorer-status{margin:0 0 10px!important;padding:0;font-size:11px;color:var(--muted)}
-        .filter-row{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+        .filter-row{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 1px 3px}
         .filter-row::-webkit-scrollbar{display:none}
         .filter-btn{flex:0 0 auto;white-space:nowrap}
+        .explorer-v2-tools{position:static!important;top:auto!important;z-index:auto!important;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:transparent!important;backdrop-filter:none!important}
+        .explorer-v2-tools::-webkit-scrollbar{display:none}
+        .explorer-v2-tools>*{flex:0 0 auto}
+        .explorer-v2-tools .v2-spacer{display:none}
       }
       @media(min-width:801px){.site-header nav{display:flex!important}.site-header .menu{display:none!important}}
     `;
