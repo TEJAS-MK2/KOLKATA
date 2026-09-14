@@ -139,7 +139,7 @@ jobs:
           grep -q 'Kumartuli Sarbojanin' pandal-expansion-more-2026.js
           grep -q 'Hatibagan Nabinpally' pandal-expansion-more-2026.js
           grep -q '20 Palli Sarbojani Durgotsab' pandal-expansion-more-2026.js
-          grep -q 'Route-first' puja-guides.js
+          grep -q 'ROUTE-FIRST PUJO' puja-guides.js
           grep -q 'Old Kolkata, on foot' puja-guides.js
           grep -q 'Lights, themes & adda' puja-guides.js
           grep -q 'College Street after dark' puja-guides.js
