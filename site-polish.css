@@ -10,18 +10,14 @@
   --polish-muted:#716a61;
   --polish-shadow:0 18px 50px rgba(24,21,18,.09);
 }
-
-/* Global rhythm + selection */
 ::selection{background:var(--polish-red);color:#fff}
 html{scroll-padding-top:92px}
 body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 img{image-rendering:auto}
 a,button,input{accent-color:var(--polish-red)}
-button,a{ -webkit-tap-highlight-color:transparent }
+button,a{-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:3px solid rgba(180,49,34,.3);outline-offset:3px}
-
-/* Header */
-.site-header{height:76px;background:rgba(247,244,238,.9);border-bottom-color:rgba(180,49,34,.12);box-shadow:0 8px 30px rgba(24,21,18,.06);backdrop-filter:blur(18px) saturate(130%)}
+.site-header{height:76px;background:rgba(247,244,238,.9);border-bottom-color:rgba(180,49,34,.12);box-shadow:0 8px 30px rgba(24,21,18,.06);backdrop-filter:blur(18px) saturate(130%);z-index:1000}
 .site-header .brand{gap:12px}
 .site-header .brand-bengali{font-family:var(--bengali);font-size:18px;letter-spacing:0}
 .site-header .brand small{padding:.35em .6em;border:1px solid rgba(180,49,34,.2);border-radius:999px;background:rgba(180,49,34,.05)}
@@ -29,8 +25,15 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .site-header nav a:hover{color:var(--polish-red);transform:translateY(-1px)}
 .menu{border-radius:10px;transition:background .2s ease,transform .2s ease}
 .menu:hover{background:rgba(180,49,34,.06);transform:translateY(-1px)}
-
-/* Hero */
+.menu[aria-expanded="true"]{background:rgba(180,49,34,.1)}
+.menu[aria-expanded="true"] span:first-child{transform:translateY(4px) rotate(45deg)}
+.menu[aria-expanded="true"] span:last-child{transform:translateY(-4px) rotate(-45deg)}
+@media(max-width:600px){
+  .site-header.menu-open nav{display:flex;position:absolute;left:10px;right:10px;top:calc(100% + 8px);z-index:1100;flex-direction:column;gap:4px;padding:10px;border:1px solid rgba(180,49,34,.12);border-radius:16px;background:rgba(255,253,250,.97);box-shadow:0 22px 50px rgba(24,21,18,.16);backdrop-filter:blur(18px)}
+  .site-header.menu-open nav a{display:block;padding:13px 14px;border-radius:10px}
+  .site-header.menu-open nav a:active,.site-header.menu-open nav a:hover{background:rgba(180,49,34,.07);transform:none}
+  html.menu-is-open,html.menu-is-open body{overflow:hidden}
+}
 .hero{isolation:isolate}
 .hero-image{transform:scale(1.015);transition:transform 1.2s cubic-bezier(.16,1,.3,1),filter .6s ease}
 .hero:hover .hero-image{transform:scale(1.025)}
@@ -42,8 +45,6 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .hero-actions .primary:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(0,0,0,.2)}
 .text-link{border-bottom:1px solid rgba(255,255,255,.3);transition:border-color .2s ease,color .2s ease}
 .text-link:hover{border-color:#fff}
-
-/* Sections */
 .section-label{letter-spacing:.16em}
 .section h2{text-wrap:balance}
 .intro{background:linear-gradient(180deg,#faf8f3,var(--polish-paper))}
@@ -58,8 +59,6 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .culture-photo{box-shadow:inset -30px 0 60px rgba(24,21,18,.08)}
 .culture-card{position:relative}
 .culture-card:before{content:"✦";position:absolute;top:45px;right:60px;color:rgba(180,49,34,.3);font-size:22px}
-
-/* Explorer */
 .guide{background:radial-gradient(circle at 90% 5%,rgba(180,49,34,.045),transparent 25%),var(--polish-paper)}
 .guide-head{margin-bottom:28px}
 .puja-quick-info>div{background:linear-gradient(145deg,#fffdfa,#f8f4ed);border-color:var(--polish-line);box-shadow:0 6px 20px rgba(24,21,18,.035)}
@@ -85,8 +84,6 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .leaflet-container{font-family:var(--sans)}
 .leaflet-control-zoom{border:0!important;box-shadow:0 6px 18px rgba(24,21,18,.16)!important}
 .leaflet-control-zoom a{border:0!important}
-
-/* Route + utility modules */
 .route-planner{background:linear-gradient(145deg,#181512,#241e19);border-color:#40372f;box-shadow:0 20px 60px rgba(24,21,18,.18)}
 .route-primary{box-shadow:0 8px 24px rgba(255,255,255,.1)}
 .route-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,255,255,.14)}
@@ -96,27 +93,28 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .night-progress-bar{background:linear-gradient(90deg,#b88a3b,#e0b96f)}
 .puja-guides,.puja-feature-suite,.puja-bingo,.puja-passport{border-color:#ded6ca!important}
 .puja-guide-card{background:#fffdfa!important}
-
-/* Gallery */
 .gallery{background:linear-gradient(145deg,#171310,#211a16)}
 .gallery-grid{gap:14px}
 .gallery-grid .tile{box-shadow:0 10px 35px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.16,1,.3,1),filter .35s ease,box-shadow .35s ease}
 .gallery-grid .tile:hover{transform:scale(.985);filter:saturate(1);box-shadow:0 18px 45px rgba(0,0,0,.25)}
-
-/* Closing */
 .closing{background:radial-gradient(circle at 50% 35%,rgba(180,49,34,.08),transparent 34%),var(--polish-paper)}
 .closing h2{text-wrap:balance}
 .closing .primary{box-shadow:0 9px 25px rgba(24,21,18,.12)}
 .closing .primary:hover{transform:translateY(-2px)}
 footer{background:#15120f;border-top-color:#3a312a}
-
-/* Modal / lightbox */
 .lightbox{backdrop-filter:blur(10px)}
 .lightbox img{box-shadow:0 25px 90px rgba(0,0,0,.35)}
 .pandal-details-modal{backdrop-filter:blur(12px)}
 .pandal-details-card{box-shadow:0 30px 90px rgba(0,0,0,.2)}
-
-/* Mobile refinement */
+.kolkata-page-enter .site-header,.kolkata-page-enter .hero-content,.kolkata-page-enter .hero-mark,.kolkata-page-enter .scroll-note{opacity:0}
+.kolkata-page-ready .site-header{animation:kolkataFadeDown .65s cubic-bezier(.16,1,.3,1) both}
+.kolkata-page-ready .hero-content{animation:kolkataHeroIn .9s .08s cubic-bezier(.16,1,.3,1) both}
+.kolkata-page-ready .hero-mark{animation:kolkataMarkIn 1s .2s cubic-bezier(.16,1,.3,1) both}
+.kolkata-page-ready .scroll-note{animation:kolkataFadeUp .7s .35s ease both}
+@keyframes kolkataFadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes kolkataHeroIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes kolkataMarkIn{from{opacity:0;transform:scale(.86) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes kolkataFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(max-width:900px){
   .site-header{height:66px}
   .stats div:not(:last-child):after{display:none}
@@ -145,6 +143,7 @@ footer{background:#15120f;border-top-color:#3a312a}
   footer{padding-bottom:24px}
 }
 @media(prefers-reduced-motion:reduce){
+  .kolkata-page-ready .site-header,.kolkata-page-ready .hero-content,.kolkata-page-ready .hero-mark,.kolkata-page-ready .scroll-note{animation:none!important}
   .hero-image,.hero-actions .primary,.pandal-card,.gallery-grid .tile,.closing .primary{transition:none!important}
   .hero:hover .hero-image,.hero-actions .primary:hover,.pandal-card:hover,.gallery-grid .tile:hover,.closing .primary:hover{transform:none!important}
 }
