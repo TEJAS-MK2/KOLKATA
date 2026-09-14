@@ -37,61 +37,35 @@
     document.head.appendChild(style);
     const setMenu=open=>{nav.dataset.open=String(open);menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close menu':'Open menu')};
     const syncMenu=()=>{if(window.innerWidth>800)setMenu(false);else setMenu(nav.dataset.open==='true')};
-    menu.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();setMenu(nav.style.display==='flex')});
+    menu.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();setMenu(nav.dataset.open!=='true')});
     nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{if(window.innerWidth<=800)setMenu(false)}));
     document.addEventListener('click',event=>{if(window.innerWidth<=800&&nav.dataset.open==='true'&&!nav.contains(event.target)&&!menu.contains(event.target))setMenu(false)});
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&window.innerWidth<=800&&nav.dataset.open==='true'){event.preventDefault();setMenu(false);menu.focus()}});
     window.addEventListener('resize',syncMenu,{passive:true});syncMenu();
   }
 
-  if(!modal)return;
-  const image=document.querySelector('#details-image'),zone=document.querySelector('#details-zone'),title=document.querySelector('#details-title'),summary=document.querySelector('#details-summary'),area=document.querySelector('#details-area'),zoneFact=document.querySelector('#details-zone-fact'),rating=document.querySelector('#details-rating'),route=document.querySelector('#details-route'),directions=document.querySelector('#details-directions');
-  let current=null,previousFocus=null;
-  const descriptions={
-    'Bagbazar Sarbojanin':'A heritage favourite in North Kolkata, known for its long-running community Puja and classic Bagbazar atmosphere.',
-    'Kumartuli Park':'A North Kolkata stop beside the artisan quarter, pairing pandal culture with the neighbourhood where many Durga idols are made.',
-    'Shobhabazar Rajbari':'A historic North Kolkata experience centred on the old Rajbari tradition and a very different sense of Puja scale.',
-    'College Square':'A Central Kolkata favourite around College Street, especially atmospheric when the surrounding streets light up at night.',
-    'Santosh Mitra Square':'A Central Kolkata theme-driven stop in the Sealdah area, best treated as one of the route highlights when crowd conditions allow.',
-    'Maddox Square':'A classic South Kolkata adda spot in Ballygunge with a relaxed neighbourhood identity and a strong evening atmosphere.',
-    'Deshapriya Park':'A major South Kolkata stop around Deshapriya Park, useful as an anchor for a wider south-side Puja route.',
-    'Naktala Udayan Sangha':'A neighbourhood favourite in Naktala, suited to visitors who want to explore beyond the central headline pandals.'
-  };
-  function findPandal(name){return window.pandals?.find?.(p=>p.name===name)||null}
-  function directionsUrl(p){
-    if(!p)return 'https://www.google.com/maps/search/?api=1&query=Kolkata%20Durga%20Puja';
-    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';
-    const travel=mode==='two-wheeler'?'driving':mode;
-    if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)))return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(travel)}`;
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name}, ${p.area||''}, Kolkata, West Bengal`)}`;
+  const findPandal=name=>window.pandals?.find?.(p=>p.name===name)||null;
+  let lastFocus=null;
+  function openDetails(name){
+    const p=findPandal(name);if(!p||!modal)return;
+    lastFocus=document.activeElement;
+    const img=document.querySelector('#details-image'),zone=document.querySelector('#details-zone'),title=document.querySelector('#details-title'),summary=document.querySelector('#details-summary'),area=document.querySelector('#details-area'),zoneFact=document.querySelector('#details-zone-fact'),rating=document.querySelector('#details-rating'),route=document.querySelector('#details-route'),directions=document.querySelector('#details-directions');
+    if(img){img.src=p.photo||'';img.alt=`Archive photo associated with ${p.name}`;img.style.display=p.photo?'block':'none'}
+    if(zone)zone.textContent=p.zone||'Kolkata';if(title)title.textContent=p.name;if(summary)summary.textContent=p.tag||'Kolkata Puja pandal guide point.';if(area)area.textContent=p.area||'Kolkata';if(zoneFact)zoneFact.textContent=p.zone||'Kolkata';if(rating)rating.textContent=Number(p.rating)>0?`${Number(p.rating).toFixed(1)} / 5 (historical)`: 'Not rated';
+    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';const travel=mode==='two-wheeler'?'driving':mode;
+    if(directions)directions.href=Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(travel)}`:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name}, ${p.area||''}, Kolkata, West Bengal`)}`;
+    const inRoute=window.routeStops?.some?.(x=>x.name===p.name);if(route){route.textContent=inRoute?'Added ✓':'Add to Puja Night +';route.disabled=!!inRoute}
+    modal.hidden=false;modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>modal.classList.add('open'));document.body.style.overflow='hidden';route?.focus();
   }
-  function focusables(){return [...modal.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null)}
-  function openDetails(p){
-    if(!p)return;current=p;previousFocus=document.activeElement;
-    image.src=p.photo||'';image.alt=p.photo?`Archive photo associated with ${p.name}`:'Archive image unavailable';image.onerror=()=>{image.removeAttribute('src');image.alt='Archive image unavailable'};
-    zone.textContent=`${p.zone} Kolkata · ${p.tag||'Discovery listing'}`;title.textContent=p.name;summary.textContent=descriptions[p.name]||`Explore ${p.name} in ${p.area}, ${p.zone} Kolkata.`;area.textContent=p.area||'Kolkata';zoneFact.textContent=p.zone||'Kolkata';rating.textContent=p.rating?`${p.rating.toFixed(1)} / 5`:'Not rated';
-    directions.href=directionsUrl(p);
-    const inRoute=window.routeStops?.some?.(x=>x.name===p.name);route.textContent=inRoute?'Added ✓':'Add to Puja Night +';route.disabled=!!inRoute;
-    modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';document.querySelector('.pandal-details-close')?.focus();
-  }
-  function closeDetails(){modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.style.overflow='';previousFocus?.focus?.();current=null}
-  document.addEventListener('click',e=>{const card=e.target.closest?.('.pandal-card');if(card&&!e.target.closest('a,button'))openDetails(findPandal(card.dataset.name));if(e.target.matches?.('[data-details-close]'))closeDetails()});
-  route?.addEventListener('click',()=>{if(!current)return;if(window.addToRoute){window.addToRoute(current);route.textContent='Added ✓';route.disabled=true}});
-  document.addEventListener('keydown',e=>{if(modal.hidden)return;if(e.key==='Escape'){e.preventDefault();closeDetails();return}if(e.key==='Tab'){const items=focusables();if(!items.length)return;const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
-})();
-
-(()=>{
-  const list=document.querySelector('#pandal-list');if(!list)return;
-  const sync=()=>{
-    const visible=new Set([...list.querySelectorAll('.pandal-card')].map(c=>c.dataset.name));
-    document.querySelectorAll('.leaflet-marker-icon').forEach(icon=>{const name=icon.getAttribute('title')||icon.getAttribute('alt');if(name)icon.style.display=visible.has(name)?'':'none'});
-    const mode=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';
-    const travel=mode==='two-wheeler'?'driving':mode;
-    list.querySelectorAll('.pandal-card').forEach(card=>{const p=window.pandals?.find?.(x=>x.name===card.dataset.name),link=card.querySelector('.route');if(!p||!link)return;if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)))link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(travel)}`;else link.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name}, ${p.area||''}, Kolkata, West Bengal`)}`});
-    let status=document.querySelector('.explorer-status');if(!status){status=document.createElement('p');status.className='explorer-status';status.setAttribute('aria-live','polite');document.querySelector('.explorer-toolbar')?.after(status)}
-    const count=list.querySelectorAll('.pandal-card').length;status.textContent=`${count} ${count===1?'pandal':'pandals'} shown`;
-  };
-  new MutationObserver(sync).observe(list,{childList:true});
-  document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(sync,0)));
-  sync();
+  function closeDetails(){if(!modal)return;modal.classList.remove('open');modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.style.overflow='';lastFocus?.focus?.();lastFocus=null}
+  document.addEventListener('click',event=>{const card=event.target.closest('#pandal-list .pandal-card');if(!card||event.target.closest('a,button'))return;openDetails(card.dataset.name)});
+  modal?.querySelectorAll('[data-details-close]').forEach(el=>el.addEventListener('click',closeDetails));
+  modal?.querySelector('.pandal-details-close')?.addEventListener('click',closeDetails);
+  document.querySelector('#details-route')?.addEventListener('click',()=>{const p=findPandal(document.querySelector('#details-title')?.textContent?.trim());if(!p)return;if(window.addToRoute){window.addToRoute(p);document.querySelector('#details-route').textContent='Added ✓';document.querySelector('#details-route').disabled=true}});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&modal&&!modal.hidden)closeDetails()});
+  document.addEventListener('click',event=>{if(event.target.closest('.pandal-card')){const name=event.target.closest('.pandal-card')?.dataset.name;if(name)setTimeout(()=>openDetails(name),0)}});
+  function syncRouteLinks(){const travel=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';const mode=travel==='two-wheeler'?'driving':travel;document.querySelectorAll('#pandal-list .pandal-card[data-name]').forEach(card=>{const p=findPandal(card.dataset.name),link=card.querySelector('.route');if(!p||!link)return;if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)))link.href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mode)}`;else link.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name}, ${p.area||''}, Kolkata, West Bengal`)}`})}
+  const list=document.querySelector('#pandal-list');if(list)new MutationObserver(()=>requestAnimationFrame(syncRouteLinks)).observe(list,{childList:true});
+  window.addEventListener('kolkata:canonical-controller-ready',syncRouteLinks);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',syncRouteLinks,{once:true});else syncRouteLinks();
 })();
