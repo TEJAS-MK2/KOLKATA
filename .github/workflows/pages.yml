@@ -29,13 +29,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
+          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
       - name: Validate JavaScript
         shell: bash
         run: |
           set -euo pipefail
           node --check intro-upgrade.js
           node --check pandal-catalog-upgrade.js
+          node --check map-fallback.js
           node --check puja2026-suite.js
           node --check qa-polish.js
       - name: Upload site
