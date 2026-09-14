@@ -14,7 +14,8 @@ try {
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 15000 });
   await page.waitForFunction(() => window.__KOLKATA_CANONICAL_CONTROLLER_READY === true, null, { timeout: 10000 });
-  await wait(500);
+  // Companion/Toolkit/Bingo modules initialize asynchronously after the core controller.
+  await wait(3000);
 
   const checks = await page.evaluate(() => ({
     cards: document.querySelectorAll('.pandal-card').length,
