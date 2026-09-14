@@ -19,33 +19,67 @@ const CANONICAL={
   'Hindusthan Park':[22.51768,88.36207],
   'Ballygunge Cultural Association':[22.51646,88.35561],
   'Bosepukur Sitala Mandir':[22.51915,88.38475],
-  '66 Pally':[22.51824,88.34286]
+  '66 Pally':[22.51824,88.34286],
+  'Mudiali':[22.51008,88.34663],
+  'Suruchi Sangha':[22.50899,88.33395],
+  'Jagat Mukherjee Park':[22.59967,88.36600],
+  'Kashi Bose Lane':[22.59100,88.36890],
+  'Nalin Sarkar Street':[22.59500,88.37390],
+  'Ahiritola Sarbojanin':[22.59484,88.35717],
+  'Kumartuli Sarbojanin':[22.60088,88.36232],
+  'Hatibagan Nabinpally':[22.59590,88.37342],
+  '20 Palli Sarbojani Durgotsab':[22.59363,88.35813]
 };
 const EXTRA={
-  'Tala Prattoy':['North','Tala',22.61046,88.38460,'Verified location'],
-  'Hatibagan Sarbojanin':['North','Hatibagan',22.59439,88.37200,'Verified location'],
-  'Sree Bhumi Sporting Club':['North','Sreebhumi',22.59890,88.40293,'Verified location'],
-  'Dumdum Park Bharat Chakra':['North','Dum Dum Park',22.61082,88.41460,'Verified location'],
-  'Dumdum Park Sarbojanin':['North','Dum Dum Park',22.60944,88.41641,'Verified location'],
-  'Chetla Agrani':['South','Chetla',22.51640,88.33684,'Verified location'],
-  'Ekdalia Evergreen':['South','Gariahat',22.52125,88.36596,'Verified location'],
-  'Hindusthan Park':['South','Gariahat',22.51768,88.36207,'Verified location'],
-  'Ballygunge Cultural Association':['South','Ballygunge',22.51646,88.35561,'Verified location'],
-  'Bosepukur Sitala Mandir':['South','Bosepukur',22.51915,88.38475,'Verified location'],
-  '66 Pally':['South','Ballygunge',22.51824,88.34286,'Verified location']
+  'Tala Prattoy':['North','Tala'],
+  'Hatibagan Sarbojanin':['North','Hatibagan'],
+  'Sree Bhumi Sporting Club':['North','Sreebhumi'],
+  'Dumdum Park Bharat Chakra':['North','Dum Dum Park'],
+  'Dumdum Park Sarbojanin':['North','Dum Dum Park'],
+  'Kumartuli Park':['North','Kumartuli'],
+  'Shobhabazar Rajbari':['North','Shobhabazar'],
+  'College Square':['Central','College Street'],
+  'Santosh Mitra Square':['Central','Sealdah'],
+  'Maddox Square':['South','Ballygunge'],
+  'Deshapriya Park':['South','Deshapriya Park'],
+  'Naktala Udayan Sangha':['South','Naktala'],
+  'Chetla Agrani':['South','Chetla'],
+  'Ekdalia Evergreen':['South','Gariahat'],
+  'Hindusthan Park':['South','Gariahat'],
+  'Ballygunge Cultural Association':['South','Ballygunge'],
+  'Bosepukur Sitala Mandir':['South','Bosepukur'],
+  '66 Pally':['South','Ballygunge'],
+  'Mudiali':['South','Tollygunge'],
+  'Suruchi Sangha':['South','New Alipore'],
+  'Jagat Mukherjee Park':['North','Shobhabazar'],
+  'Kashi Bose Lane':['North','Hatibagan'],
+  'Nalin Sarkar Street':['North','Hatibagan'],
+  'Ahiritola Sarbojanin':['North','Ahiritola'],
+  'Kumartuli Sarbojanin':['North','Kumartuli'],
+  'Hatibagan Nabinpally':['North','Hatibagan'],
+  '20 Palli Sarbojani Durgotsab':['North','Ahiritola']
 };
 function normalize(list){
   if(!Array.isArray(list))return list;
-  for(const [name,[zone,area,lat,lng,tag]] of Object.entries(EXTRA)){
-    if(!list.some(p=>p?.name===name))list.push({name,zone,area,lat,lng,tag,photo:'',rating:0});
+  for(const [name,coords] of Object.entries(CANONICAL)){
+    const existing=list.find(p=>p?.name===name);
+    const meta=EXTRA[name]||[];
+    if(existing){
+      existing.lat=coords[0];existing.lng=coords[1];
+      if(meta[0])existing.zone=meta[0];
+      if(meta[1])existing.area=meta[1];
+      existing.tag=existing.tag||'Verified location';
+    }else{
+      list.push({name,zone:meta[0]||'Kolkata',area:meta[1]||'Kolkata',lat:coords[0],lng:coords[1],tag:'Verified location',photo:'',rating:0});
+    }
   }
-  list.forEach(p=>{const xy=CANONICAL[p?.name];if(xy){p.lat=xy[0];p.lng=xy[1]}});
   return list;
 }
-let stored;
+let stored=[];
 try{
   const desc=Object.getOwnPropertyDescriptor(window,'pandals');
-  if(desc && !desc.configurable){stored=normalize(window.pandals);}
+  if(desc?.get&&desc?.set)stored=normalize(Array.isArray(window.pandals)?window.pandals:[]);
+  else if(desc&&!desc.configurable)stored=normalize(window.pandals);
   else Object.defineProperty(window,'pandals',{configurable:true,get(){return stored},set(value){stored=normalize(value)}});
 }catch{}
 if(window.L?.map&&!window.L.map.__kolkataWrapped){
