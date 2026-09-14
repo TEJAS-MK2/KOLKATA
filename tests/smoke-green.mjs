@@ -31,8 +31,7 @@ try {
     leaflet: Boolean(window.L),
     state: Boolean(window.KolkataState),
     cards: document.querySelectorAll('.pandal-card').length,
-    scripts: [...document.scripts].map(s => s.src || 'inline'),
-    pageErrors
+    scripts: [...document.scripts].map(s => s.src || 'inline')
   }));
   if (bootstrap.pandals === null || bootstrap.uniquePandals !== bootstrap.pandals) {
     throw new Error(`Bootstrap catalog invalid: ${JSON.stringify(bootstrap)}`);
