@@ -24,11 +24,14 @@ Before reusing an image outside this project, check the individual Wikimedia Com
 - [29 Palli, Behala](https://commons.wikimedia.org/wiki/File:29_Palli,_Behala.JPG)
 - [Bosepukur Talbagan](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Bosepukur_Talbagan_-_Kasba_-_Kolkata_2012-10-23_1178.JPG)
 - [Chetla Agrani Club](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Chetla_Agrani_Club_-_Kolkata_2017-09-26_4199.JPG)
-- [Ekdalia Evergreen](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Ekdalia_Evergreen_-_Ekdalia_Road_-_Kolkata_2013-10-11_3312.JPG)
+- [Ekdalia Evergreen](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Ekdalia_Evergreen_-_Ekdalia_Road_-_Kolkata_2017-09-26_4105.JPG)
 - [Jodhpur Park](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Jodhpur_Park_-_Kolkata_2017-09-26_4067-4070.tif)
 - [Tridhara Sammilani](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Tridhara_Sammilani_-_Manohar_Pukur_Road_-_Kolkata_2014-10-02_9048-9050.TIF)
 - [Singhi Park](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_Singhi_Park_-_Dover_Lane_-_Kolkata_2013-10-11_3410.JPG)
 - [Bosepukur Sitala Mandir](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Bosepukur_Sitala_Mandir_-_Kasba_-_Kolkata_2012-10-23_1154.JPG)
 - [Barisha Sporting Club](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_Barisha_Sporting_Club_-_Kolkata_2012-10-23_1147.JPG)
+- [66 Pally](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_66_Pally_-_Nepal_Bhattacharya_Street_-_Kolkata_2015-10-21_6346.JPG)
+- [Ballygunge Cultural Association — 02](https://commons.wikimedia.org/wiki/File:DurgaPuja2017_-_Pandal_of_Ballygunge_Cultural_Association_02.jpg)
+- [Hindustan Park — 01](https://commons.wikimedia.org/wiki/File:DurgaPuja2017_-_Pandal_of_Hindustan_Park_01.jpg)
 
 The project does not claim ownership of these archival photographs.
