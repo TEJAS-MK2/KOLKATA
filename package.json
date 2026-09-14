@@ -7,6 +7,6 @@
     "test:smoke": "node tests/smoke-green.mjs"
   },
   "devDependencies": {
-    "playwright": "1.55.0"
+    "playwright": "1.62.1"
   }
 }
