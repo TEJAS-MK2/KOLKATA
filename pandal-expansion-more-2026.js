@@ -9,7 +9,12 @@
     'Alipur Sarbojanin':{zone:'South',area:'Alipore',lat:22.51963,lng:88.33366,tag:'Verified location',photo:''},
     'Dhakuria Sarbojanin':{zone:'South',area:'Dhakuria',lat:22.51003,lng:88.37199,tag:'Verified location',photo:''},
     'Barisha Sarbojanin':{zone:'South',area:'Barisha',lat:22.47999,lng:88.30808,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Barisha_Sarbojanin_2025_Durga_utsav_01.jpg'},
-    'Shibmandir Sarbojanin':{zone:'South',area:'Southern Avenue',lat:22.51100,lng:88.34985,tag:'Verified location',photo:''}
+    'Shibmandir Sarbojanin':{zone:'South',area:'Southern Avenue',lat:22.51100,lng:88.34985,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Shibmandir_Sarbojanin_Durgotsav_2025_01.jpg'},
+    'Lake Youth Corner':{zone:'South',area:'Lake Gardens',lat:22.51495,lng:88.35470,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/LakeYouth_Corner_Durga_puja_2025_01.jpg'},
+    'Lake Kalibari':{zone:'South',area:'Lake Gardens',lat:22.51367,lng:88.35503,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Lake_Kalibari_01.jpg'},
+    'Samajsebi Sangha':{zone:'South',area:'Lake Road',lat:22.51474,lng:88.35600,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Samaj_Sebi_Sangha_Durga_Puja_in_South_Kolkata_(Lake_View_Road)_02.jpg'},
+    'Singhi Park':{zone:'South',area:'Gariahat',lat:22.52122,lng:88.36301,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Singhi_Park_-_Dover_Lane_-_Kolkata_2014-10-02_8943.JPG'},
+    'Tarun Matri Sevak Samity':{zone:'South',area:'Behala',lat:22.5022,lng:88.3215,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Behala_Tarun_Matri_Sevak_Samity_Durga_puja_2025_01.jpg'}
   };
   window.KOLKATA_MORE_PINS=Object.freeze(Object.fromEntries(Object.entries(MORE).map(([name,p])=>[name,[p.lat,p.lng]])));
   window.KOLKATA_PIN_METADATA=window.KOLKATA_PIN_METADATA||{};
@@ -19,11 +24,6 @@
 
   const EXTRA=[
     ['Aatchala Bari, Barisha','South','Barisha','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Aatchala_Bari%2C_Barisha_01.jpg'],
-    ['Lake Kalibari','South','Lake Kalibari','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Lake_Kalibari_01.jpg'],
-    ['Lake Youth Corner','South','Lake Gardens','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Lake_Youth_Corner_01.jpg'],
-    ['Tarun Matri Sevak Samity','Central','Central Kolkata','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Tarun_Matri_Sevak_Samity_01.jpg'],
-    ['Samajsebi Sangha','South','South Kolkata','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Samajsebi_Sangha_01.jpg'],
-    ['Ramdulal Sarkar Street Amra Sobai','North','Ramdulal Sarkar Street','https://commons.wikimedia.org/wiki/Special:FilePath/Ramdulal_sarkar_street_Amra_sobai_Durgostav_committee_2025_01.jpg'],
     ['Chaltabagan Sarbojanin','North','Chaltabagan','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Chalta_Bagan_Sarbojanin_18.jpg'],
     ['Dum Dum Park Tarun Sangha','North','Dum Dum Park','https://commons.wikimedia.org/wiki/Special:FilePath/Dum_Dum_Park_Tarun_Sangha_2023.jpg'],
     ['Behala Club','South','Behala','https://commons.wikimedia.org/wiki/Special:FilePath/Behala_Club.jpg'],
