@@ -13,6 +13,12 @@ function patchCatalogCards(){
   document.querySelectorAll('[data-verified-count]').forEach(el=>{el.textContent=String(Object.keys(canonical).length)});
 }
 function patchCompanionDates(){document.querySelectorAll('#puja-pro, #puja-companion, #puja-night-upgrade, body').forEach(root=>{root.querySelectorAll?.('*').forEach(el=>{if(el.children.length===0&&/22[–-]24\s*Oct/.test(el.textContent))el.textContent=el.textContent.replace(/22[–-]24\s*Oct/g,'22–23 Oct')})})}
+function patchCompanionHolidayCopy(){
+  const title=document.getElementById('pro-today-title');
+  const copy=document.getElementById('pro-today-copy');
+  if(title)title.textContent=title.textContent.replace(/days until Puja begins\.?/i,'days until the Puja holiday window begins.');
+  if(copy)copy.textContent=copy.textContent.replace(/Maha Chaturthi starts the official 2026 Puja holiday period on 15 October\.?/i,'The official 2026 Puja holiday window begins on 15 October; core ritual days run from Shashthi on 17 October through Dashami on 21 October.');
+}
 function patchHolidayCopy(){
   document.querySelectorAll('.hero .eyebrow, .puja-countdown .countdown-title, .puja-countdown .countdown-date').forEach(el=>{
     if(el.classList.contains('countdown-title'))el.textContent=el.textContent.replace(/Durga Puja begins in/i,'Puja holiday window begins in');
@@ -24,7 +30,8 @@ function fixGalleryA11y(){document.querySelectorAll('.gallery-grid .tile').forEa
 function fixLeafletAssetUrls(){document.querySelectorAll('img[src*="/distmarker-"]').forEach(img=>{img.src=img.src.replace('/distmarker-','/dist/images/marker-')})}
 function normalizeLinks(){const active=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem(MODE_KEY)||'walking';const mode=active==='two-wheeler'?'driving':active;document.querySelectorAll('a[href*="google.com/maps/dir/"]').forEach(a=>{try{const u=new URL(a.href);u.searchParams.set('travelmode',mode);a.href=u.toString();const rel=new Set((a.rel||'').split(/\s+/).filter(Boolean));rel.add('noopener');a.rel=[...rel].join(' ')}catch{}})}
 function registerSW(){if(!('serviceWorker' in navigator))return;navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{})}
-function boot(){window.KOLKATA_NORMALIZE_PANDALS?.(window.pandals);syncMode();exposeSelector();patchCatalogCards();patchCompanionDates();patchHolidayCopy();fixGalleryA11y();normalizeLinks();fixLeafletAssetUrls();registerSW();setTimeout(()=>{patchCatalogCards();patchCompanionDates();patchHolidayCopy();fixGalleryA11y();normalizeLinks();fixLeafletAssetUrls()},1200);setTimeout(()=>{patchCatalogCards();patchCompanionDates();patchHolidayCopy();normalizeLinks();fixLeafletAssetUrls()},3200)}
+function patchAll(){patchCatalogCards();patchCompanionDates();patchCompanionHolidayCopy();patchHolidayCopy();fixGalleryA11y();normalizeLinks();fixLeafletAssetUrls()}
+function boot(){window.KOLKATA_NORMALIZE_PANDALS?.(window.pandals);syncMode();exposeSelector();patchAll();registerSW();setTimeout(patchAll,1200);setTimeout(patchAll,3200)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-window.addEventListener('load',()=>{patchCatalogCards();patchHolidayCopy();normalizeLinks();fixLeafletAssetUrls()},{once:true});
+window.addEventListener('load',patchAll,{once:true});
 })();
