@@ -70,20 +70,18 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
+          import re
           from pathlib import Path
           path=Path('index.html')
           html=path.read_text(encoding='utf-8')
-          targets=('anime.min.js','leaflet.js')
-          for target in targets:
-            html=html.replace(' defer></script>', ' async></script>', 1) if target not in html else html
-          replacements={
-            'src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous" defer>':'src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous" async>',
-            'src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer>':'src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" async>',
-            'src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer>':'src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" async>'
-          }
-          for old,new in replacements.items():
-            if old not in html: raise SystemExit(f'Expected third-party script tag was not found: {old[:80]}')
-            html=html.replace(old,new,1)
+          patterns=[
+            r'(<script\b[^>]*src="https://cdn\.jsdelivr\.net/npm/leaflet@1\.9\.4/dist/leaflet\.js"[^>]*?)(?:\s+(?:defer|async))?\s*>',
+            r'(<script\b[^>]*src="https://cdnjs\.cloudflare\.com/ajax/libs/animejs/3\.2\.2/anime\.min\.js"[^>]*?)(?:\s+(?:defer|async))?\s*>',
+            r'(<script\b[^>]*src="https://unpkg\.com/leaflet@1\.9\.4/dist/leaflet\.js"[^>]*?)(?:\s+(?:defer|async))?\s*>'
+          ]
+          for pattern in patterns:
+            html,count=re.subn(pattern,lambda m:m.group(1)+' async>',html,count=1)
+            if count != 1: raise SystemExit(f'Third-party script tag not found: {pattern}')
           path.write_text(html,encoding='utf-8')
           PY
           grep -q 'cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js.*async' index.html
