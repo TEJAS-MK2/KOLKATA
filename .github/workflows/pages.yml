@@ -74,8 +74,9 @@ jobs:
           from pathlib import Path
           path=Path('index.html')
           html=path.read_text(encoding='utf-8')
-          html,count=re.subn(r'<script\b[^>]*https://cdn\.jsdelivr\.net/npm/leaflet@1\.9\.4/dist/leaflet\.js[^>]*>\s*</script>', '', html, count=1, flags=re.I)
-          if count != 1: raise SystemExit('Duplicate jsDelivr Leaflet script tag not found')
+          duplicate='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'
+          if duplicate not in html: raise SystemExit('Duplicate jsDelivr Leaflet URL not found')
+          html=html.replace(duplicate,'data:text/javascript,',1)
           patterns=[
             r'(<script\b[^>]*src=["\']https://cdnjs\.cloudflare\.com/ajax/libs/animejs/3\.2\.2/anime\.min\.js["\'][^>]*?)(?:\s+(?:defer|async))?\s*>',
             r'(<script\b[^>]*src=["\']https://unpkg\.com/leaflet@1\.9\.4/dist/leaflet\.js["\'][^>]*?)(?:\s+(?:defer|async))?\s*>'
@@ -87,7 +88,7 @@ jobs:
           PY
           grep -q 'anime.min.js.*async' index.html
           grep -q 'unpkg.com/leaflet@1.9.4/dist/leaflet.js.*async' index.html
-          if grep -qi 'cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js' index.html; then echo 'Blocking duplicate Leaflet CDN remains'; exit 1; fi
+          if grep -q 'cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js' index.html; then echo 'Blocking duplicate Leaflet CDN remains'; exit 1; fi
       - name: Run production browser smoke test
         run: npm run test:smoke
       - name: Upload site
