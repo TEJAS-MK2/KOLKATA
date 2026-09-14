@@ -6,7 +6,7 @@
   const state=read(); state.visited=state.visited||[]; state.route=state.route||[]; state.passport=state.passport||[];
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const all=()=>Array.isArray(window.pandals)?window.pandals:[];
-  const catalogNames=()=>Array.from(document.querySelectorAll('#pandal-list .pandal-card[data-name]')).map(x=>x.dataset.name);
+  const syncRouteState=()=>{state.route=Array.isArray(window.routeStops)?window.routeStops.map(p=>({name:p.name,lat:p.lat,lng:p.lng})):state.route;write(state)};
   function nearest(){
     if(!navigator.geolocation)return alert('Location is not available in this browser.');
     navigator.geolocation.getCurrentPosition(pos=>{
@@ -17,22 +17,29 @@
   }
   function addRoute(name){
     const p=all().find(x=>x.name===name); if(!p)return;
-    if(!state.route.some(x=>x.name===name)){state.route.push({name:p.name,lat:p.lat,lng:p.lng});write(state)}
+    if(typeof window.addToRoute==='function'){window.addToRoute(p);syncRouteState();}else if(!state.route.some(x=>x.name===name)){state.route.push({name:p.name,lat:p.lat,lng:p.lng});write(state)}
     renderRoute();
   }
-  function removeRoute(name){state.route=state.route.filter(x=>x.name!==name);write(state);renderRoute()}
+  function removeRoute(name){
+    if(typeof window.removeFromRoute==='function')window.removeFromRoute(name);
+    state.route=state.route.filter(x=>x.name!==name);write(state);renderRoute();
+  }
   function renderRoute(){
     const box=document.querySelector('#suite-route-list'); if(!box)return;
     box.innerHTML=state.route.length?state.route.map((p,i)=>`<div class="suite-route-row"><span><b>${i+1}</b> ${esc(p.name)}</span><button data-remove-route="${esc(p.name)}">Remove</button></div>`).join(''):'<p class="suite-muted">Add verified pins from the Explorer to build a route.</p>';
     box.querySelectorAll('[data-remove-route]').forEach(b=>b.onclick=()=>removeRoute(b.dataset.removeRoute));
+    updateStats();
+    const r=document.querySelector('#suite-open-route');if(r)r.href=routeLink();
   }
   function routeLink(){
-    if(state.route.length<2)return '#';
-    const pts=state.route.map(p=>`${p.lat},${p.lng}`).join('/');
+    const route=Array.isArray(window.routeStops)&&window.routeStops.length?window.routeStops:state.route;
+    if(route.length<1)return '#';
+    const pts=route.map(p=>`${p.lat},${p.lng}`).join('/');
     return `https://www.google.com/maps/dir/${pts}`;
   }
   function toggleVisited(name){
-    state.visited=state.visited.includes(name)?state.visited.filter(x=>x!==name):state.visited.concat(name);write(state);updateStats();renderPassport();}
+    state.visited=state.visited.includes(name)?state.visited.filter(x=>x!==name):state.visited.concat(name);write(state);updateStats();renderPassport();
+  }
   function updateStats(){
     const el=document.querySelector('#suite-stats'); if(el)el.textContent=`${state.visited.length} visited · ${state.route.length} in route`;
   }
@@ -50,12 +57,12 @@
     if(typeof panel.showModal==='function')panel.showModal();else panel.setAttribute('open','');
   }
   function toolkit(){
+    syncRouteState();
     const route=`<section class="suite-card"><div class="suite-card-head"><div><small>SMART ROUTE</small><h3>Your Puja Route</h3></div><span id="suite-stats"></span></div><div id="suite-route-list"></div><div class="suite-actions"><a class="suite-primary" href="${routeLink()}" target="_blank" rel="noopener" id="suite-open-route">Open route in Maps ↗</a><button id="suite-clear-route">Clear route</button></div></section>`;
     const passport=`<section class="suite-card"><div class="suite-card-head"><div><small>PUJA PASSPORT</small><h3>Places you've visited</h3></div></div><div id="suite-passport-list"></div></section>`;
     openPanel('Puja Toolkit',`${route}${passport}<section class="suite-grid"><button class="suite-tool" id="suite-near">Near me</button><button class="suite-tool" id="suite-focus">Verified pins</button><button class="suite-tool" id="suite-food">Food nearby</button><button class="suite-tool" id="suite-help">Visitor help</button></section>`);
     renderRoute();renderPassport();updateStats();
-    const r=document.querySelector('#suite-open-route'); if(r)r.href=routeLink();
-    document.querySelector('#suite-clear-route').onclick=()=>{state.route=[];write(state);renderRoute();const x=document.querySelector('#suite-open-route');if(x)x.href='#'};
+    document.querySelector('#suite-clear-route').onclick=()=>{if(typeof window.removeFromRoute==='function'&&Array.isArray(window.routeStops))window.routeStops.slice().forEach(p=>window.removeFromRoute(p.name));state.route=[];write(state);renderRoute();const x=document.querySelector('#suite-open-route');if(x)x.href='#'};
     document.querySelector('#suite-near').onclick=nearest;
     document.querySelector('#suite-focus').onclick=()=>{document.querySelector('#puja-suite-panel')?.close();document.querySelector('#pandal-map')?.scrollIntoView({behavior:'smooth',block:'center'})};
     document.querySelector('#suite-food').onclick=()=>openPanel('Food nearby','<p>Use Google Maps to find food around Kolkata Puja venues. The site does not invent restaurant listings.</p><a class="suite-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/food+near+Durga+Puja+pandal+Kolkata">Find food in Maps ↗</a>');
@@ -72,9 +79,9 @@
     if(card.dataset.suiteReady)return;card.dataset.suiteReady='1';const name=card.dataset.name;if(!name)return;
     const actions=card.querySelector('.pandal-actions');if(!actions)return;
     const v=document.createElement('button');v.type='button';v.className='suite-visit';v.textContent=state.visited.includes(name)?'Visited ✓':'Mark visited';v.onclick=e=>{e.stopPropagation();toggleVisited(name);v.textContent=state.visited.includes(name)?'Visited ✓':'Mark visited'};actions.appendChild(v);
-    const p=all().find(x=>x.name===name);if(p?.lat&&p?.lng){const r=document.createElement('button');r.type='button';r.className='suite-route-add';r.textContent=state.route.some(x=>x.name===name)?'In route ✓':'Add to route +';r.onclick=e=>{e.stopPropagation();addRoute(name);r.textContent='In route ✓'};actions.appendChild(r)}
+    const p=all().find(x=>x.name===name);if(p?.lat&&p?.lng&&!actions.querySelector('.catalog-route,.add-route,.suite-route-add')){const r=document.createElement('button');r.type='button';r.className='suite-route-add';r.textContent=state.route.some(x=>x.name===name)?'In route ✓':'Add to route +';r.onclick=e=>{e.stopPropagation();addRoute(name);r.textContent='In route ✓'};actions.appendChild(r)}
   }
   function observe(){const list=document.querySelector('#pandal-list');if(list){new MutationObserver(()=>list.querySelectorAll('.pandal-card').forEach(decorateCard)).observe(list,{childList:true})}}
-  function boot(){inject();observe();window.addEventListener('kolkata:state',()=>{document.querySelectorAll('#pandal-list .pandal-card').forEach(decorateCard)});}
+  function boot(){inject();observe();window.addEventListener('kolkata:state',()=>{document.querySelectorAll('#pandal-list .pandal-card').forEach(decorateCard);syncRouteState()});}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,1800),{once:true});else setTimeout(boot,1800);
 })();
