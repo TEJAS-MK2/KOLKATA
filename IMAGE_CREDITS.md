@@ -37,5 +37,9 @@ Before reusing an image outside this project, check the individual Wikimedia Com
 - [Suruchi Sangha's Durga Puja 2025 — 09](https://commons.wikimedia.org/wiki/File:Suruchi_Sangha%27s_Durga_Puja_2025_09.jpg)
 - [Jagat Mukherjee Park pandal — 2019](https://commons.wikimedia.org/wiki/File:Durga_Puja2019_-_Durga_Puja_Pandal_of_Jagat_Mukherjee_Park_in_Kolkata_10.jpg)
 - [Kashi Bose Lane pandal — 2019](https://commons.wikimedia.org/wiki/File:Durga_Puja2019_-_Durga_Puja_Pandal_of_Kashi_Bose_Lane_in_Kolkata_14.jpg)
+- [Nalin Sarkar Street Durga Puja — 2023](https://commons.wikimedia.org/wiki/File:Nalin_Sarkar_Street_Durga_Puja_2023_01.jpg)
+- [Ahiritola Sarbojanin Durgotsab — 2023](https://commons.wikimedia.org/wiki/File:Ahiritola_Sarbojanin_Durgotsab_2023_16.jpg)
+- [Kumartuli Sarbojanin Durgatsab — 2023](https://commons.wikimedia.org/wiki/File:Kumartuli_Sarbojanin_Durgatsab_2023_01.jpg)
+- [Hatibagan Nabinpally Durga Utsav Committee — 2024](https://commons.wikimedia.org/wiki/File:Hatibagan_Nabinpally_Durga_Utsav_Committee_04.jpg)
 
 The project does not claim ownership of these archival photographs.
