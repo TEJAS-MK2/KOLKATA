@@ -23,33 +23,56 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
       - name: Prepare site
         shell: bash
         run: |
           set -euo pipefail
-          python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); tags=['<script src=\"intro-upgrade.js\" defer></script>','<script src=\"pandal-catalog-upgrade.js\" defer></script>','<script src=\"map-fallback.js\" defer></script>','<script src=\"puja2026-suite.js\" defer></script>','<script src=\"qa-polish.js\" defer></script>','<script src=\"explorer-v2.js\" defer></script>','<script src=\"puja-companion.js\" defer></script>','<script src=\"puja-night-upgrade.js\" defer></script>','<script src=\"pandal-personal.js\" defer></script>','<script src=\"menu-fix.js\" defer></script>','<script src=\"filter-fix.js\" defer></script>','<script src=\"puja-countdown.js\" defer></script>','<script src=\"puja-companion-pro.js\" defer></script>','<script src=\"qa-hotfix.js\" defer></script>']; needle='</body>'; additions=''.join('  '+t+'\\n' for t in tags if t not in s); p.write_text(s.replace(needle, additions+needle, 1) if needle in s else s)"
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tags=[
+            '<script src="intro-upgrade.js" defer></script>',
+            '<script src="pandal-catalog-upgrade.js" defer></script>',
+            '<script src="map-fallback.js" defer></script>',
+            '<script src="puja2026-suite.js" defer></script>',
+            '<script src="qa-polish.js" defer></script>',
+            '<script src="explorer-v2.js" defer></script>',
+            '<script src="puja-companion.js" defer></script>',
+            '<script src="puja-night-upgrade.js" defer></script>',
+            '<script src="pandal-personal.js" defer></script>',
+            '<script src="menu-fix.js" defer></script>',
+            '<script src="filter-fix.js" defer></script>',
+            '<script src="puja-countdown.js" defer></script>',
+            '<script src="puja-companion-pro.js" defer></script>',
+            '<script src="qa-hotfix.js" defer></script>',
+            '<script src="runtime-fixes.js" defer></script>',
+          ]
+          needle='</body>'
+          additions=''.join('  '+t+'\n' for t in tags if t not in s)
+          if needle not in s:
+              raise SystemExit('index.html has no closing body tag')
+          p.write_text(s.replace(needle, additions+needle, 1), encoding='utf-8')
+          PY
+
       - name: Validate JavaScript
         shell: bash
         run: |
           set -euo pipefail
-          node --check intro-upgrade.js
-          node --check pandal-catalog-upgrade.js
-          node --check map-fallback.js
-          node --check puja2026-suite.js
-          node --check qa-polish.js
-          node --check explorer-v2.js
-          node --check puja-companion.js
-          node --check puja-night-upgrade.js
-          node --check pandal-personal.js
-          node --check menu-fix.js
-          node --check filter-fix.js
-          node --check puja-countdown.js
-          node --check puja-companion-pro.js
-          node --check qa-hotfix.js
-          node --check sw.js
-      - name: Validate site structure
+          for f in \
+            script.js details.js intro-upgrade.js pandal-catalog-upgrade.js map-fallback.js \
+            puja2026-suite.js qa-polish.js explorer-v2.js puja-companion.js \
+            puja-night-upgrade.js pandal-personal.js menu-fix.js filter-fix.js \
+            puja-countdown.js puja-companion-pro.js qa-hotfix.js runtime-fixes.js sw.js
+          do
+            node --check "$f"
+          done
+
+      - name: Validate site structure and asset references
         shell: bash
         run: |
           set -euo pipefail
@@ -57,6 +80,7 @@ jobs:
           test -s styles.css
           test -s script.js
           test -s details.js
+          test -s details.css
           test -s puja-assets.css
           test -s 404.html
           test -s robots.txt
@@ -69,23 +93,38 @@ jobs:
           test -s filter-fix.js
           test -s puja-countdown.js
           test -s puja-companion-pro.js
+          test -s runtime-fixes.js
           test -s sw.js
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'canonical' index.html
           grep -q 'pandal-list' index.html
           grep -q 'pandal-map' index.html
-          grep -q 'map-fallback.js' index.html
-          grep -q 'qa-polish.js' index.html
-          grep -q 'puja-companion.js' index.html
-          grep -q 'pandal-personal.js' index.html
-          grep -q 'menu-fix.js' index.html
-          grep -q 'filter-fix.js' index.html
-          grep -q 'puja-countdown.js' index.html
+          grep -q 'leaflet@1.9.4' index.html
+          grep -q 'animejs/3.2.2' index.html
+          grep -q 'runtime-fixes.js' index.html
+          grep -q 'explorer-v2.js' index.html
           grep -q 'puja-companion-pro.js' index.html
+          grep -q 'details.js' index.html
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          refs=re.findall(r'(?:src|href)=["\']([^"\']+)["\']',html)
+          local=[]
+          for ref in refs:
+              if ref.startswith(('#','http:','https:','data:','mailto:')): continue
+              if ref.startswith('//'): continue
+              local.append(ref.split('?',1)[0].split('#',1)[0])
+          missing=sorted({r for r in local if r and not Path(r).exists()})
+          if missing:
+              raise SystemExit('Missing local assets: '+', '.join(missing))
+          PY
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
