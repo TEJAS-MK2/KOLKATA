@@ -6,15 +6,17 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const fail = message => { throw new Error(message); };
 let browser;
 try {
-  await wait(800);
+  await wait(500);
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const page = await context.newPage();
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
+
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 15000 });
-  await page.waitForFunction(() => window.__KOLKATA_CANONICAL_CONTROLLER_READY === true, null, { timeout: 10000 });
-  await wait(3000);
+  await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 28, null, { timeout: 10000 });
+  await wait(3200);
 
   const checks = await page.evaluate(() => ({
     cards: document.querySelectorAll('.pandal-card').length,
@@ -23,37 +25,87 @@ try {
     markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
     leaflet: Boolean(window.L),
     map: Boolean(document.getElementById('pandal-map')?._leaflet_id),
+    state: window.KolkataState?.get?.() || null,
     search: Boolean(document.getElementById('pandal-search')),
     route: Boolean(document.getElementById('route-stops')),
     menu: Boolean(document.querySelector('.menu')),
-    toolkit: /Puja Toolkit/i.test(document.body.innerText),
-    bingo: /Puja Bingo/i.test(document.body.innerText),
+    toolkit: Boolean(document.querySelector('#puja-suite-launcher')),
+    bingo: Boolean(document.querySelector('#puja-bingo')),
+    guides: Boolean(document.querySelector('.puja-guides')),
+    swSupported: 'serviceWorker' in navigator
   }));
 
   if (checks.cards !== 100) fail(`Expected 100 pandal cards, found ${checks.cards}`);
   if (checks.canonicalPins !== 28) fail(`Expected 28 canonical pins, found ${checks.canonicalPins}`);
-  if (checks.pandals < 28) fail(`Expected at least 28 canonical pandals, found ${checks.pandals}`);
+  if (checks.pandals !== 100) fail(`Expected unified window.pandals catalog to contain 100 entries, found ${checks.pandals}`);
   if (checks.markerCount !== 28) fail(`Expected 28 Leaflet markers, found ${checks.markerCount}`);
   if (!checks.leaflet || !checks.map) fail('Leaflet map did not initialize');
   if (!checks.search || !checks.route || !checks.menu) fail('Core mobile controls are missing');
-  if (!checks.toolkit || !checks.bingo) fail('Puja Toolkit or Puja Bingo did not load');
+  if (!checks.toolkit || !checks.bingo || !checks.guides) fail('One or more Puja feature modules did not load');
+  if (!checks.state || checks.state.version !== 3) fail('Unified v3 state store did not initialize');
 
   const search = page.locator('#pandal-search');
   await search.fill('20 Palli');
   await wait(250);
-  if (await page.locator('.pandal-card:visible').count() < 1) fail('Pandal search did not find 20 Palli Sarbojani Durgotsab');
+  if (await page.locator('.pandal-card:not(.v2-hidden)').count() < 1) fail('Search did not find 20 Palli Sarbojani Durgotsab');
+  if (!await page.locator('.pandal-card:not(.v2-hidden)').first().getAttribute('data-name').then(n => n?.includes('20 Palli'))) fail('20 Palli search result was not the expected pandal');
   await search.fill('');
   await wait(250);
 
-  const firstAdd = page.locator('.pandal-card:visible .catalog-route, .pandal-card:visible .add-route').first();
-  if (await firstAdd.count()) {
-    await firstAdd.click();
-    await wait(200);
-    const routeCount = await page.locator('#route-count').textContent();
-    if (!routeCount?.startsWith('1 / 8')) fail(`Route add failed; got ${routeCount}`);
-    const directionHref = await page.locator('.pandal-card:visible a.route, .pandal-card:visible a.route-primary, .pandal-card:visible .route').first().getAttribute('href');
-    if (!directionHref?.match(/(?:destination=|query=)[^&]+/)) fail('Directions URL is missing a destination/query');
-  } else fail('No route control found on the first pandal card');
+  const firstCard = page.locator('.pandal-card').filter({ hasText: 'Bagbazar Sarbojanin' }).first();
+  const add = firstCard.locator('.catalog-route, .add-route').first();
+  if (await add.count() !== 1) fail('No route control found for Bagbazar Sarbojanin');
+  await add.click();
+  await wait(200);
+  if ((await page.locator('#route-count').textContent())?.trim() !== '1 / 8') fail('Adding a pandal did not update the route count');
+  const directionHref = await firstCard.locator('a.route').getAttribute('href');
+  if (!directionHref?.match(/(?:destination=|query=)[^&]+/)) fail('Directions URL is missing a destination/query');
+
+  const drive = page.locator('.mode-btn[data-mode="driving"]');
+  await drive.click();
+  await wait(150);
+  const routeHref = await page.locator('#open-route').getAttribute('href');
+  if (!routeHref?.includes('travelmode=driving')) fail('Travel mode did not update the route URL');
+  const storedMode = await page.evaluate(() => window.KolkataState.get().mode);
+  if (storedMode !== 'driving') fail(`Unified state did not persist driving mode: ${storedMode}`);
+
+  await firstCard.locator('h3').click();
+  await page.waitForFunction(() => document.querySelector('#pandal-details')?.hidden === false, null, { timeout: 5000 });
+  if (!await page.locator('#details-title').textContent().then(t => t?.includes('Bagbazar Sarbojanin'))) fail('Pandal details modal opened with the wrong record');
+  await wait(250);
+  if (await page.locator('#pp-mark').count() !== 1 || await page.locator('#pp-note').count() !== 1) fail('Personal notebook controls did not attach to the details modal');
+  await page.locator('#pp-mark').click();
+  await wait(100);
+  const visited = await page.evaluate(() => window.KolkataState.get().visited);
+  if (!visited.includes('Bagbazar Sarbojanin')) fail('Visited state was not saved in the unified store');
+  await page.locator('#pp-note').fill('Smoke-test note');
+  if (await page.locator('#pp-note').inputValue() !== 'Smoke-test note') fail('Private note field did not accept input');
+  await page.locator('[data-details-close]').first().click();
+  await wait(100);
+
+  const fav = firstCard.locator('.v2-fav').first();
+  if (await fav.count() !== 1) fail('Favourite control was not attached to the pandal card');
+  await fav.click();
+  await wait(100);
+  const saved = await page.evaluate(() => window.KolkataState.get().saved);
+  if (!saved.includes('Bagbazar Sarbojanin')) fail('Favourite state was not saved in the unified store');
+
+  const bingoCell = page.locator('#puja-bingo .bingo-cell').first();
+  if (await bingoCell.count() !== 1) fail('Puja Bingo board is missing');
+  await bingoCell.click();
+  await wait(100);
+  const bingo = await page.evaluate(() => window.KolkataState.get().bingo);
+  if (!bingo.includes(0)) fail('Puja Bingo state was not saved in the unified store');
+
+  await page.locator('#puja-suite-launcher').click();
+  await page.waitForSelector('#puja-suite-panel[open]', { timeout: 3000 });
+  await page.locator('#puja-suite-panel [data-close]').click();
+
+  await page.locator('#clear-route').click();
+  await wait(100);
+  if ((await page.locator('#route-count').textContent())?.trim() !== '0 / 8') fail('Clear route did not empty the planner');
+  const stateAfterClear = await page.evaluate(() => window.KolkataState.get());
+  if (stateAfterClear.route.length !== 0 || stateAfterClear.completed.length !== 0) fail('Route state was not cleared in the unified store');
 
   const menu = page.locator('.menu');
   await menu.click();
@@ -61,8 +113,9 @@ try {
   await menu.click();
   if ((await menu.getAttribute('aria-expanded')) !== 'false') fail('Mobile menu did not close');
 
+  if (checks.swSupported) await page.waitForFunction(async () => Boolean(await navigator.serviceWorker.getRegistration()), null, { timeout: 5000 }).catch(() => fail('Service worker did not register within the smoke-test window'));
   if (pageErrors.length) fail(`Runtime page errors: ${pageErrors.join(' | ')}`);
-  console.log('Smoke test passed:', JSON.stringify(checks));
+  console.log('Production smoke test passed:', JSON.stringify(checks));
 } finally {
   await browser?.close();
   server.kill('SIGTERM');
