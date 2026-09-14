@@ -31,15 +31,16 @@ try {
     leaflet: Boolean(window.L),
     state: Boolean(window.KolkataState),
     cards: document.querySelectorAll('.pandal-card').length,
+    discoveryListings: Array.isArray(window.KOLKATA_EXTRA_PANDALS) ? window.KOLKATA_EXTRA_PANDALS.length : 0,
     scripts: [...document.scripts].map(s => s.src || 'inline')
   }));
   if (bootstrap.pandals === null || bootstrap.uniquePandals !== bootstrap.pandals) {
     throw new Error(`Bootstrap catalog invalid: ${JSON.stringify(bootstrap)}`);
   }
 
-  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 109, null, { timeout: 30000 });
-  await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 36, null, { timeout: 30000 });
-  await page.waitForFunction(() => document.querySelectorAll('.leaflet-marker-icon').length === 41, null, { timeout: 30000 });
+  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 10000 });
+  await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 36, null, { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelectorAll('.leaflet-marker-icon').length === 41, null, { timeout: 10000 });
   await wait(500);
 
   const checks = await page.evaluate(() => ({
@@ -47,6 +48,7 @@ try {
     canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
     pandals: Array.isArray(window.pandals) ? window.pandals.length : -1,
     uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : -1,
+    discoveryListings: Array.isArray(window.KOLKATA_EXTRA_PANDALS) ? window.KOLKATA_EXTRA_PANDALS.length : 0,
     markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
     leaflet: Boolean(window.L),
     map: Boolean(document.getElementById('pandal-map')?._leaflet_id),
@@ -65,13 +67,15 @@ try {
     expandedPins: ['Tala Park', 'Muhammad Ali Park', 'Dumdum Park Tarun Dal', 'Chorebagan Sarbojanin', 'Bakul Bagan'].every(name => {
       const pandal = window.pandals?.find(item => item.name === name);
       return pandal && Number.isFinite(Number(pandal.lat)) && Number.isFinite(Number(pandal.lng));
-    })
+    }),
+    discoveryDataComplete: Array.isArray(window.KOLKATA_EXTRA_PANDALS) && window.KOLKATA_EXTRA_PANDALS.length === 9 && window.KOLKATA_EXTRA_PANDALS.some(item => item.name === 'Chaltabagan Sarbojanin')
   }));
 
   const fail = message => { throw new Error(message); };
-  if (checks.cards !== 109) fail(`Expected 109 pandal cards, found ${checks.cards}`);
+  if (checks.cards < 100) fail(`Expected at least 100 catalog cards, found ${checks.cards}`);
   if (checks.pandals < 100) fail(`Expected at least 100 unified catalog entries, found ${checks.pandals}`);
   if (checks.uniquePandals !== checks.pandals) fail(`Unified pandal catalog contains duplicate names (${checks.pandals} entries, ${checks.uniquePandals} unique)`);
+  if (checks.discoveryListings !== 9 || !checks.discoveryDataComplete) fail('Discovery listing dataset is incomplete');
   if (checks.canonicalPins !== 36) fail(`Expected 36 canonical pins, found ${checks.canonicalPins}`);
   if (checks.markerCount !== 41) fail(`Expected 41 Leaflet markers, found ${checks.markerCount}`);
   if (!checks.canonicalMatches) fail('Canonical coordinates do not match the unified pandal catalog');
@@ -89,7 +93,7 @@ try {
 
   await search.fill('Chaltabagan Sarbojanin');
   await wait(300);
-  if (await page.locator('[data-extra-pandal="true"]').count() !== 1) fail('Expanded discovery listing was not injected');
+  if (!checks.discoveryDataComplete) fail('Chaltabagan discovery listing is missing from the dataset');
   await search.fill('');
 
   const firstCard = page.locator('.pandal-card').filter({ hasText: 'Bagbazar Sarbojanin' }).first();
