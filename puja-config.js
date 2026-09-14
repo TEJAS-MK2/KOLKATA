@@ -1,4 +1,4 @@
-(() => {
+(()=>{
   'use strict';
   const updates = Object.freeze([
     Object.freeze({
@@ -20,7 +20,19 @@
     updates
   });
   const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  const correctOfficialDates = () => {
+    const dates = document.querySelector('.puja-2026-dates');
+    if (!dates) return;
+    const official = [['16 Oct','Shashthi'],['18 Oct','Saptami'],['19 Oct','Ashtami'],['20 Oct','Navami'],['21 Oct','Dashami']];
+    dates.querySelectorAll('.puja-2026-date').forEach((el, i) => {
+      if (!official[i]) return;
+      const b = el.querySelector('b'), span = el.querySelector('span');
+      if (b) b.textContent = official[i][0];
+      if (span) span.textContent = official[i][1];
+    });
+  };
   const renderUpdates = () => {
+    correctOfficialDates();
     const host = document.querySelector('#puja-2026-info');
     if (!host || !updates.length || document.getElementById('puja-live-updates')) return;
     const section = document.createElement('div');
