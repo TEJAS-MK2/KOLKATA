@@ -34,8 +34,29 @@
     let count=document.querySelector('#pandal-result-count'); if(!count){count=document.createElement('p');count.id='pandal-result-count';count.className='catalog-count';list.parentNode.insertBefore(count,list);}
     count.textContent=`${visible.length} pandals in the discovery catalog · ${visible.filter(p=>p.lat&&p.lng).length} verified map pins`;
     list.innerHTML=visible.length?visible.map(p=>{const pin=Boolean(p.lat&&p.lng);const image=p.photo?`<img src="${escapeHtml(p.photo)}" alt="Archive photo associated with ${escapeHtml(p.name)}" loading="lazy" onerror="this.remove()">`:'';return `<article class="pandal-card catalog-card" data-name="${escapeHtml(p.name)}" tabindex="0" aria-label="Explore ${escapeHtml(p.name)}">${image}<div class="pandal-card-body"><div class="pandal-meta">${escapeHtml(p.zone)} · ${escapeHtml(p.area)}</div><h3>${escapeHtml(p.name)}</h3><div class="rating">${pin?'● Map pin verified':'○ Discovery listing'}</div><div class="pandal-actions"><button class="catalog-map" type="button" ${pin?'':'disabled'}>${pin?'View map':'Map pin pending'}</button>${pin?`<button class="catalog-route" type="button">Add to route +</button>`:''}<a class="route" href="${mapsSearch(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`;}).join(''):`<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
-    list.querySelectorAll('.catalog-map').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=items.find(x=>x.name===btn.closest('.pandal-card')?.dataset.name);if(p?.lat&&p?.lng&&window.pandals?.some(x=>x.name===p.name)&&typeof window.selectPandal==='function')window.selectPandal(window.pandals.find(x=>x.name===p.name));}));
-    list.querySelectorAll('.catalog-route').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=items.find(x=>x.name===btn.closest('.pandal-card')?.dataset.name);const original=p&&window.pandals?.find(x=>x.name===p.name);if(original&&typeof window.addToRoute==='function'){window.addToRoute(original);render();}}));
+    list.querySelectorAll('.catalog-map').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const card = btn.closest('.pandal-card');
+        const p = items.find(x => x.name === card?.dataset.name);
+        const original = p && window.pandals?.find(x => x.name === p.name);
+        if (original && original.lat && original.lng && typeof window.selectPandal === 'function') {
+          window.selectPandal(original);
+        }
+      });
+    });
+    list.querySelectorAll('.catalog-route').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const card = btn.closest('.pandal-card');
+        const p = items.find(x => x.name === card?.dataset.name);
+        const original = p && window.pandals?.find(x => x.name === p.name);
+        if (original && typeof window.addToRoute === 'function') {
+          window.addToRoute(original);
+          render();
+        }
+      });
+    });
   }
   function bind(){const search=replaceWithCleanControl(document.querySelector('#pandal-search'));search?.addEventListener('input',render);document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn=>{const clean=replaceWithCleanControl(btn);clean.addEventListener('click',()=>{document.querySelectorAll('#pandal-filters .filter-btn').forEach(b=>b.classList.toggle('active',b===clean));render();});});render();}
   function addCatalogNote(){const host=document.querySelector('#pandal-list')?.parentElement;if(!host||document.querySelector('#catalog-verification-note'))return;const note=document.createElement('div');note.id='catalog-verification-note';note.className='catalog-note';note.innerHTML='<strong>Verification-first map</strong><span>The discovery catalog is expanded with archival images from Wikimedia Commons. A marker is shown only when the exact pin is already verified; we do not invent coordinates. Directions for every listing open a place search.</span>';host.insertBefore(note,document.querySelector('#pandal-list'));}
