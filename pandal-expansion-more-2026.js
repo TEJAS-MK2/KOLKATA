@@ -14,7 +14,10 @@
     'Lake Kalibari':{zone:'South',area:'Lake Gardens',lat:22.51367,lng:88.35503,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Lake_Kalibari_01.jpg'},
     'Samajsebi Sangha':{zone:'South',area:'Lake Road',lat:22.51474,lng:88.35600,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Samaj_Sebi_Sangha_Durga_Puja_in_South_Kolkata_(Lake_View_Road)_02.jpg'},
     'Singhi Park':{zone:'South',area:'Gariahat',lat:22.52122,lng:88.36301,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Singhi_Park_-_Dover_Lane_-_Kolkata_2014-10-02_8943.JPG'},
-    'Tarun Matri Sevak Samity':{zone:'South',area:'Behala',lat:22.5022,lng:88.3215,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Behala_Tarun_Matri_Sevak_Samity_Durga_puja_2025_01.jpg'}
+    'Tarun Matri Sevak Samity':{zone:'South',area:'Behala',lat:22.5022,lng:88.3215,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Behala_Tarun_Matri_Sevak_Samity_Durga_puja_2025_01.jpg'},
+    'Kidderpore 25 Pally':{zone:'South',area:'Kidderpore',lat:22.53848,lng:88.32660,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_25_Pally_-_Kolkata_2011-10-03_030258.JPG'},
+    'Kidderpore 74 Pally':{zone:'South',area:'Kidderpore',lat:22.53978,lng:88.32512,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_74_Pally_-_Kolkata_2011-10-03_030266.JPG'},
+    'Kidderpore 75 Pally':{zone:'South',area:'Kidderpore',lat:22.54030,lng:88.32528,tag:'Verified location',photo:''}
   };
   window.KOLKATA_MORE_PINS=Object.freeze(Object.fromEntries(Object.entries(MORE).map(([name,p])=>[name,[p.lat,p.lng]])));
   window.KOLKATA_PIN_METADATA=window.KOLKATA_PIN_METADATA||{};
@@ -31,7 +34,10 @@
     ['Pratapaditya Road Tricon Park','South','Kalighat',''],
     ['Vivekananda Sporting Club','South','Haridevpur',''],
     ['41 Pally Club','South','Haridevpur','https://commons.wikimedia.org/wiki/Special:FilePath/41_Pally_Durga_puja_2025_11.jpg'],
-    ['Roy Bari, Behala','South','Behala','https://commons.wikimedia.org/wiki/Special:FilePath/The_2025_Durga_Puja_at_Amarendra_Bhawan_%28Behala_Roy_Bari%29_05.jpg']
+    ['Roy Bari, Behala','South','Behala','https://commons.wikimedia.org/wiki/Special:FilePath/The_2025_Durga_Puja_at_Amarendra_Bhawan_%28Behala_Roy_Bari%29_05.jpg'],
+    ['Bosepukur Talbagan','South','Bosepukur, Kasba','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Bosepukur_Talbagan_-_Kasba_-_Kolkata_2012-10-23_1190.JPG'],
+    ['Chorebagan Sarbojanin','North','Simla/Girish Park',''],
+    ['22 Palli Sarodotsab','South','Bakul Bagan, Bhowanipore','']
   ].map(([name,zone,area,photo])=>({name,zone,area,photo}));
   window.KOLKATA_EXTRA_PANDALS=Object.freeze(EXTRA);
   const escapeHtml=s=>String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
