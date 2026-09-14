@@ -28,17 +28,33 @@ const CANONICAL={
   'Ahiritola Sarbojanin':[22.59484,88.35717],
   'Kumartuli Sarbojanin':[22.60088,88.36232],
   'Hatibagan Nabinpally':[22.59590,88.37342],
-  '20 Palli Sarbojani Durgotsab':[22.59363,88.35813]
+  '20 Palli Sarbojani Durgotsab':[22.59363,88.35813],
+  'Badamtala Ashar Sangha':[22.51797,88.34372],
+  'Tridhara Sammilani':[22.51953,88.35544],
+  'Simla Byayam Samity':[22.58533,88.36503],
+  'Jodhpur Park Sarbojanin':[22.50458,88.36560],
+  'Ajeya Sanghati':[22.48055,88.33742],
+  'Barisha Club':[22.48129,88.31324],
+  'Behala Nutan Dal':[22.50021,88.32029]
+};
+const PHOTOS={
+  'Badamtala Ashar Sangha':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Badamtala_Ashar_Sangha_-_Kolkata_2012-10-23_1159.JPG',
+  'Tridhara Sammilani':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Tridhara_Sammilani_-_Manohar_Pukur_Road_-_Kolkata_2017-09-26_3988.JPG',
+  'Simla Byayam Samity':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Simla_Byayam_Samity_-_Kolkata_2012-10-23_1170.JPG',
+  'Jodhpur Park Sarbojanin':'https://commons.wikimedia.org/wiki/Special:FilePath/Jodhpur_Park.jpg',
+  'Ajeya Sanghati':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Ajeya_Sanghati_-_Kolkata_2017-09-26_4012.JPG',
+  'Barisha Club':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Barisha_Club_-_Kolkata_2012-10-23_1142.JPG',
+  'Behala Nutan Dal':'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_Pandal_-_Behala_Natun_Dal_-_Kolkata_2012-10-23_1145.JPG'
 };
 const META={
-  'Tala Prattoy':['North','Tala'],'Hatibagan Sarbojanin':['North','Hatibagan'],'Sree Bhumi Sporting Club':['North','Sreebhumi'],'Dumdum Park Bharat Chakra':['North','Dum Dum Park'],'Dumdum Park Sarbojanin':['North','Dum Dum Park'],'Kumartuli Park':['North','Kumartuli'],'Shobhabazar Rajbari':['North','Shobhabazar'],'College Square':['Central','College Street'],'Santosh Mitra Square':['Central','Sealdah'],'Maddox Square':['South','Ballygunge'],'Deshapriya Park':['South','Deshapriya Park'],'Naktala Udayan Sangha':['South','Naktala'],'Chetla Agrani':['South','Chetla'],'Ekdalia Evergreen':['South','Gariahat'],'Hindusthan Park':['South','Gariahat'],'Ballygunge Cultural Association':['South','Ballygunge'],'Bosepukur Sitala Mandir':['South','Bosepukur'],'66 Pally':['South','Ballygunge'],'Mudiali':['South','Tollygunge'],'Suruchi Sangha':['South','New Alipore'],'Jagat Mukherjee Park':['North','Shobhabazar'],'Kashi Bose Lane':['North','Hatibagan'],'Nalin Sarkar Street':['North','Hatibagan'],'Ahiritola Sarbojanin':['North','Ahiritola'],'Kumartuli Sarbojanin':['North','Kumartuli'],'Hatibagan Nabinpally':['North','Hatibagan'],'20 Palli Sarbojani Durgotsab':['North','Ahiritola']
+  'Tala Prattoy':['North','Tala'],'Hatibagan Sarbojanin':['North','Hatibagan'],'Sree Bhumi Sporting Club':['North','Sreebhumi'],'Dumdum Park Bharat Chakra':['North','Dum Dum Park'],'Dumdum Park Sarbojanin':['North','Dum Dum Park'],'Kumartuli Park':['North','Kumartuli'],'Shobhabazar Rajbari':['North','Shobhabazar'],'College Square':['Central','College Street'],'Santosh Mitra Square':['Central','Sealdah'],'Maddox Square':['South','Ballygunge'],'Deshapriya Park':['South','Deshapriya Park'],'Naktala Udayan Sangha':['South','Naktala'],'Chetla Agrani':['South','Chetla'],'Ekdalia Evergreen':['South','Gariahat'],'Hindusthan Park':['South','Gariahat'],'Ballygunge Cultural Association':['South','Ballygunge'],'Bosepukur Sitala Mandir':['South','Bosepukur'],'66 Pally':['South','Ballygunge'],'Mudiali':['South','Tollygunge'],'Suruchi Sangha':['South','New Alipore'],'Jagat Mukherjee Park':['North','Shobhabazar'],'Kashi Bose Lane':['North','Hatibagan'],'Nalin Sarkar Street':['North','Hatibagan'],'Ahiritola Sarbojanin':['North','Ahiritola'],'Kumartuli Sarbojanin':['North','Kumartuli'],'Hatibagan Nabinpally':['North','Hatibagan'],'20 Palli Sarbojani Durgotsab':['North','Ahiritola'],'Badamtala Ashar Sangha':['South','Kalighat'],'Tridhara Sammilani':['South','Manoharpukur'],'Simla Byayam Samity':['North','Simla'],'Jodhpur Park Sarbojanin':['South','Jodhpur Park'],'Ajeya Sanghati':['South','Tollygunge'],'Barisha Club':['South','Barisha'],'Behala Nutan Dal':['South','Behala']
 };
 function normalize(list){
  if(!Array.isArray(list))return [];
  for(const [name,coords] of Object.entries(CANONICAL)){
   const existing=list.find(p=>p?.name===name),meta=META[name]||[];
-  if(existing){existing.lat=coords[0];existing.lng=coords[1];if(meta[0])existing.zone=meta[0];if(meta[1])existing.area=meta[1];existing.tag=existing.tag||'Verified location';}
-  else list.push({name,zone:meta[0]||'Kolkata',area:meta[1]||'Kolkata',lat:coords[0],lng:coords[1],tag:'Verified location',photo:'',rating:0});
+  if(existing){existing.lat=coords[0];existing.lng=coords[1];if(meta[0])existing.zone=meta[0];if(meta[1])existing.area=meta[1];existing.tag=existing.tag||'Verified location';if(PHOTOS[name]&&!existing.photo)existing.photo=PHOTOS[name];}
+  else list.push({name,zone:meta[0]||'Kolkata',area:meta[1]||'Kolkata',lat:coords[0],lng:coords[1],tag:'Verified location',photo:PHOTOS[name]||'',rating:0});
  }
  return list;
 }
