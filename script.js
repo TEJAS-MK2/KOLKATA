@@ -47,6 +47,7 @@ window.pandals = pandals;
 pandals = window.pandals;
 Object.defineProperty(window, 'routeStops', { configurable: true, get: () => routeStops });
 window.addToRoute = addToRoute;
+window.removeFromRoute = removeFromRoute;
 
 try { routeStops=JSON.parse(localStorage.getItem('kolkata-pujo-route')||'[]').map(saved=>pandals.find(p=>p.name===saved.name)).filter(Boolean); } catch {}
 try { completedStops=new Set(JSON.parse(localStorage.getItem('kolkata-pujo-completed')||'[]')); } catch {}
