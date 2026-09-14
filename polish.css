@@ -4,6 +4,7 @@
 :focus-visible{outline:3px solid rgba(180,49,34,.28);outline-offset:3px}
 html{scroll-padding-top:88px}
 body{line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,a,input,select{touch-action:manipulation}
 .site-header{height:74px}
 .site-header .brand-bengali{font-family:var(--bengali);font-size:17px;letter-spacing:0}
 .site-header nav a{transition:transform .18s ease,color .18s ease,background .18s ease,opacity .18s ease}
@@ -91,5 +92,9 @@ footer{min-height:68px;align-items:center}
  .gallery-grid{grid-template-columns:1fr;grid-template-rows:260px 180px 180px 180px}
  .gallery-grid .tall{grid-row:auto}
  footer{flex-direction:column;gap:8px;text-align:center;padding:18px 16px}
+ .pandal-actions{gap:8px}
+ .pandal-actions button,.pandal-actions a,.route-primary,.route-secondary,.filter-btn,.mode-btn{min-height:44px}
+ .explorer-search{min-height:44px}
+ .map-panel{overflow:hidden}
 }
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}.pandal-card:hover img,.puja-guide-card:hover{transform:none!important}}
