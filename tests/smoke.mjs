@@ -14,7 +14,6 @@ try {
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 15000 });
   await page.waitForFunction(() => window.__KOLKATA_CANONICAL_CONTROLLER_READY === true, null, { timeout: 10000 });
-  // Companion/Toolkit/Bingo modules initialize asynchronously after the core controller.
   await wait(3000);
 
   const checks = await page.evaluate(() => ({
@@ -46,15 +45,15 @@ try {
   await search.fill('');
   await wait(250);
 
-  const firstAdd = page.locator('.pandal-card:visible .add-route').first();
+  const firstAdd = page.locator('.pandal-card:visible .catalog-route, .pandal-card:visible .add-route').first();
   if (await firstAdd.count()) {
     await firstAdd.click();
     await wait(200);
     const routeCount = await page.locator('#route-count').textContent();
     if (!routeCount?.startsWith('1 / 8')) fail(`Route add failed; got ${routeCount}`);
-    const directionHref = await page.locator('.pandal-card:visible .route').first().getAttribute('href');
+    const directionHref = await page.locator('.pandal-card:visible a.route, .pandal-card:visible a.route-primary, .pandal-card:visible .route').first().getAttribute('href');
     if (!directionHref?.includes('destination=')) fail('Directions URL is missing a destination');
-  } else fail('No Add to route control found on the first pandal card');
+  } else fail('No route control found on the first pandal card');
 
   const menu = page.locator('.menu');
   await menu.click();
