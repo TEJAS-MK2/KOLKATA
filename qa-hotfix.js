@@ -57,6 +57,14 @@
       status.textContent='● Map pin verified';
       status.setAttribute('aria-label','Exact map pin verified');
 
+      // Late catalog layers may leave their old discovery/pending labels behind.
+      // Remove only those exact labels inside verified cards; discovery cards remain untouched.
+      card.querySelectorAll('*').forEach(el=>{
+        if(el===status)return;
+        const text=el.textContent?.trim();
+        if(text==='○ Discovery listing'||text==='Map pin pending'||text==='● Map pin verified')el.remove();
+      });
+
       card.classList.remove('pending-pin');
       const route=card.querySelector('.route');
       const pin=CANONICAL_PINS[name];
