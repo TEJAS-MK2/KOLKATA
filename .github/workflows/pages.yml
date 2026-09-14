@@ -37,7 +37,7 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
           s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="script.js" defer></script>')
-          tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js']
+          tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js']
           additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
           if additions and '</body>' in s:s=s.replace('</body>','  '+additions+'</body>',1)
           p.write_text(s,encoding='utf-8')
@@ -60,7 +60,7 @@ jobs:
           for f in \
             script.js production-bootstrap.js details.js pandal-catalog-upgrade.js map-fallback.js \
             explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js \
-            runtime-fixes.js sw.js
+            runtime-fixes.js puja-feature-suite.js sw.js
           do
             node --check "$f"
           done
@@ -88,6 +88,7 @@ jobs:
           test -s puja-countdown.js
           test -s puja-companion-pro.js
           test -s runtime-fixes.js
+          test -s puja-feature-suite.js
           test -s sw.js
           for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do
             test ! -e "$legacy"
@@ -104,6 +105,7 @@ jobs:
           grep -q 'pandal-personal-safe.js' index.html
           grep -q 'puja-companion-pro.js' index.html
           grep -q 'runtime-fixes.js' index.html
+          grep -q 'puja-feature-suite.js' index.html
           ! grep -q '<script src="puja-companion.js"' index.html
           ! grep -q '<script src="puja-night-upgrade.js"' index.html
           ! grep -q '<script src="puja2026-suite.js"' index.html
@@ -115,6 +117,9 @@ jobs:
           grep -q 'Dumdum Park Sarbojanin' production-bootstrap.js
           grep -q '22.56602' production-bootstrap.js
           grep -q '22–23 Oct' puja-companion-pro.js
+          grep -q 'Puja Toolkit' puja-feature-suite.js
+          grep -q 'Puja Passport' puja-feature-suite.js
+          grep -q 'Near me' puja-feature-suite.js
           python - <<'PY'
           import re
           from pathlib import Path
@@ -124,7 +129,7 @@ jobs:
           if count != 13:
               raise SystemExit(f'Expected 13 canonical pins, found {count}')
           html=Path('index.html').read_text(encoding='utf-8')
-          required=['production-bootstrap.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js']
+          required=['production-bootstrap.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js']
           positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
           if positions != sorted(positions):
               raise SystemExit('Production scripts are not in deterministic order')
