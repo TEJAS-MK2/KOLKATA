@@ -1,6 +1,18 @@
 (()=>{
 'use strict';
-// Compatibility/readiness shim. The canonical map, explorer and route controller lives in script.js.
-const ready=()=>{const count=Array.isArray(window.pandals)?window.pandals.length:0;if(count<28)return false;window.__KOLKATA_CANONICAL_CONTROLLER_READY=true;window.dispatchEvent(new CustomEvent('kolkata:canonical-controller-ready',{detail:{pandals:count,markers:document.querySelectorAll('.leaflet-marker-icon').length}}));return true};
-if(ready()){}else{window.addEventListener('load',ready,{once:true});window.addEventListener('kolkata:state-ready',ready,{once:true})}
+// Compatibility/readiness shim. script.js owns the canonical map, explorer and route UI.
+const ready=()=>{
+  try{window.initKolkataMap?.()}catch{}
+  const count=Array.isArray(window.pandals)?window.pandals.length:0;
+  const markers=document.querySelectorAll('.leaflet-marker-icon').length;
+  if(count<28)return false;
+  if(!markers){setTimeout(ready,250);return false}
+  window.__KOLKATA_CANONICAL_CONTROLLER_READY=true;
+  window.dispatchEvent(new CustomEvent('kolkata:canonical-controller-ready',{detail:{pandals:count,markers}}));
+  return true;
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ready();setTimeout(ready,500)},{once:true});
+else ready();
+window.addEventListener('load',ready,{once:true});
+window.addEventListener('kolkata:state-ready',ready,{once:true});
 })();
