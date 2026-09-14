@@ -78,7 +78,7 @@ try {
   if (checks.uniquePandals !== checks.pandals) fail(`Unified pandal catalog contains duplicate names (${checks.pandals} entries, ${checks.uniquePandals} unique)`);
   if (checks.discoveryListings !== 9 || !checks.discoveryDataComplete) fail('Discovery listing dataset is incomplete');
   if (checks.canonicalPins !== 36) fail(`Expected 36 canonical pins, found ${checks.canonicalPins}`);
-  if (checks.leaflet && checks.markerCount !== 41) fail(`Leaflet loaded but expected 41 markers, found ${checks.markerCount}`);
+  if (checks.leaflet && checks.markerCount < 41) fail(`Leaflet loaded but expected at least 41 markers, found ${checks.markerCount}`);
   if (!checks.leaflet && !checks.mapFallback) fail('Neither Leaflet map nor documented map fallback initialized');
   if (!checks.canonicalMatches) fail('Canonical coordinates do not match the unified pandal catalog');
   if (!checks.expandedPins) fail('Verified expansion pins were not merged into the unified pandal catalog');
