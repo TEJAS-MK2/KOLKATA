@@ -63,6 +63,8 @@ jobs:
           for f in *.js tests/*.mjs; do node --check "$f"; done
       - name: Install browser test dependencies
         run: npm ci
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Make third-party scripts non-blocking
