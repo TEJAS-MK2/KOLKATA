@@ -49,7 +49,7 @@ jobs:
           for a in ['1','2','3','4']: c=c.replace(f"background-image:url('var(--gallery-{a})')",f'background-image:var(--gallery-{a})')
           c+='\n/* Puja Toolkit is the single floating launcher; the legacy companion shortcut remains hidden. */\n.puja-fab{display:none!important}\n'
           css.write_text(c,encoding='utf-8')
-          pro=Path('puja-companion-pro.js'); pc=pro.read_text(encoding='utf-8').replace("['Extra Puja holidays','22–24 Oct'","['Extra Puja holidays','22–23 Oct'"); pro.write_text(pc,encoding='utf-8')
+          pro=Path('puja-companion-pro.js'); pc=pro.read_text(encoding='utf-8').replace("['Extra Puja holidays','22–24 Oct'","['Extra Puja holidays','22–23 Oct'").replace('Math.ceil((START-now)/86400000)','Math.floor((START-now)/86400000)'); pro.write_text(pc,encoding='utf-8')
           personal=Path('pandal-personal-safe.js'); ps=personal.read_text(encoding='utf-8').replace('schedule();setInterval(sync,2000)','schedule()'); personal.write_text(ps,encoding='utf-8')
           details=Path('details.css'); d=details.read_text(encoding='utf-8').replace('background:var(--cream);','background:var(--paper);').replace('color:var(--cream)','color:var(--paper)'); d='\n'.join(line for line in d.splitlines() if not line.startswith('.pandal-card[data-name="Santosh Mitra Square"]') and not line.startswith('.pandal-card[data-name="Shobhabazar Rajbari"]'))+'\n'; details.write_text(d,encoding='utf-8')
           PY
@@ -120,6 +120,7 @@ jobs:
           grep -q 'Dumdum Park Sarbojanin' production-bootstrap.js
           grep -q '22.56602' production-bootstrap.js
           grep -q '22–23 Oct' puja-companion-pro.js
+          grep -q 'Math.floor((START-now)/86400000)' puja-companion-pro.js
           grep -q 'Puja Toolkit' puja-feature-suite.js
           grep -q 'Puja Passport' puja-feature-suite.js
           grep -q 'Near me' puja-feature-suite.js
