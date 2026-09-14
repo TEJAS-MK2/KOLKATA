@@ -7,13 +7,14 @@
     'Hatibagan Nabinpally':{zone:'North',area:'Hatibagan',lat:22.59590,lng:88.37342,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Hatibagan_Nabinpally_Durga_Utsav_Committee_04.jpg'},
     '20 Palli Sarbojani Durgotsab':{zone:'North',area:'Ahiritola',lat:22.59363,lng:88.35813,tag:'Verified location',photo:''},
     'Alipur Sarbojanin':{zone:'South',area:'Alipore',lat:22.51963,lng:88.33366,tag:'Verified location',photo:''},
-    'Dhakuria Sarbojanin':{zone:'South',area:'Dhakuria',lat:22.51003,lng:88.37199,tag:'Verified location',photo:''}
+    'Dhakuria Sarbojanin':{zone:'South',area:'Dhakuria',lat:22.51003,lng:88.37199,tag:'Verified location',photo:''},
+    'Barisha Sarbojanin':{zone:'South',area:'Barisha',lat:22.47999,lng:88.30808,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Barisha_Sarbojanin_2025_Durga_utsav_01.jpg'},
+    'Shibmandir Sarbojanin':{zone:'South',area:'Southern Avenue',lat:22.51100,lng:88.34985,tag:'Verified location',photo:''}
   };
   window.KOLKATA_MORE_PINS=Object.freeze(Object.fromEntries(Object.entries(MORE).map(([name,p])=>[name,[p.lat,p.lng]])));
   window.KOLKATA_PIN_METADATA=window.KOLKATA_PIN_METADATA||{};
   Object.assign(window.KOLKATA_PIN_METADATA,MORE);
 
-  // Merge verified additions into the canonical runtime dataset before map/explorer boot.
   window.pandals=window.pandals||[];
   Object.entries(MORE).forEach(([name,p])=>{
     const existing=window.pandals.find(x=>x.name===name);
@@ -21,8 +22,8 @@
     else window.pandals.push({name,...p});
   });
 
-  // Additional discovery listings sourced from 2025 Kolkata Puja directories/Commons.
-  // These intentionally remain discovery-only: no coordinates are invented.
+  // Additional discovery listings sourced from 2025 Kolkata Puja directories and Wikimedia Commons venue archives.
+  // These intentionally remain discovery-only when an exact coordinate is not verified.
   const EXTRA=[
     ['Chaltabagan Sarbojanin','North','Chaltabagan','https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2025_at_Chalta_Bagan_Sarbojanin_18.jpg'],
     ['Ahiritola Yubak Brinda','North','Ahiritola',''],
@@ -39,11 +40,15 @@
     ['Chakraberia Sarbojanin','South','Bhowanipore',''],
     ['Abasar','South','Bhowanipore',''],
     ['Purbachal Shakti Sangha','South','Santoshpur',''],
-    ['Santoshpur Trikon Park','South','Santoshpur','']
+    ['Santoshpur Trikon Park','South','Santoshpur',''],
+    ['41 Pally Club','South','Haridevpur','https://commons.wikimedia.org/wiki/Special:FilePath/41_Pally_Durga_puja_2025_11.jpg'],
+    ['Roy Bari, Behala','South','Behala','https://commons.wikimedia.org/wiki/Special:FilePath/The_2025_Durga_Puja_at_Amarendra_Bhawan_%28Behala_Roy_Bari%29_05.jpg'],
+    ['Santosh Mitra Square','Central','Sealdah','https://commons.wikimedia.org/wiki/Special:FilePath/Santosh_Mitra_square_Durga_Puja_2025_01.jpg'],
+    ['Barisha Club','South','Barisha','https://commons.wikimedia.org/wiki/Special:FilePath/Barisha_Club_2025_Durga_puja_18.jpg']
   ].map(([name,zone,area,photo])=>({name,zone,area,photo}));
   window.KOLKATA_EXTRA_PANDALS=Object.freeze(EXTRA);
 
-  const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escapeHtml=s=>String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
   function injectExtras(){
     const list=document.querySelector('#pandal-list');
     if(!list)return;
