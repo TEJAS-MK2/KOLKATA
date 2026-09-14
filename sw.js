@@ -1,4 +1,4 @@
-const CACHE='kolkata-puja-2026-v7';
+const CACHE='kolkata-puja-2026-v8';
 const CORE=[
   '/KOLKATA/','/KOLKATA/index.html','/KOLKATA/styles.css','/KOLKATA/polish.css','/KOLKATA/puja-assets.css','/KOLKATA/details.css','/KOLKATA/site.webmanifest',
   '/KOLKATA/script.js','/KOLKATA/puja-config.js','/KOLKATA/state-v3.js','/KOLKATA/production-bootstrap.js','/KOLKATA/pandal-expansion-2026.js','/KOLKATA/pandal-expansion-more-2026.js','/KOLKATA/details.js','/KOLKATA/pandal-catalog-upgrade.js','/KOLKATA/map-fallback.js','/KOLKATA/explorer-v2.js','/KOLKATA/pandal-personal-safe.js','/KOLKATA/puja-countdown.js','/KOLKATA/puja-companion-pro.js','/KOLKATA/runtime-fixes.js','/KOLKATA/puja-feature-suite.js','/KOLKATA/puja-bingo.js','/KOLKATA/puja-guides.js','/KOLKATA/404.html'
