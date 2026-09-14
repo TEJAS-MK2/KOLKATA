@@ -52,7 +52,7 @@ try {
     const routeCount = await page.locator('#route-count').textContent();
     if (!routeCount?.startsWith('1 / 8')) fail(`Route add failed; got ${routeCount}`);
     const directionHref = await page.locator('.pandal-card:visible a.route, .pandal-card:visible a.route-primary, .pandal-card:visible .route').first().getAttribute('href');
-    if (!directionHref?.includes('destination=')) fail('Directions URL is missing a destination');
+    if (!directionHref?.match(/(?:destination=|query=)[^&]+/)) fail('Directions URL is missing a destination/query');
   } else fail('No route control found on the first pandal card');
 
   const menu = page.locator('.menu');
