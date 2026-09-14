@@ -1,0 +1,95 @@
+/* Kolkata Puja 2026 — final visual polish layer. Keeps one clear source of truth for refinements. */
+:root{--focus:#b43122;--soft-shadow:0 14px 42px rgba(24,21,18,.08);--lift-shadow:0 20px 55px rgba(24,21,18,.12)}
+::selection{background:#b43122;color:#fff}
+:focus-visible{outline:3px solid rgba(180,49,34,.28);outline-offset:3px}
+html{scroll-padding-top:88px}
+body{line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.site-header{height:74px}
+.site-header .brand-bengali{font-family:var(--bengali);font-size:17px;letter-spacing:0}
+.site-header nav a{transition:transform .18s ease,color .18s ease,background .18s ease,opacity .18s ease}
+.site-header nav a:hover{transform:translateY(-1px)}
+.hero{min-height:760px}
+.hero-content{padding-bottom:8px}
+.hero h1{max-width:850px;text-wrap:balance}
+.hero-copy{font-size:17px}
+.button,.route-primary,.route-secondary,.filter-btn,.mode-btn,.pandal-actions button,.pandal-actions a{transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
+.button:hover,.route-primary:hover,.route-secondary:hover,.filter-btn:hover,.mode-btn:hover,.pandal-actions button:hover,.pandal-actions a:hover{transform:translateY(-1px)}
+.section{scroll-margin-top:88px}
+.intro-grid,.timeline-head,.guide-head,.gallery-head{align-items:start}
+.stats{border-bottom:1px solid var(--line)}
+.stats strong{letter-spacing:-.04em}
+.days article{transition:background .2s ease}
+.days article:hover{background:rgba(255,255,255,.025)}
+.culture-photo{position:relative}
+.culture-photo:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 65%,rgba(24,21,18,.12));pointer-events:none}
+.guide{position:relative}
+.guide-head{margin-bottom:30px}
+.puja-quick-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 auto 20px;max-width:var(--max)}
+.puja-quick-info>div{border:1px solid var(--line);background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(24,21,18,.025)}
+.puja-quick-info strong{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;color:var(--red)}
+.puja-quick-info span{display:block;font-size:12px;color:var(--muted);line-height:1.55}
+.explorer-toolbar{position:sticky;top:86px;z-index:20;padding:10px 0;background:linear-gradient(var(--paper) 78%,transparent);backdrop-filter:blur(8px)}
+.pandal-list{scrollbar-width:thin;scrollbar-color:#c7beb2 transparent}
+.pandal-card{isolation:isolate}
+.pandal-card img{transition:transform .35s ease,filter .35s ease}
+.pandal-card:hover img{transform:scale(1.025);filter:saturate(1)}
+.pandal-card h3{overflow-wrap:anywhere}
+.map-panel{box-shadow:var(--soft-shadow)}
+.leaflet-control-zoom a{color:var(--ink)!important}
+.route-planner,.night-mode{box-shadow:0 18px 50px rgba(24,21,18,.16)}
+.route-primary{box-shadow:0 8px 20px rgba(255,255,255,.08)}
+.puja-guides{border-radius:14px;box-shadow:0 8px 30px rgba(24,21,18,.045)}
+.puja-guide-card{border-radius:11px;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.puja-guide-card:hover{transform:translateY(-3px);box-shadow:var(--soft-shadow);border-color:#c9c0b4}
+.gallery-grid .tile{transition:transform .3s ease,filter .3s ease}
+.gallery-grid .tile:hover{transform:scale(.99);filter:saturate(.9)}
+.lightbox button{box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.closing{position:relative;overflow:hidden}
+.closing h2{position:relative;z-index:1}
+footer{min-height:68px;align-items:center}
+@media(max-width:900px){
+ .site-header{height:66px}
+ .hero{min-height:680px;height:82vh}
+ .intro-grid{gap:38px}
+ .explorer-toolbar{top:70px}
+ .puja-quick-info{grid-template-columns:1fr}
+ .explorer-layout{grid-template-columns:1fr}
+ .map-panel{position:relative;top:auto;min-height:430px}
+ .map-panel #pandal-map{min-height:430px}
+ .pandal-list{max-height:560px}
+ .gallery-grid{grid-template-rows:240px 240px}
+}
+@media(max-width:600px){
+ .site-header .brand-bengali{font-size:15px}
+ .site-header .brand small{font-size:8px}
+ .hero{min-height:620px;padding-bottom:48px}
+ .hero h1{font-size:clamp(48px,16vw,76px)}
+ .hero-copy{font-size:15px}
+ .hero-actions{flex-wrap:wrap}
+ .section{padding:64px 16px}
+ .intro-grid{grid-template-columns:1fr;gap:22px;padding:0}
+ .stats{grid-template-columns:1fr 1fr;gap:20px;padding:20px 0}
+ .stats div:last-child{grid-column:1/-1}
+ .timeline-head,.guide-head,.gallery-head{display:block;margin-bottom:28px}
+ .timeline-head p,.guide-head p,.gallery-head p{margin-top:14px}
+ .days{grid-template-columns:1fr 1fr}
+ .days article{min-height:210px;padding:16px}
+ .days span{margin-bottom:34px}
+ .culture{grid-template-columns:1fr}
+ .culture-photo{min-height:340px}
+ .culture-card{padding:56px 20px}
+ .explorer-toolbar{top:66px;padding:8px 0}
+ .filter-row{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}
+ .filter-btn{white-space:nowrap}
+ .pandal-list{grid-template-columns:1fr;max-height:none;overflow:visible}
+ .pandal-card img{height:190px}
+ .map-panel{min-height:380px}
+ .map-panel #pandal-map{min-height:380px}
+ .route-planner{padding:16px}
+ .night-actions{grid-template-columns:1fr 1fr}
+ .night-primary{grid-column:1/-1;grid-row:1}
+ .gallery-grid{grid-template-columns:1fr;grid-template-rows:260px 180px 180px 180px}
+ .gallery-grid .tall{grid-row:auto}
+ footer{flex-direction:column;gap:8px;text-align:center;padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
