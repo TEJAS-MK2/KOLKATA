@@ -18,7 +18,9 @@
     'Bakul Bagan':{zone:'South',area:'Bhowanipore',lat:22.52676,lng:88.34826,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Bakul_Bagan_Sarbojanin_Arnab_Dutta_2011.jpg'},
     'Dumdum Park Tarun Dal':{zone:'North',area:'Dum Dum Park',lat:22.61173,lng:88.41874,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Dum_Dum_Park_Tarun_Dal_2023.jpg'},
     'Chorebagan Sarbojanin':{zone:'North',area:'Chorebagan',lat:22.583485,lng:88.363380,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Puja_2024_at_Chorbagan_Sarbojanin_05.jpg'},
-    'Muhammad Ali Park':{zone:'Central',area:'Central Kolkata',lat:22.57710,lng:88.36030,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/5465g_muhammad-ali-park_pratima-foeticide.jpg'}
+    'Muhammad Ali Park':{zone:'Central',area:'Central Kolkata',lat:22.57710,lng:88.36030,tag:'Verified location',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/5465g_muhammad-ali-park_pratima-foeticide.jpg'},
+    'Tala Park':{zone:'North',area:'Tala',lat:22.61150,lng:88.38411,tag:'Verified location',photo:''},
+    '23 Pally':{zone:'Central',area:'Bhowanipore',lat:22.52540,lng:88.34400,tag:'Verified location',photo:''}
   };
   window.KOLKATA_MORE_PINS=Object.freeze(Object.fromEntries(Object.entries(MORE).map(([name,p])=>[name,[p.lat,p.lng]])));
   window.KOLKATA_PIN_METADATA=window.KOLKATA_PIN_METADATA||{};
@@ -38,7 +40,7 @@
     ['Roy Bari, Behala','South','Behala','https://commons.wikimedia.org/wiki/Special:FilePath/The_2025_Durga_Puja_at_Amarendra_Bhawan_%28Behala_Roy_Bari%29_05.jpg']
   ].map(([name,zone,area,photo])=>({name,zone,area,photo}));
   window.KOLKATA_EXTRA_PANDALS=Object.freeze(EXTRA);
-  const escapeHtml=s=>String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  const escapeHtml=s=>String(s).replace(/[&<>\\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;',"'":'&#39;'}[c]));
   function injectExtras(){
     const list=document.querySelector('#pandal-list');if(!list)return;
     list.querySelectorAll('[data-extra-pandal="true"]').forEach(n=>n.remove());
