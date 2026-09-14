@@ -33,5 +33,9 @@ Before reusing an image outside this project, check the individual Wikimedia Com
 - [66 Pally](https://commons.wikimedia.org/wiki/File:Durga_Puja_Pandal_-_66_Pally_-_Nepal_Bhattacharya_Street_-_Kolkata_2015-10-21_6346.JPG)
 - [Ballygunge Cultural Association — 02](https://commons.wikimedia.org/wiki/File:DurgaPuja2017_-_Pandal_of_Ballygunge_Cultural_Association_02.jpg)
 - [Hindustan Park — 01](https://commons.wikimedia.org/wiki/File:DurgaPuja2017_-_Pandal_of_Hindustan_Park_01.jpg)
+- [Mudiali Club Durga Puja 2025 — 09](https://commons.wikimedia.org/wiki/File:Mudiali_Club_Durga_Puja_2025_09.jpg)
+- [Suruchi Sangha's Durga Puja 2025 — 09](https://commons.wikimedia.org/wiki/File:Suruchi_Sangha%27s_Durga_Puja_2025_09.jpg)
+- [Jagat Mukherjee Park pandal — 2019](https://commons.wikimedia.org/wiki/File:Durga_Puja2019_-_Durga_Puja_Pandal_of_Jagat_Mukherjee_Park_in_Kolkata_10.jpg)
+- [Kashi Bose Lane pandal — 2019](https://commons.wikimedia.org/wiki/File:Durga_Puja2019_-_Durga_Puja_Pandal_of_Kashi_Bose_Lane_in_Kolkata_14.jpg)
 
 The project does not claim ownership of these archival photographs.
