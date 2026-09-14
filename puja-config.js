@@ -22,13 +22,21 @@
   const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
   const correctOfficialDates = () => {
     const dates = document.querySelector('.puja-2026-dates');
-    if (!dates) return;
-    const official = [['16 Oct','Shashthi'],['18 Oct','Saptami'],['19 Oct','Ashtami'],['20 Oct','Navami'],['21 Oct','Dashami']];
-    dates.querySelectorAll('.puja-2026-date').forEach((el, i) => {
-      if (!official[i]) return;
-      const b = el.querySelector('b'), span = el.querySelector('span');
-      if (b) b.textContent = official[i][0];
-      if (span) span.textContent = official[i][1];
+    if (dates) {
+      const official = [['16 Oct','Shashthi'],['18 Oct','Saptami'],['19 Oct','Ashtami'],['20 Oct','Navami'],['21 Oct','Dashami']];
+      dates.querySelectorAll('.puja-2026-date').forEach((el, i) => {
+        if (!official[i]) return;
+        const b = el.querySelector('b'), span = el.querySelector('span');
+        if (b) b.textContent = official[i][0];
+        if (span) span.textContent = official[i][1];
+      });
+    }
+    const hero = document.querySelector('.hero .eyebrow');
+    if (hero) hero.textContent = 'MAHALAYA 10 OCTOBER · HOLIDAY WINDOW 15—26 OCTOBER 2026';
+    const proCopy = document.querySelector('#pro-today-copy');
+    if (proCopy) proCopy.textContent = 'The official 2026 Puja holiday window begins on 15 October; core ritual days run from Shashthi on 16 October through Dashami on 21 October.';
+    document.querySelectorAll('.pro-guide small').forEach(el => {
+      if (el.textContent.includes('17 Oct')) el.textContent = el.textContent.replace('17 Oct', '16 Oct');
     });
   };
   const renderUpdates = () => {
