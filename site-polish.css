@@ -1,0 +1,150 @@
+/* Kolkata Puja 2026 — whole-site refinement layer. Loaded by runtime-fixes.js. */
+:root{
+  --polish-red:#b43122;
+  --polish-red-dark:#8f2419;
+  --polish-gold:#b88a3b;
+  --polish-paper:#f7f4ee;
+  --polish-card:#fffdfa;
+  --polish-line:#ded6ca;
+  --polish-ink:#181512;
+  --polish-muted:#716a61;
+  --polish-shadow:0 18px 50px rgba(24,21,18,.09);
+}
+
+/* Global rhythm + selection */
+::selection{background:var(--polish-red);color:#fff}
+html{scroll-padding-top:92px}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{image-rendering:auto}
+a,button,input{accent-color:var(--polish-red)}
+button,a{ -webkit-tap-highlight-color:transparent }
+:focus-visible{outline:3px solid rgba(180,49,34,.3);outline-offset:3px}
+
+/* Header */
+.site-header{height:76px;background:rgba(247,244,238,.9);border-bottom-color:rgba(180,49,34,.12);box-shadow:0 8px 30px rgba(24,21,18,.06);backdrop-filter:blur(18px) saturate(130%)}
+.site-header .brand{gap:12px}
+.site-header .brand-bengali{font-family:var(--bengali);font-size:18px;letter-spacing:0}
+.site-header .brand small{padding:.35em .6em;border:1px solid rgba(180,49,34,.2);border-radius:999px;background:rgba(180,49,34,.05)}
+.site-header nav a{padding:8px 0;transition:color .2s ease,opacity .2s ease,transform .2s ease}
+.site-header nav a:hover{color:var(--polish-red);transform:translateY(-1px)}
+.menu{border-radius:10px;transition:background .2s ease,transform .2s ease}
+.menu:hover{background:rgba(180,49,34,.06);transform:translateY(-1px)}
+
+/* Hero */
+.hero{isolation:isolate}
+.hero-image{transform:scale(1.015);transition:transform 1.2s cubic-bezier(.16,1,.3,1),filter .6s ease}
+.hero:hover .hero-image{transform:scale(1.025)}
+.hero-overlay{background:linear-gradient(90deg,rgba(11,7,6,.82),rgba(11,7,6,.24) 68%,rgba(11,7,6,.08)),linear-gradient(0deg,rgba(11,7,6,.78),transparent 58%)}
+.hero-content{max-width:780px}
+.hero h1{text-wrap:balance;text-shadow:0 12px 45px rgba(0,0,0,.2)}
+.hero h1 em{color:#f1d0a0}
+.hero-actions .primary{box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.hero-actions .primary:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(0,0,0,.2)}
+.text-link{border-bottom:1px solid rgba(255,255,255,.3);transition:border-color .2s ease,color .2s ease}
+.text-link:hover{border-color:#fff}
+
+/* Sections */
+.section-label{letter-spacing:.16em}
+.section h2{text-wrap:balance}
+.intro{background:linear-gradient(180deg,#faf8f3,var(--polish-paper))}
+.stats{border-bottom:1px solid var(--polish-line)}
+.stats div{position:relative}
+.stats div:not(:last-child):after{content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--polish-line)}
+.timeline{background:linear-gradient(145deg,#181512,#211b17)}
+.days{border-color:#3d352e;box-shadow:0 20px 70px rgba(0,0,0,.16)}
+.days article{transition:background .25s ease,transform .25s ease}
+.days article:hover{background:rgba(255,255,255,.035);transform:translateY(-3px)}
+.culture{background:linear-gradient(110deg,#eee9df,#f6f2ea)}
+.culture-photo{box-shadow:inset -30px 0 60px rgba(24,21,18,.08)}
+.culture-card{position:relative}
+.culture-card:before{content:"✦";position:absolute;top:45px;right:60px;color:rgba(180,49,34,.3);font-size:22px}
+
+/* Explorer */
+.guide{background:radial-gradient(circle at 90% 5%,rgba(180,49,34,.045),transparent 25%),var(--polish-paper)}
+.guide-head{margin-bottom:28px}
+.puja-quick-info>div{background:linear-gradient(145deg,#fffdfa,#f8f4ed);border-color:var(--polish-line);box-shadow:0 6px 20px rgba(24,21,18,.035)}
+.puja-quick-info>div:hover{box-shadow:var(--polish-shadow)}
+.explorer-toolbar{border-radius:12px}
+.explorer-search{box-shadow:0 5px 18px rgba(24,21,18,.035);transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+.explorer-search:focus{transform:translateY(-1px);box-shadow:0 9px 26px rgba(180,49,34,.09)!important}
+.filter-btn{transition:all .2s ease}
+.filter-btn:hover{border-color:#c8beb1;background:#fff}
+.filter-btn.active{box-shadow:0 6px 16px rgba(24,21,18,.12)}
+.pandal-card{background:linear-gradient(180deg,#fff,#fffdfa);border-color:#e0d9cf;box-shadow:0 3px 12px rgba(24,21,18,.035)}
+.pandal-card:hover,.pandal-card.selected{transform:translateY(-3px);box-shadow:var(--polish-shadow);border-color:#c8beb1}
+.pandal-card img{background:#e9e3da}
+.pandal-card-body{position:relative}
+.pandal-card h3{line-height:1.2}
+.pandal-meta{line-height:1.45}
+.pin-status{font-size:10px!important;line-height:1.3!important;margin-top:7px!important;padding:4px 7px;border-radius:999px;display:inline-flex!important;width:max-content;background:#f2eee7;color:#756d63}
+.pin-status.verified{background:rgba(180,49,34,.08);color:var(--polish-red);font-weight:700}
+.pin-status.pending{background:#f2eee7;color:#756d63}
+.pandal-actions .route{box-shadow:0 6px 14px rgba(180,49,34,.15)}
+.map-panel{border-color:#d4ccc0;box-shadow:var(--polish-shadow)}
+.map-panel:before{content:"EXPLORE KOLKATA";position:absolute;z-index:500;top:12px;left:12px;padding:6px 9px;border-radius:999px;background:rgba(24,21,18,.78);color:#fff;font:700 9px/1 var(--sans);letter-spacing:.12em;backdrop-filter:blur(8px);pointer-events:none}
+.leaflet-container{font-family:var(--sans)}
+.leaflet-control-zoom{border:0!important;box-shadow:0 6px 18px rgba(24,21,18,.16)!important}
+.leaflet-control-zoom a{border:0!important}
+
+/* Route + utility modules */
+.route-planner{background:linear-gradient(145deg,#181512,#241e19);border-color:#40372f;box-shadow:0 20px 60px rgba(24,21,18,.18)}
+.route-primary{box-shadow:0 8px 24px rgba(255,255,255,.1)}
+.route-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,255,255,.14)}
+.route-secondary:hover{border-color:#75695d;background:rgba(255,255,255,.035)}
+.night-mode{background:linear-gradient(145deg,#201a16,#171311);box-shadow:0 20px 55px rgba(24,21,18,.18)}
+.night-progress{height:5px}
+.night-progress-bar{background:linear-gradient(90deg,#b88a3b,#e0b96f)}
+.puja-guides,.puja-feature-suite,.puja-bingo,.puja-passport{border-color:#ded6ca!important}
+.puja-guide-card{background:#fffdfa!important}
+
+/* Gallery */
+.gallery{background:linear-gradient(145deg,#171310,#211a16)}
+.gallery-grid{gap:14px}
+.gallery-grid .tile{box-shadow:0 10px 35px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.16,1,.3,1),filter .35s ease,box-shadow .35s ease}
+.gallery-grid .tile:hover{transform:scale(.985);filter:saturate(1);box-shadow:0 18px 45px rgba(0,0,0,.25)}
+
+/* Closing */
+.closing{background:radial-gradient(circle at 50% 35%,rgba(180,49,34,.08),transparent 34%),var(--polish-paper)}
+.closing h2{text-wrap:balance}
+.closing .primary{box-shadow:0 9px 25px rgba(24,21,18,.12)}
+.closing .primary:hover{transform:translateY(-2px)}
+footer{background:#15120f;border-top-color:#3a312a}
+
+/* Modal / lightbox */
+.lightbox{backdrop-filter:blur(10px)}
+.lightbox img{box-shadow:0 25px 90px rgba(0,0,0,.35)}
+.pandal-details-modal{backdrop-filter:blur(12px)}
+.pandal-details-card{box-shadow:0 30px 90px rgba(0,0,0,.2)}
+
+/* Mobile refinement */
+@media(max-width:900px){
+  .site-header{height:66px}
+  .stats div:not(:last-child):after{display:none}
+  .map-panel:before{top:9px;left:9px}
+}
+@media(max-width:600px){
+  html{scroll-padding-top:78px}
+  .site-header{height:64px}
+  .site-header .brand-bengali{font-size:15px}
+  .site-header nav{display:none}
+  .hero{min-height:650px}
+  .hero-content{padding-bottom:2px}
+  .hero h1{letter-spacing:-.065em}
+  .hero-actions{gap:9px}
+  .hero-actions .button{min-height:46px}
+  .section{padding-top:58px;padding-bottom:58px}
+  .stats{gap:16px}
+  .stats strong{font-size:34px}
+  .culture-card:before{top:28px;right:28px}
+  .explorer-toolbar{top:64px}
+  .pandal-card{border-radius:13px}
+  .pandal-card img{height:180px}
+  .map-panel{border-radius:13px}
+  .route-planner{border-radius:13px}
+  .puja-quick-info>div{padding:14px}
+  footer{padding-bottom:24px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-image,.hero-actions .primary,.pandal-card,.gallery-grid .tile,.closing .primary{transition:none!important}
+  .hero:hover .hero-image,.hero-actions .primary:hover,.pandal-card:hover,.gallery-grid .tile:hover,.closing .primary:hover{transform:none!important}
+}
