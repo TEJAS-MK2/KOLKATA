@@ -13,12 +13,14 @@ try {
   page.on('pageerror', error => pageErrors.push(error.message));
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 15000 });
-  await wait(1000);
+  await page.waitForFunction(() => window.__KOLKATA_CANONICAL_CONTROLLER_READY === true, null, { timeout: 10000 });
+  await wait(500);
 
   const checks = await page.evaluate(() => ({
     cards: document.querySelectorAll('.pandal-card').length,
     canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
     pandals: Array.isArray(window.pandals) ? window.pandals.length : -1,
+    markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
     leaflet: Boolean(window.L),
     map: Boolean(document.getElementById('pandal-map')?._leaflet_id),
     search: Boolean(document.getElementById('pandal-search')),
@@ -31,6 +33,7 @@ try {
   if (checks.cards !== 100) fail(`Expected 100 pandal cards, found ${checks.cards}`);
   if (checks.canonicalPins !== 28) fail(`Expected 28 canonical pins, found ${checks.canonicalPins}`);
   if (checks.pandals < 28) fail(`Expected at least 28 canonical pandals, found ${checks.pandals}`);
+  if (checks.markerCount !== 28) fail(`Expected 28 Leaflet markers, found ${checks.markerCount}`);
   if (!checks.leaflet || !checks.map) fail('Leaflet map did not initialize');
   if (!checks.search || !checks.route || !checks.menu) fail('Core mobile controls are missing');
   if (!checks.toolkit || !checks.bingo) fail('Puja Toolkit or Puja Bingo did not load');
@@ -42,12 +45,14 @@ try {
   await search.fill('');
   await wait(250);
 
-  const firstAdd = page.locator('.pandal-card:visible .pandal-actions button').first();
+  const firstAdd = page.locator('.pandal-card:visible .add-route').first();
   if (await firstAdd.count()) {
     await firstAdd.click();
     await wait(200);
     const routeCount = await page.locator('#route-count').textContent();
     if (!routeCount?.startsWith('1 / 8')) fail(`Route add failed; got ${routeCount}`);
+    const directionHref = await page.locator('.pandal-card:visible .route').first().getAttribute('href');
+    if (!directionHref?.includes('destination=')) fail('Directions URL is missing a destination');
   } else fail('No Add to route control found on the first pandal card');
 
   const menu = page.locator('.menu');
