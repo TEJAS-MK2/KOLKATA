@@ -38,7 +38,7 @@ jobs:
           s=s.replace('<html lang="en-IN">','<html lang="bn-IN">',1)
           s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
           s=s.replace('<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="puja-assets.css">','<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="puja-assets.css">')
-          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="pandal-expansion-2026.js" defer></script><script src="pandal-expansion-more-2026.js" defer></script><script src="script.js" defer></script>')
+          s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="pandal-expansion-2026.js" defer></script><script src="pandal-expansion-more-2026.js" defer></script><script src="script.js" defer></script><script src="core-data-controller-v2.js" defer></script>')
           tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
           additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
           if additions and '</body>' in s:s=s.replace('</body>','  '+additions+'</body>',1)
@@ -60,7 +60,7 @@ jobs:
         run: |
           set -euo pipefail
           for f in \
-            script.js production-bootstrap.js pandal-expansion-2026.js pandal-expansion-more-2026.js details.js pandal-catalog-upgrade.js map-fallback.js \
+            script.js core-data-controller-v2.js production-bootstrap.js pandal-expansion-2026.js pandal-expansion-more-2026.js details.js pandal-catalog-upgrade.js map-fallback.js \
             explorer-v2.js pandal-personal-safe.js puja-countdown.js puja-companion-pro.js \
             runtime-fixes.js puja-feature-suite.js puja-bingo.js puja-guides.js sw.js
           do
@@ -75,6 +75,7 @@ jobs:
           test -s styles.css
           test -s polish.css
           test -s script.js
+          test -s core-data-controller-v2.js
           test -s production-bootstrap.js
           test -s pandal-expansion-2026.js
           test -s pandal-expansion-more-2026.js
@@ -107,6 +108,7 @@ jobs:
           grep -q 'leaflet@1.9.4' index.html
           grep -q 'animejs/3.2.2' index.html
           grep -q 'production-bootstrap.js' index.html
+          grep -q 'core-data-controller-v2.js' index.html
           grep -q 'pandal-expansion-2026.js' index.html
           grep -q 'pandal-expansion-more-2026.js' index.html
           grep -q 'pandal-catalog-upgrade.js' index.html
@@ -160,7 +162,7 @@ jobs:
           count=len(re.findall(r"^  '[^']+':\[",block,re.M))
           if count != 28: raise SystemExit(f'Expected 28 canonical pins, found {count}')
           html=Path('index.html').read_text(encoding='utf-8')
-          required=['production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
+          required=['production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','core-data-controller-v2.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
           positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
           if positions != sorted(positions): raise SystemExit('Production scripts are not in deterministic order')
           if 'destination=undefined' in html or 'destination=null' in html: raise SystemExit('Undefined Google Maps destination leaked into source HTML')
