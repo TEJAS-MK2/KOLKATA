@@ -6,5 +6,8 @@
   "display": "standalone",
   "background_color": "#f7f4ee",
   "theme_color": "#140c0a",
-  "lang": "en-IN"
+  "lang": "bn-IN",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }
