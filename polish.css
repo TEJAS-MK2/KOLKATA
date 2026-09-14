@@ -53,6 +53,34 @@ button,a,input,select{touch-action:manipulation}
 .closing{position:relative;overflow:hidden}
 .closing h2{position:relative;z-index:1}
 footer{min-height:68px;align-items:center}
+/* Cinematic opening inspired by Kolkata Puja editorial sites: short, skippable, session-scoped. */
+html.puja-intro-active,html.puja-intro-active body{overflow:hidden}
+.puja-intro{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#120908;color:#f8efe4;overflow:hidden;isolation:isolate;cursor:default}
+.puja-intro:before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 50% 54%,rgba(178,50,33,.28),transparent 28%),radial-gradient(circle at 50% 70%,rgba(241,167,73,.12),transparent 34%),linear-gradient(135deg,#0b0706,#1c0b08 48%,#090605);animation:pujaIntroBreath 3.2s ease-in-out both}
+.puja-intro-noise{position:absolute;inset:0;opacity:.08;background-image:radial-gradient(rgba(255,255,255,.8) .55px,transparent .55px);background-size:5px 5px;mix-blend-mode:soft-light;pointer-events:none}
+.puja-intro-lamp{position:absolute;left:50%;bottom:9%;width:72px;height:34px;transform:translateX(-50%);border-radius:50% 50% 42% 42%;background:linear-gradient(#7e3a1d,#32130d);box-shadow:0 12px 36px rgba(247,151,59,.18)}
+.puja-intro-lamp:before{content:"";position:absolute;left:50%;top:-42px;width:18px;height:42px;transform:translateX(-50%);border-radius:55% 45% 60% 45%;background:#ffcf79;filter:blur(.2px);box-shadow:0 0 24px 10px rgba(255,169,72,.3),0 0 72px 18px rgba(215,64,31,.15);animation:pujaIntroFlame .8s ease-in-out infinite alternate}
+.puja-intro-lamp span{position:absolute;left:50%;bottom:-6px;width:110px;height:26px;transform:translateX(-50%);border-radius:50%;background:rgba(243,151,60,.1);filter:blur(12px)}
+.puja-intro-content{position:relative;z-index:2;width:min(92vw,720px);text-align:center;display:flex;flex-direction:column;align-items:center;animation:pujaIntroContent 1s cubic-bezier(.16,1,.3,1) both}
+.puja-intro-kicker{font:600 10px/1 DM Sans,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#d8bca6;opacity:.8}
+.puja-intro-rule{width:min(220px,42vw);height:1px;margin:22px 0 24px;background:linear-gradient(90deg,transparent,rgba(224,174,127,.7),transparent);position:relative}
+.puja-intro-rule i{position:absolute;left:50%;top:50%;width:6px;height:6px;transform:translate(-50%,-50%) rotate(45deg);background:#e7a05d;box-shadow:0 0 18px rgba(231,160,93,.65)}
+.puja-intro-bengali{font:600 clamp(48px,11vw,92px)/.9 'Noto Serif Bengali',serif;letter-spacing:-.035em;text-shadow:0 8px 38px rgba(0,0,0,.45)}
+.puja-intro-title{margin-top:9px;font:700 clamp(31px,6vw,54px)/1 'Playfair Display',serif;letter-spacing:.08em}
+.puja-intro-year{margin-top:15px;font:500 12px/1 DM Sans,sans-serif;letter-spacing:.38em;color:#dca36e;padding-left:.38em}
+.puja-intro-tagline{margin:27px 0 0;color:#c9b3a2;font:400 14px/1.5 DM Sans,sans-serif;letter-spacing:.04em}
+.puja-intro-skip{margin-top:30px;border:1px solid rgba(237,207,184,.34);background:rgba(255,255,255,.035);color:#f9eee4;border-radius:999px;padding:11px 17px;font:600 11px/1 DM Sans,sans-serif;letter-spacing:.08em;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease}
+.puja-intro-skip span{margin-left:7px;color:#e9a86e}.puja-intro-skip:hover{background:rgba(255,255,255,.09);border-color:rgba(237,207,184,.58);transform:translateY(-1px)}
+.puja-intro-progress{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.06)}
+.puja-intro-progress span{display:block;height:100%;width:100%;transform-origin:left center;background:#cf6339;animation:pujaIntroProgress 3.2s linear both}
+.puja-intro.is-leaving{animation:pujaIntroLeave .7s cubic-bezier(.76,0,.24,1) both;pointer-events:none}
+@keyframes pujaIntroBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes pujaIntroFlame{from{transform:translateX(-50%) scale(.88) rotate(-2deg)}to{transform:translateX(-50%) scale(1.08) rotate(2deg)}}
+@keyframes pujaIntroContent{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes pujaIntroProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pujaIntroLeave{to{opacity:0;transform:scale(1.025);visibility:hidden}}
+@media(max-width:600px){.puja-intro-content{width:88vw}.puja-intro-lamp{bottom:8%}.puja-intro-tagline{font-size:13px;margin-top:23px}.puja-intro-skip{margin-top:25px}.puja-intro-rule{margin:18px 0 21px}}
+@media(prefers-reduced-motion:reduce){.puja-intro:before,.puja-intro-lamp:before,.puja-intro-content,.puja-intro-progress span{animation:none!important}.puja-intro-content{opacity:1}.puja-intro.is-leaving{animation:pujaIntroLeave .25s ease both}}
 @media(max-width:900px){
  .site-header{height:66px}
  .hero{min-height:680px;height:82vh}
