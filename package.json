@@ -1,0 +1,12 @@
+{
+  "name": "kolkata-puja-2026",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test:smoke": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.55.0"
+  }
+}
