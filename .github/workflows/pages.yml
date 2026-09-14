@@ -99,6 +99,7 @@ jobs:
             test ! -e "$legacy"
           done
           grep -q 'কলকাতা দুর্গাপূজা' index.html
+          grep -q 'lang="bn-IN"' index.html
           grep -q 'canonical' index.html
           grep -q 'pandal-list' index.html
           grep -q 'pandal-map' index.html
@@ -156,11 +157,12 @@ jobs:
           bootstrap=Path('production-bootstrap.js').read_text(encoding='utf-8')
           block=bootstrap.split('const CANONICAL={',1)[1].split('};',1)[0]
           count=len(re.findall(r"^  '[^']+':\[",block,re.M))
-          if count != 19: raise SystemExit(f'Expected 19 canonical pins, found {count}')
+          if count != 28: raise SystemExit(f'Expected 28 canonical pins, found {count}')
           html=Path('index.html').read_text(encoding='utf-8')
           required=['production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
           positions=[html.index(f'src="{name}"') if f'src="{name}"' in html else len(html) for name in required]
           if positions != sorted(positions): raise SystemExit('Production scripts are not in deterministic order')
+          if 'destination=undefined' in html or 'destination=null' in html: raise SystemExit('Undefined Google Maps destination leaked into source HTML')
           PY
           python - <<'PY'
           from pathlib import Path
