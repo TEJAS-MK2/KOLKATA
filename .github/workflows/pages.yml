@@ -35,6 +35,7 @@ jobs:
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
+          s=s.replace('<html lang="en-IN">','<html lang="bn-IN">',1)
           s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
           s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="script.js" defer></script>')
           tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js']
@@ -46,11 +47,11 @@ jobs:
           c=c.replace("background:url('var(--hero-puja)') center/cover",'background-image:var(--hero-puja);background-position:center;background-size:cover')
           c=c.replace("background:url('var(--culture-puja)') center/cover",'background-image:var(--culture-puja);background-position:center;background-size:cover')
           for a in ['1','2','3','4']: c=c.replace(f"background-image:url('var(--gallery-{a})')",f'background-image:var(--gallery-{a})')
+          c+='\n/* Puja Toolkit is the single floating launcher; the legacy companion shortcut remains hidden. */\n.puja-fab{display:none!important}\n'
           css.write_text(c,encoding='utf-8')
           pro=Path('puja-companion-pro.js'); pc=pro.read_text(encoding='utf-8').replace("['Extra Puja holidays','22–24 Oct'","['Extra Puja holidays','22–23 Oct'"); pro.write_text(pc,encoding='utf-8')
           personal=Path('pandal-personal-safe.js'); ps=personal.read_text(encoding='utf-8').replace('schedule();setInterval(sync,2000)','schedule()'); personal.write_text(ps,encoding='utf-8')
-          details=Path('details.css'); d=details.read_text(encoding='utf-8').replace('background:var(--cream);','background:var(--paper);').replace('color:var(--cream)','color:var(--paper)')
-          d='\n'.join(line for line in d.splitlines() if not line.startswith('.pandal-card[data-name="Santosh Mitra Square"]') and not line.startswith('.pandal-card[data-name="Shobhabazar Rajbari"]'))+'\n'; details.write_text(d,encoding='utf-8')
+          details=Path('details.css'); d=details.read_text(encoding='utf-8').replace('background:var(--cream);','background:var(--paper);').replace('color:var(--cream)','color:var(--paper)'); d='\n'.join(line for line in d.splitlines() if not line.startswith('.pandal-card[data-name="Santosh Mitra Square"]') and not line.startswith('.pandal-card[data-name="Shobhabazar Rajbari"]'))+'\n'; details.write_text(d,encoding='utf-8')
           PY
 
       - name: Validate JavaScript
