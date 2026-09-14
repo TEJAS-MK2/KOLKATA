@@ -62,7 +62,7 @@ jobs:
           set -euo pipefail
           for f in *.js tests/*.mjs; do node --check "$f"; done
       - name: Install browser test dependencies
-        run: npm install --no-package-lock
+        run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run production browser smoke test
