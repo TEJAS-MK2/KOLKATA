@@ -53,6 +53,8 @@
     note.textContent = 'Freshness check: 14 September 2026. Committee-level themes are shown only when a current announcement could be verified; local timings and access rules may still change.';
     host.append(section, note);
   };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderUpdates, {once:true});
-  else renderUpdates();
+  const boot = () => { renderUpdates(); setTimeout(correctOfficialDates, 0); setTimeout(correctOfficialDates, 1000); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
+  else boot();
+  addEventListener('load', correctOfficialDates, {once:true});
 })();
