@@ -12,8 +12,10 @@ try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   const pageErrors = [];
+  const consoleErrors = [];
   const failedRequests = [];
   page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   page.on('requestfailed', request => {
     if (request.url().startsWith('http://127.0.0.1:4173/')) {
       failedRequests.push(`${request.method()} ${request.url()} :: ${request.failure()?.errorText || 'failed'}`);
@@ -58,7 +60,10 @@ try {
     toolkit: Boolean(document.querySelector('#puja-suite-launcher')),
     bingo: Boolean(document.querySelector('#puja-bingo')),
     guides: Boolean(document.querySelector('.puja-guides')),
+    details: Boolean(document.querySelector('#pandal-details')),
+    gallery: Boolean(document.querySelector('#lightbox')),
     swSupported: 'serviceWorker' in navigator,
+    duplicateIds: (() => { const ids=[...document.querySelectorAll('[id]')].map(el=>el.id).filter(Boolean); return ids.filter((id,i)=>ids.indexOf(id)!==i); })(),
     canonicalMatches: Object.entries(window.KOLKATA_CANONICAL_PINS || {}).every(([name, coords]) => {
       const pandal = window.pandals?.find(item => item.name === name);
       return pandal && Number(pandal.lat) === Number(coords[0]) && Number(pandal.lng) === Number(coords[1]);
@@ -82,15 +87,22 @@ try {
   if (!checks.leaflet && !checks.mapFallback) fail('Neither Leaflet map nor documented map fallback initialized');
   if (!checks.canonicalMatches) fail('Canonical coordinates do not match the unified pandal catalog');
   if (!checks.expandedPins) fail('Verified expansion pins were not merged into the unified pandal catalog');
-  if (!checks.search || !checks.route || !checks.menu) fail('Core mobile controls are missing');
+  if (!checks.search || !checks.route || !checks.menu || !checks.details || !checks.gallery) fail('Core mobile controls or overlays are missing');
   if (!checks.toolkit || !checks.bingo || !checks.guides) fail('One or more Puja feature modules did not load');
   if (!checks.state || checks.state.version !== 3) fail('Unified v3 state store did not initialize');
+  if (checks.duplicateIds.length) fail(`Duplicate DOM ids found: ${checks.duplicateIds.join(', ')}`);
 
   const search = page.locator('#pandal-search');
   await search.fill('20 Palli');
   await wait(250);
   if (await page.locator('.pandal-card:not(.v2-hidden)').count() < 1) fail('Search did not find 20 Palli Sarbojani Durgotsab');
   await search.fill('');
+
+  const north = page.locator('.filter-btn[data-zone="North"]');
+  await north.click();
+  await wait(150);
+  if (await page.locator('.pandal-card:not(.v2-hidden)').count() < 1) fail('North zone filter hid every pandal');
+  await page.locator('.filter-btn[data-zone="all"]').click();
 
   const firstCard = page.locator('.pandal-card').filter({ hasText: 'Bagbazar Sarbojanin' }).first();
   const add = firstCard.locator('.catalog-route,.add-route').first();
@@ -103,16 +115,22 @@ try {
   await page.waitForFunction(() => window.KolkataState?.get?.().mode === 'driving', null, { timeout: 3000 });
   await page.waitForFunction(() => document.querySelector('#open-route')?.href.includes('travelmode=driving'), null, { timeout: 3000 });
 
+  await firstCard.click();
+  await page.waitForFunction(() => document.querySelector('#pandal-details')?.hidden === false && document.querySelector('#details-title')?.textContent.includes('Bagbazar Sarbojanin'), null, { timeout: 3000 });
+  await page.locator('[data-details-close]').first().click();
+  await page.waitForFunction(() => document.querySelector('#pandal-details')?.hidden === true, null, { timeout: 3000 });
+
   const menu = page.locator('.menu');
   await menu.click();
   await page.waitForFunction(() => document.querySelector('.menu')?.getAttribute('aria-expanded') === 'true' && document.querySelector('.site-header nav')?.classList.contains('is-open'), null, { timeout: 3000 });
-  await menu.click();
+  await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('.menu')?.getAttribute('aria-expanded') === 'false' && !document.querySelector('.site-header nav')?.classList.contains('is-open'), null, { timeout: 3000 });
 
   if (checks.swSupported) {
     await page.waitForFunction(async () => Boolean(await navigator.serviceWorker.getRegistration()), null, { timeout: 5000 }).catch(() => fail('Service worker did not register'));
   }
   if (pageErrors.length) fail(`Runtime page errors: ${pageErrors.join(' | ')}`);
+  if (consoleErrors.length) fail(`Console errors: ${consoleErrors.join(' | ')}`);
   if (failedRequests.length) fail(`Unexpected local asset request failures: ${failedRequests.join(' | ')}`);
 
   console.log('Production smoke test passed:', JSON.stringify(checks));
