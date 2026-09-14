@@ -175,6 +175,19 @@ jobs:
           if missing: raise SystemExit('Missing local assets: '+', '.join(missing))
           PY
 
+      - name: Install browser test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run production browser smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/smoke.mjs
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
