@@ -37,6 +37,7 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('<html lang="en-IN">','<html lang="bn-IN">',1)
           s=s.replace('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">','<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">')
+          s=s.replace('<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="puja-assets.css">','<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="puja-assets.css">')
           s=s.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="script.js" defer></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script><script src="production-bootstrap.js" defer></script><script src="pandal-expansion-2026.js" defer></script><script src="pandal-expansion-more-2026.js" defer></script><script src="script.js" defer></script>')
           tags=['pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
           additions=''.join(f'<script src="{tag}" defer></script>\n  ' for tag in tags if f'<script src="{tag}" defer></script>' not in s)
@@ -72,6 +73,7 @@ jobs:
           set -euo pipefail
           test -s index.html
           test -s styles.css
+          test -s polish.css
           test -s script.js
           test -s production-bootstrap.js
           test -s pandal-expansion-2026.js
@@ -95,11 +97,10 @@ jobs:
           test -s puja-feature-suite.js
           test -s puja-bingo.js
           test -s sw.js
-          for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do
-            test ! -e "$legacy"
-          done
+          for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do test ! -e "$legacy"; done
           grep -q 'কলকাতা দুর্গাপূজা' index.html
           grep -q 'lang="bn-IN"' index.html
+          grep -q 'polish.css' index.html
           grep -q 'canonical' index.html
           grep -q 'pandal-list' index.html
           grep -q 'pandal-map' index.html
