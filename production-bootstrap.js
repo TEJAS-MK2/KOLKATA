@@ -44,6 +44,7 @@ if(window.L?.map&&!window.L.map.__kolkataWrapped){
 }
 window.KOLKATA_CANONICAL_PINS=Object.freeze({...CANONICAL});
 window.KOLKATA_NORMALIZE_PANDALS=normalize;
+function slug(p){return String(p.id||p.slug||p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'))}
 function syncDirections(){
   const active=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';
   const mode=active==='two-wheeler'?'driving':active;
@@ -53,16 +54,25 @@ function syncPersonalState(){
   try{
     const fav=JSON.parse(localStorage.getItem('kolkata-pujo-favourites-v1')||'[]');
     const current=JSON.parse(localStorage.getItem('kolkata-puja-2026-personal-v2')||'{"saved":[],"visited":[],"notes":{}}');
-    const ids=new Set(fav.map(name=>{const p=window.pandals?.find?.(x=>x.name===name);return p?String(p.id||p.slug||p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')):String(name)}));
+    const ids=new Set([...(current.saved||[]),...fav.map(name=>{const p=window.pandals?.find?.(x=>x.name===name);return p?slug(p):String(name)})]);
     current.saved=[...ids];
     localStorage.setItem('kolkata-puja-2026-personal-v2',JSON.stringify(current));
+  }catch{}
+}
+function syncFavoritesFromPro(){
+  try{
+    const current=JSON.parse(localStorage.getItem('kolkata-puja-2026-personal-v2')||'{"saved":[]}');
+    const existing=JSON.parse(localStorage.getItem('kolkata-pujo-favourites-v1')||'[]');
+    const names=new Set(existing);
+    (current.saved||[]).forEach(id=>{const p=window.pandals?.find?.(x=>slug(x)===String(id));if(p)names.add(p.name)});
+    localStorage.setItem('kolkata-pujo-favourites-v1',JSON.stringify([...names]));
   }catch{}
 }
 function boot(){syncDirections();syncPersonalState()}
 document.addEventListener('click',event=>{
   if(event.target.closest('.mode-btn'))setTimeout(syncDirections,0);
   if(event.target.closest('.v2-fav'))setTimeout(syncPersonalState,0);
-  if(event.target.closest('#pro-save-one,#pro-first-save'))setTimeout(()=>{try{const current=JSON.parse(localStorage.getItem('kolkata-puja-2026-personal-v2')||'{"saved":[]}');const names=(current.saved||[]).map(id=>window.pandals?.find?.(p=>String(p.id||p.slug||p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'))===id)?.name).filter(Boolean);localStorage.setItem('kolkata-pujo-favourites-v1',JSON.stringify(names))}catch{}},0);
+  if(event.target.closest('#pro-save-one,#pro-first-save'))setTimeout(syncFavoritesFromPro,0);
   if(event.target.closest('a[href*="google.com/maps/dir/"]'))setTimeout(syncDirections,0);
 },{capture:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
