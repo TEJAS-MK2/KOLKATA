@@ -1,0 +1,12 @@
+(()=>{
+'use strict';
+const mapsMode=()=>{const active=document.querySelector('.mode-btn.active')?.dataset.mode||localStorage.getItem('kolkata-pujo-mode')||'walking';return active==='two-wheeler'?'driving':active};
+const rewriteMapsLinks=()=>{const mode=mapsMode();document.querySelectorAll('a[href*="google.com/maps"]').forEach(a=>{try{const u=new URL(a.href);if(u.hostname!=='www.google.com'||!u.pathname.startsWith('/maps/'))return;u.searchParams.set('travelmode',mode);a.href=u.toString();}catch{}})};
+const restoreRoute=()=>{const route=window.routeStops;if(!Array.isArray(route)||!Array.isArray(window.pandals))return;try{const saved=JSON.parse(localStorage.getItem('kolkata-pujo-route')||'[]');if(!saved.length)return;const wanted=saved.map(x=>x?.name).filter(Boolean);const restored=wanted.map(name=>window.pandals.find(p=>p.name===name)).filter(Boolean).slice(0,8);if(restored.length&&!route.length)route.push(...restored);}catch{}}
+const a11y=()=>{const menu=document.querySelector('.menu'),nav=document.querySelector('nav');if(menu&&!menu.hasAttribute('aria-label'))menu.setAttribute('aria-label','Open navigation');if(menu&&!menu.hasAttribute('aria-controls')&&nav?.id)menu.setAttribute('aria-controls',nav.id);document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=(a.getAttribute('rel')||'').split(/\s+/).filter(Boolean);if(!rel.includes('noopener'))rel.push('noopener');a.setAttribute('rel',rel.join(' '));});};
+const init=()=>{a11y();restoreRoute();rewriteMapsLinks();setTimeout(()=>{restoreRoute();rewriteMapsLinks();a11y();},1500);setTimeout(()=>{restoreRoute();rewriteMapsLinks();},3000);};
+document.addEventListener('click',e=>{if(e.target.closest('.mode-btn'))setTimeout(rewriteMapsLinks,0);const link=e.target.closest('a[href*="google.com/maps"]');if(link){try{const u=new URL(link.href);if(u.hostname==='www.google.com'&&u.pathname.startsWith('/maps/')){u.searchParams.set('travelmode',mapsMode());link.href=u.toString();}}catch{}}},{capture:true});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const nav=document.querySelector('nav'),menu=document.querySelector('.menu');if(nav?.dataset.open==='true'){nav.dataset.open='false';nav.style.display='';menu?.setAttribute('aria-expanded','false');}});
+new MutationObserver(()=>{rewriteMapsLinks();a11y();}).observe(document.body,{childList:true,subtree:true});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
