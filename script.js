@@ -1,133 +1,315 @@
-const header = document.querySelector('.site-header');
+(() => {
+  'use strict';
 
-window.addEventListener('scroll', () => {
-  const y = window.scrollY;
-  if (header) {
-    header.classList.toggle('is-scrolled', y > 40);
-    header.style.transition = 'background .25s ease, box-shadow .25s ease';
+  const header = document.querySelector('.site-header');
+  const nav = document.querySelector('.site-header nav');
+  const menu = document.querySelector('.menu');
+  const routeMax = 8;
+  const MODE_KEY = 'kolkata-pujo-mode';
+
+  const pandals = [
+    {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg',rating:4.8},
+    {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.59913,lng:88.36157,tag:'Artisan quarter',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg',rating:0},
+    {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Shobhabazar_Rajbari_Durga_Puja.jpg',rating:0},
+    {name:'College Square',zone:'Central',area:'College Street',lat:22.57453,lng:88.36447,tag:'Central Kolkata',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg',rating:4.9},
+    {name:'Santosh Mitra Square',zone:'Central',area:'Sealdah',lat:22.5658,lng:88.3685,tag:'Theme-driven',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Santosh_Mitra_square_Durga_Puja_2025_01.jpg',rating:4.8},
+    {name:'Maddox Square',zone:'South',area:'Ballygunge',lat:22.52656,lng:88.35465,tag:'Classic adda',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_With_Her_Family_-_Ballygunge_Durga_Puja_Samiti_-_Maddox_Square_-_Kolkata_2017-09-26_3939.JPG',rating:0},
+    {name:'Deshapriya Park',zone:'South',area:'Deshapriya Park',lat:22.51858,lng:88.35346,tag:'South Kolkata',photo:'https://upload.wikimedia.org/wikipedia/commons/f/fe/Durga_Puja_Pandal_-_Ballygunge_Sarbojanin_Durgotsab_-_Deshapriya_Park_-_Kolkata_2017-09-27_4501.JPG',rating:0},
+    {name:'Naktala Udayan Sangha',zone:'South',area:'Naktala',lat:22.4643,lng:88.3715,tag:'Neighbourhood favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Idol_Naktala_Udayan_Sangha.jpg',rating:4.5}
+  ];
+
+  let activeZone = 'all';
+  let map = null;
+  let markers = [];
+  let routeStops = [];
+  let travelMode = localStorage.getItem(MODE_KEY) || 'walking';
+  let nightIndex = 0;
+  let completedStops = new Set();
+
+  window.pandals = pandals;
+  Object.defineProperty(window, 'routeStops', {configurable:true,get:() => routeStops});
+  window.addToRoute = addToRoute;
+  window.removeFromRoute = removeFromRoute;
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   }
-  const hero = document.querySelector('.hero-image');
-  if (hero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) hero.style.transform = `translateY(${Math.min(y * 0.08, 50)}px) scale(1.02)`;
-}, { passive: true });
 
-const nav = document.querySelector('nav');
-const menu = document.querySelector('.menu');
-menu?.addEventListener('click', () => {
-  const open = nav.dataset.open === 'true';
-  nav.dataset.open = String(!open);
-  menu.setAttribute('aria-expanded', String(!open));
-  nav.style.display = open ? '' : 'flex';
-  if (!open) { nav.style.position='absolute'; nav.style.top='72px'; nav.style.right='6vw'; nav.style.flexDirection='column'; nav.style.padding='18px 22px'; nav.style.background='rgba(18,10,8,.96)'; nav.style.border='1px solid rgba(243,234,217,.15)'; }
-});
+  function normalizeMode(mode) {
+    return mode === 'two-wheeler' ? 'driving' : (['walking','driving','transit'].includes(mode) ? mode : 'walking');
+  }
 
-document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
-  const target = document.querySelector(link.getAttribute('href'));
-  if (!target) return;
-  event.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' });
-  if (window.innerWidth <= 800 && nav.dataset.open === 'true') menu?.click();
-}));
+  function mapsTravelMode() { return normalizeMode(travelMode); }
 
-const pandals = [
-  {name:'Bagbazar Sarbojanin',zone:'North',area:'Bagbazar',lat:22.60121,lng:88.36682,tag:'Heritage favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Bagbazar_Sarbojonin_Durgotsov.jpg',rating:4.8},
-  {name:'Kumartuli Park',zone:'North',area:'Kumartuli',lat:22.59913,lng:88.36157,tag:'Artisan quarter',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/DurgaPuja2019_-_Durga_Puja_pandal_of_Kumartoli_Park_in_Kolkata_01.jpg',rating:0},
-  {name:'Shobhabazar Rajbari',zone:'North',area:'Shobhabazar',lat:22.5974,lng:88.3672,tag:'Historic puja',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Shobhabazar_Rajbari_Durga_Puja.jpg',rating:0},
-  {name:'College Square',zone:'Central',area:'College Street',lat:22.57453,lng:88.36447,tag:'Central Kolkata',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/College_square_puja.jpg',rating:4.9},
-  {name:'Santosh Mitra Square',zone:'Central',area:'Sealdah',lat:22.5658,lng:88.3685,tag:'Theme-driven',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Santosh_Mitra_square_Durga_Puja_2025_01.jpg',rating:4.8},
-  {name:'Maddox Square',zone:'South',area:'Ballygunge',lat:22.52656,lng:88.35465,tag:'Classic adda',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_With_Her_Family_-_Ballygunge_Durga_Puja_Samiti_-_Maddox_Square_-_Kolkata_2017-09-26_3939.JPG',rating:0},
-  {name:'Deshapriya Park',zone:'South',area:'Deshapriya Park',lat:22.51858,lng:88.35346,tag:'South Kolkata',photo:'https://upload.wikimedia.org/wikipedia/commons/f/fe/Durga_Puja_Pandal_-_Ballygunge_Sarbojanin_Durgotsab_-_Deshapriya_Park_-_Kolkata_2017-09-27_4501.JPG',rating:0},
-  {name:'Naktala Udayan Sangha',zone:'South',area:'Naktala',lat:22.4643,lng:88.3715,tag:'Neighbourhood favourite',photo:'https://commons.wikimedia.org/wiki/Special:FilePath/Durga_Idol_Naktala_Udayan_Sangha.jpg',rating:4.5}
-];
+  function singleDirectionsUrl(pandal) {
+    if (!pandal || !Number.isFinite(Number(pandal.lat)) || !Number.isFinite(Number(pandal.lng))) return 'https://www.google.com/maps/dir/?api=1';
+    const destination = `${pandal.lat},${pandal.lng}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(mapsTravelMode())}`;
+  }
 
-let activeZone='all', map, markers=[], routeStops=[], travelMode='walking';
-const routeMax=8;
-let nightIndex=0, completedStops=new Set();
+  function routeUrl() {
+    if (!routeStops.length) return 'https://www.google.com/maps/dir/?api=1';
+    const mobile = window.matchMedia('(max-width: 800px)').matches;
+    const start = mobile ? Math.min(nightIndex, routeStops.length - 1) : 0;
+    const stops = mobile ? routeStops.slice(start, start + 4) : routeStops;
+    const last = stops[stops.length - 1];
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${last.lat},${last.lng}`)}&travelmode=${encodeURIComponent(mapsTravelMode())}`;
+    const waypoints = stops.slice(0, -1).map(p => `${p.lat},${p.lng}`).join('|');
+    if (waypoints) url += `&waypoints=${encodeURIComponent(waypoints)}`;
+    return url;
+  }
 
-window.pandals = pandals;
-// production-bootstrap normalizes this shared array with all verified canonical pins.
-pandals = window.pandals;
-Object.defineProperty(window, 'routeStops', { configurable: true, get: () => routeStops });
-window.addToRoute = addToRoute;
-window.removeFromRoute = removeFromRoute;
+  function persistNight() {
+    try {
+      localStorage.setItem('kolkata-pujo-route', JSON.stringify(routeStops.map(p => ({name:p.name}))));
+      localStorage.setItem('kolkata-pujo-completed', JSON.stringify([...completedStops]));
+    } catch {}
+  }
 
-try { routeStops=JSON.parse(localStorage.getItem('kolkata-pujo-route')||'[]').map(saved=>pandals.find(p=>p.name===saved.name)).filter(Boolean); } catch {}
-try { completedStops=new Set(JSON.parse(localStorage.getItem('kolkata-pujo-completed')||'[]')); } catch {}
+  function restoreState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('kolkata-pujo-route') || '[]');
+      routeStops = saved.map(item => pandals.find(p => p.name === item.name)).filter(Boolean);
+    } catch { routeStops = []; }
+    try {
+      const done = JSON.parse(localStorage.getItem('kolkata-pujo-completed') || '[]');
+      completedStops = new Set(Array.isArray(done) ? done : []);
+    } catch { completedStops = new Set(); }
+  }
 
-function persistNight(){localStorage.setItem('kolkata-pujo-route',JSON.stringify(routeStops.map(p=>({name:p.name}))));localStorage.setItem('kolkata-pujo-completed',JSON.stringify([...completedStops]));}
-function renderStars(value){return `<span class="stars" aria-label="${value?value.toFixed(1)+' out of 5':'Not rated'}">${value?'★★★★★':'☆☆☆☆☆'}</span> ${value?value.toFixed(1):'Not rated'}`;}
-function filteredPandals(){const query=(document.querySelector('#pandal-search')?.value||'').trim().toLowerCase();return pandals.filter(p=>(activeZone==='all'||p.zone===activeZone)&&(!query||`${p.name} ${p.area} ${p.zone} ${p.tag}`.toLowerCase().includes(query)));}
-function selectPandal(p){if(!p)return;if(map){map.flyTo([p.lat,p.lng],15,{duration:.7});markers.find(m=>m.pandal===p)?.marker.openPopup();}document.querySelectorAll('.pandal-card').forEach(c=>c.classList.toggle('selected',c.dataset.name===p.name));}
-function isInRoute(p){return !!p&&routeStops.some(x=>x.name===p.name);}
-function addToRoute(p){if(!p||isInRoute(p)||routeStops.length>=routeMax)return;routeStops.push(p);persistNight();renderRoute();renderNightMode();}
-function removeFromRoute(name){routeStops=routeStops.filter(p=>p.name!==name);completedStops.delete(name);nightIndex=Math.min(nightIndex,Math.max(routeStops.length-1,0));persistNight();renderRoute();renderNightMode();}
+  function isInRoute(pandal) { return Boolean(pandal && routeStops.some(p => p.name === pandal.name)); }
 
-// Google Maps Directions URLs support walking, driving, bicycling and transit.
-// Keep the site's two-wheeler option, but safely map it to driving for the external URL.
-function mapsTravelMode(){return travelMode;}
-function routeUrl(){
-  if(!routeStops.length)return 'https://www.google.com/maps/dir/?api=1';
-  const mobile=window.matchMedia('(max-width: 800px)').matches;
-  const start=mobile?Math.min(nightIndex,Math.max(routeStops.length-1,0)):0;
-  const stops=mobile?routeStops.slice(start,start+4):routeStops;
-  const destination=`${stops[stops.length-1].lat},${stops[stops.length-1].lng}`;
-  const waypoints=stops.slice(0,-1).map(p=>`${p.lat},${p.lng}`).join('|');
-  let url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(mapsTravelMode())}`;
-  if(waypoints)url+=`&waypoints=${encodeURIComponent(waypoints)}`;
-  return url;
-}
-function singleDirectionsUrl(p){return p?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lng}`)}&travelmode=${encodeURIComponent(mapsTravelMode())}`:'https://www.google.com/maps/dir/?api=1';}
-function updateRouteLink(){const link=document.querySelector('#open-route');if(link){link.href=routeUrl();link.setAttribute('aria-disabled',String(!routeStops.length));}}
-function renderRoute(){
-  const wrap=document.querySelector('#route-stops'), count=document.querySelector('#route-count');
-  if(count)count.textContent=`${routeStops.length} / ${routeMax}`;
-  if(wrap)wrap.innerHTML=routeStops.length?routeStops.map((p,i)=>`<div class="route-stop"><span class="route-stop-index">${i+1}</span><div><strong>${p.name}</strong><small>${p.area} · ${p.zone}</small></div><button class="remove-stop" type="button" data-remove="${p.name.replaceAll('"','&quot;')}" aria-label="Remove ${p.name}">×</button></div>`).join(''):`<div class="empty-state"><strong>Your route is empty.</strong><p>Tap “Add to route” on pandals above.</p></div>`;
-  wrap?.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>removeFromRoute(btn.dataset.remove)));
-  updateRouteLink();
-  document.querySelectorAll('.add-route').forEach(btn=>{const p=pandals.find(x=>x.name===btn.dataset.name);const added=isInRoute(p);btn.textContent=added?'Added ✓':(routeStops.length>=routeMax?'Route full':'Add to route +');btn.disabled=added||routeStops.length>=routeMax;});
-  refreshRouteIntelligence();
-}
-function renderPandalExplorer(){
-  const list=document.querySelector('#pandal-list');if(!list)return;const items=filteredPandals();
-  list.innerHTML=items.length?items.map(p=>`<article class="pandal-card" data-name="${p.name.replaceAll('"','&quot;')}" tabindex="0" aria-label="Explore ${p.name}"><img src="${p.photo}" alt="Archive photo associated with ${p.name}" loading="lazy" onerror="this.style.display='none'"><div class="pandal-card-body"><div class="pandal-meta">${p.zone} · ${p.area}</div><h3>${p.name}</h3><div class="rating">${renderStars(p.rating)}${p.rating?' · Historical visitor rating':''}</div><div class="pandal-actions"><button class="view-map" type="button">View map</button><button class="add-route" type="button" data-name="${p.name.replaceAll('"','&quot;')}">${isInRoute(p)?'Added ✓':routeStops.length>=routeMax?'Route full':'Add to route +'}</button><a class="route" href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`).join(''):`<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
-  list.querySelectorAll('.pandal-card').forEach(card=>{const p=pandals.find(x=>x.name===card.dataset.name);card.addEventListener('click',e=>{if(!e.target.closest('a,button'))selectPandal(p);});card.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){e.preventDefault();selectPandal(p);}});});
-  list.querySelectorAll('.view-map').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();selectPandal(pandals.find(p=>p.name===btn.closest('.pandal-card').dataset.name));}));
-  list.querySelectorAll('.add-route').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=pandals.find(x=>x.name===btn.dataset.name);if(isInRoute(p))removeFromRoute(p.name);else addToRoute(p);renderPandalExplorer();}));
-}
-function initMap(){if(!window.L||!document.querySelector('#pandal-map'))return;map=L.map('pandal-map',{scrollWheelZoom:false}).setView([22.5726,88.3639],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);markers=pandals.map(p=>{const marker=L.marker([p.lat,p.lng],{title:p.name,alt:p.name}).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.area} · ${p.zone}<br><button type="button" class="popup-add" data-pandal="${p.name.replaceAll('"','&quot;')}">Add to route</button> · <a href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a>`);marker.on('popupopen',()=>document.querySelector('.popup-add[data-pandal]')?.addEventListener('click',()=>{const q=document.querySelector('.popup-add[data-pandal]').dataset.pandal;const item=pandals.find(x=>x.name===q);if(item&&!isInRoute(item)){addToRoute(item);renderPandalExplorer();}}));return{pandal:p,marker};});}
+  function addToRoute(pandal) {
+    if (!pandal || isInRoute(pandal) || routeStops.length >= routeMax) return false;
+    routeStops.push(pandal);
+    persistNight();
+    renderRoute();
+    renderNightMode();
+    return true;
+  }
 
-document.querySelector('#pandal-search')?.addEventListener('input',renderPandalExplorer);
-document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn=>btn.addEventListener('click',()=>{activeZone=btn.dataset.zone;document.querySelectorAll('#pandal-filters .filter-btn').forEach(b=>b.classList.toggle('active',b===btn));renderPandalExplorer();}));
-document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>{travelMode=btn.dataset.mode;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b===btn));updateRouteLink();renderNightMode();refreshRouteIntelligence();}));
-document.querySelector('#clear-route')?.addEventListener('click',()=>{routeStops=[];completedStops.clear();nightIndex=0;persistNight();renderRoute();renderPandalExplorer();renderNightMode();});
+  function removeFromRoute(name) {
+    routeStops = routeStops.filter(p => p.name !== name);
+    completedStops.delete(name);
+    nightIndex = Math.min(nightIndex, Math.max(routeStops.length - 1, 0));
+    persistNight();
+    renderRoute();
+    renderPandalExplorer();
+    renderNightMode();
+  }
 
-function renderNightMode(){
-  const total=routeStops.length, current=routeStops[nightIndex];
-  const label=document.querySelector('#night-stop-label'),name=document.querySelector('#night-stop-name'),area=document.querySelector('#night-stop-area'),bar=document.querySelector('#night-progress-bar'),text=document.querySelector('#night-progress-text'),prev=document.querySelector('#night-prev'),next=document.querySelector('#night-next'),directions=document.querySelector('#night-directions');
-  if(!total){if(label)label.textContent='STOP 1 OF 0';if(name)name.textContent='Add stops to begin';if(area)area.textContent='Your selected route will appear here.';if(bar)bar.style.width='0%';if(text)text.textContent='0 / 0 completed';if(directions)directions.href=routeUrl();if(prev)prev.disabled=true;if(next)next.disabled=true;return;}
-  if(nightIndex>=total)nightIndex=total-1;
-  const done=completedStops.has(current.name);
-  if(label)label.textContent=`STOP ${nightIndex+1} OF ${total}${done?' · VISITED':''}`;
-  if(name)name.textContent=current.name;
-  if(area)area.textContent=`${current.area} · ${current.zone} · ${done?'Marked as visited':'Not visited yet'}`;
-  const completedCount=routeStops.filter(p=>completedStops.has(p.name)).length;
-  if(bar)bar.style.width=`${Math.round((completedCount/total)*100)}%`;
-  if(text)text.textContent=`${completedCount} / ${total} completed`;
-  if(prev)prev.disabled=nightIndex===0;
-  if(next)next.textContent=nightIndex===total-1?'Finish stop ✓':'Next stop →';
-  if(directions)directions.href=singleDirectionsUrl(current);
-  refreshRouteIntelligence();
-}
-function openNightMode(){const panel=document.querySelector('#night-mode');if(!panel)return;panel.classList.remove('hidden');renderNightMode();panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
-function closeNightMode(){document.querySelector('#night-mode')?.classList.add('hidden');}
+  function renderStars(value) {
+    const rated = Number(value) > 0;
+    const label = rated ? `${Number(value).toFixed(1)} out of 5` : 'Not rated';
+    return `<span class="stars" aria-label="${label}">${rated ? '★★★★★' : '☆☆☆☆☆'}</span> ${rated ? Number(value).toFixed(1) : 'Not rated'}`;
+  }
 
-document.querySelector('#night-mode-toggle')?.addEventListener('click',openNightMode);
-document.querySelector('#night-close')?.addEventListener('click',closeNightMode);
-document.querySelector('#night-prev')?.addEventListener('click',()=>{nightIndex=Math.max(0,nightIndex-1);renderNightMode();});
-document.querySelector('#night-next')?.addEventListener('click',()=>{if(!routeStops.length)return;completedStops.add(routeStops[nightIndex].name);if(nightIndex<routeStops.length-1)nightIndex+=1;persistNight();renderNightMode();});
-document.querySelector('#night-route')?.addEventListener('click',()=>{window.open(routeUrl(),'_blank','noopener');});
-document.querySelector('#night-reset')?.addEventListener('click',()=>{completedStops.clear();nightIndex=0;persistNight();renderNightMode();});
+  function filteredPandals() {
+    const query = (document.querySelector('#pandal-search')?.value || '').trim().toLowerCase();
+    return pandals.filter(p => (activeZone === 'all' || p.zone === activeZone) && (!query || `${p.name} ${p.area} ${p.zone} ${p.tag}`.toLowerCase().includes(query)));
+  }
 
-function initLightbox(){const box=document.querySelector('#lightbox'),image=document.querySelector('#lightbox-image');const close=()=>box?.classList.remove('open');document.querySelectorAll('.gallery-grid .tile').forEach(tile=>tile.addEventListener('click',()=>{const bg=getComputedStyle(tile).backgroundImage,match=bg.match(/url\([\"']?(.*?)[\"']?\)/);if(match&&image){image.src=match[1];box.classList.add('open');}}));document.querySelector('#lightbox-close')?.addEventListener('click',close);box?.addEventListener('click',e=>{if(e.target===box)close();});}
-function refreshRouteIntelligence(){const el=document.querySelector('#route-intelligence');if(!el)return;const total=routeStops.length;if(!total){el.innerHTML='<strong>Route intelligence</strong><p>Add verified stops to see route guidance.</p>';return;}const mode=travelMode==='two-wheeler'?'driving':travelMode;const eta=mode==='walking'?Math.max(8,total*11):mode==='transit'?Math.max(12,total*8):Math.max(7,total*5);el.innerHTML=`<strong>${total} stops · ${mode}</strong><p>Rough planning estimate only: ${eta}–${eta+12} min between stops. Live traffic and crowding are not included.</p>`;}
-function initRouteIntelligence(){const host=document.querySelector('.route-planner');if(!host||document.querySelector('#route-intelligence'))return;const el=document.createElement('div');el.id='route-intelligence';el.className='route-intelligence';host.appendChild(el);refreshRouteIntelligence();}
-function boot(){renderPandalExplorer();initMap();renderRoute();renderNightMode();initLightbox();initRouteIntelligence();}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,80),{once:true});else setTimeout(boot,80);
+  function selectPandal(pandal) {
+    if (!pandal) return;
+    if (map) {
+      map.flyTo([pandal.lat, pandal.lng], 15, {duration:0.7});
+      markers.find(item => item.pandal === pandal)?.marker.openPopup();
+    }
+    document.querySelectorAll('.pandal-card').forEach(card => card.classList.toggle('selected', card.dataset.name === pandal.name));
+  }
+  window.selectPandal = selectPandal;
+
+  function renderPandalExplorer() {
+    const list = document.querySelector('#pandal-list');
+    if (!list) return;
+    const items = filteredPandals();
+    list.innerHTML = items.length ? items.map(p => `
+      <article class="pandal-card" data-name="${escapeHtml(p.name)}" tabindex="0" aria-label="Explore ${escapeHtml(p.name)}">
+        <img src="${escapeHtml(p.photo)}" alt="Archive photo associated with ${escapeHtml(p.name)}" loading="lazy" onerror="this.style.display='none'">
+        <div class="pandal-card-body">
+          <div class="pandal-meta">${escapeHtml(p.zone)} · ${escapeHtml(p.area)}</div>
+          <h3>${escapeHtml(p.name)}</h3>
+          <div class="rating">${renderStars(p.rating)}${p.rating ? ' · Historical visitor rating' : ''}</div>
+          <div class="pandal-actions">
+            <button class="view-map" type="button">View map</button>
+            <button class="add-route" type="button" data-name="${escapeHtml(p.name)}">${isInRoute(p) ? 'Added ✓' : routeStops.length >= routeMax ? 'Route full' : 'Add to route +'}</button>
+            <a class="route" href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a>
+          </div>
+        </div>
+      </article>`).join('') : '<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>';
+
+    list.querySelectorAll('.pandal-card').forEach(card => {
+      const pandal = pandals.find(p => p.name === card.dataset.name);
+      card.addEventListener('click', event => { if (!event.target.closest('a,button')) selectPandal(pandal); });
+      card.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button')) { event.preventDefault(); selectPandal(pandal); }
+      });
+    });
+    list.querySelectorAll('.view-map').forEach(button => button.addEventListener('click', event => {
+      event.stopPropagation();
+      selectPandal(pandals.find(p => p.name === button.closest('.pandal-card')?.dataset.name));
+    }));
+    list.querySelectorAll('.add-route').forEach(button => button.addEventListener('click', event => {
+      event.stopPropagation();
+      const pandal = pandals.find(p => p.name === button.dataset.name);
+      if (isInRoute(pandal)) removeFromRoute(pandal.name); else addToRoute(pandal);
+      renderPandalExplorer();
+    }));
+  }
+
+  function initMap() {
+    const host = document.querySelector('#pandal-map');
+    if (!host || !window.L || map) return;
+    map = window.L.map(host, {scrollWheelZoom:false}).setView([22.5726,88.3639],12);
+    window.kolkataMap = map;
+    window.map = map;
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+    markers = pandals.filter(p => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng))).map(p => {
+      const marker = window.L.marker([p.lat,p.lng], {title:p.name,alt:p.name}).addTo(map);
+      marker.bindPopup(`<strong>${escapeHtml(p.name)}</strong><br>${escapeHtml(p.area)} · ${escapeHtml(p.zone)}<br><button type="button" class="popup-add" data-pandal="${escapeHtml(p.name)}">Add to route</button> · <a href="${singleDirectionsUrl(p)}" target="_blank" rel="noopener">Directions ↗</a>`);
+      marker.on('popupopen', () => {
+        const button = document.querySelector(`.popup-add[data-pandal="${CSS.escape(p.name)}"]`);
+        button?.addEventListener('click', () => { if (addToRoute(p)) renderPandalExplorer(); }, {once:true});
+      });
+      return {pandal:p,marker};
+    });
+  }
+
+  function updateRouteLink() {
+    const link = document.querySelector('#open-route');
+    if (!link) return;
+    link.href = routeUrl();
+    link.setAttribute('aria-disabled', String(!routeStops.length));
+  }
+
+  function renderRoute() {
+    const wrap = document.querySelector('#route-stops');
+    const count = document.querySelector('#route-count');
+    if (count) count.textContent = `${routeStops.length} / ${routeMax}`;
+    if (wrap) wrap.innerHTML = routeStops.length ? routeStops.map((p,i) => `
+      <div class="route-stop"><span class="route-stop-index">${i+1}</span><div><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(p.area)} · ${escapeHtml(p.zone)}</small></div><button class="remove-stop" type="button" data-remove="${escapeHtml(p.name)}" aria-label="Remove ${escapeHtml(p.name)}">×</button></div>`).join('') : '<div class="empty-state"><strong>Your route is empty.</strong><p>Tap “Add to route” on pandals above.</p></div>';
+    wrap?.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => removeFromRoute(button.dataset.remove)));
+    updateRouteLink();
+    document.querySelectorAll('.add-route').forEach(button => {
+      const pandal = pandals.find(p => p.name === button.dataset.name);
+      const added = isInRoute(pandal);
+      button.textContent = added ? 'Added ✓' : routeStops.length >= routeMax ? 'Route full' : 'Add to route +';
+      button.disabled = added || routeStops.length >= routeMax;
+    });
+    refreshRouteIntelligence();
+  }
+
+  function renderNightMode() {
+    const total = routeStops.length;
+    const current = routeStops[nightIndex];
+    const label = document.querySelector('#night-stop-label');
+    const name = document.querySelector('#night-stop-name');
+    const area = document.querySelector('#night-stop-area');
+    const bar = document.querySelector('#night-progress-bar');
+    const text = document.querySelector('#night-progress-text');
+    const prev = document.querySelector('#night-prev');
+    const next = document.querySelector('#night-next');
+    const directions = document.querySelector('#night-directions');
+    if (!total) {
+      if(label) label.textContent='STOP 1 OF 0'; if(name) name.textContent='Add stops to begin'; if(area) area.textContent='Your selected route will appear here.'; if(bar) bar.style.width='0%'; if(text) text.textContent='0 / 0 completed'; if(directions) directions.href=routeUrl(); if(prev) prev.disabled=true; if(next) next.disabled=true; return;
+    }
+    nightIndex = Math.min(nightIndex, total - 1);
+    const done = completedStops.has(current.name);
+    const completedCount = routeStops.filter(p => completedStops.has(p.name)).length;
+    if(label) label.textContent=`STOP ${nightIndex+1} OF ${total}${done ? ' · VISITED' : ''}`;
+    if(name) name.textContent=current.name;
+    if(area) area.textContent=`${current.area} · ${current.zone} · ${done ? 'Marked as visited' : 'Not visited yet'}`;
+    if(bar) bar.style.width=`${Math.round((completedCount/total)*100)}%`;
+    if(text) text.textContent=`${completedCount} / ${total} completed`;
+    if(prev) prev.disabled=nightIndex===0;
+    if(next) next.textContent=nightIndex===total-1 ? 'Finish stop ✓' : 'Next stop →';
+    if(directions) directions.href=singleDirectionsUrl(current);
+    refreshRouteIntelligence();
+  }
+
+  function refreshRouteIntelligence() {
+    const el = document.querySelector('#route-intelligence');
+    if (!el) return;
+    if (!routeStops.length) { el.innerHTML='<strong>Route intelligence</strong><p>Add verified stops to see a rough planning estimate.</p>'; return; }
+    const factor = normalizeMode(travelMode) === 'walking' ? 11 : normalizeMode(travelMode) === 'transit' ? 8 : 5;
+    const minutes = Math.max(0, routeStops.length * factor);
+    el.innerHTML=`<strong>${routeStops.length} stops · ${travelMode}</strong><p>Rough planning estimate only: ${minutes}–${minutes+12} min between stops. Live traffic and crowding are not included.</p>`;
+  }
+
+  function initLightbox() {
+    const box = document.querySelector('#lightbox');
+    const image = document.querySelector('#lightbox-image');
+    if (!box || !image) return;
+    const close = () => box.classList.remove('open');
+    document.querySelectorAll('.gallery-grid .tile').forEach(tile => tile.addEventListener('click', () => {
+      const bg = getComputedStyle(tile).backgroundImage;
+      const match = bg.match(/url\(["']?(.*?)["']?\)/);
+      if (match?.[1]) { image.src = match[1]; box.classList.add('open'); }
+    }));
+    document.querySelector('#lightbox-close')?.addEventListener('click', close);
+    box.addEventListener('click', event => { if (event.target === box) close(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+  }
+
+  function bindUI() {
+    menu?.addEventListener('click', () => {
+      if (!nav) return;
+      const open = nav.dataset.open === 'true';
+      nav.dataset.open = String(!open);
+      menu.setAttribute('aria-expanded', String(!open));
+      nav.style.display = open ? '' : 'flex';
+      if (!open) {
+        nav.style.position='absolute'; nav.style.top='72px'; nav.style.right='6vw'; nav.style.flexDirection='column'; nav.style.padding='18px 22px'; nav.style.background='rgba(18,10,8,.96)'; nav.style.border='1px solid rgba(243,234,217,.15)';
+      }
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
+      const selector = link.getAttribute('href');
+      if (!selector || selector === '#') return;
+      const target = document.querySelector(selector);
+      if (!target) return;
+      event.preventDefault(); target.scrollIntoView({behavior:'smooth',block:'start'});
+      if (window.innerWidth <= 800 && nav?.dataset.open === 'true') menu?.click();
+    }));
+    document.querySelector('#pandal-search')?.addEventListener('input', renderPandalExplorer);
+    document.querySelectorAll('#pandal-filters .filter-btn').forEach(button => button.addEventListener('click', () => {
+      activeZone = button.dataset.zone || 'all';
+      document.querySelectorAll('#pandal-filters .filter-btn').forEach(item => item.classList.toggle('active', item === button));
+      renderPandalExplorer();
+    }));
+    document.querySelectorAll('.mode-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.mode === travelMode);
+      button.addEventListener('click', () => {
+        travelMode = button.dataset.mode || 'walking';
+        localStorage.setItem(MODE_KEY, travelMode);
+        document.querySelectorAll('.mode-btn').forEach(item => item.classList.toggle('active', item === button));
+        updateRouteLink(); renderNightMode(); renderPandalExplorer();
+      });
+    });
+    document.querySelector('#clear-route')?.addEventListener('click', () => { routeStops=[]; completedStops.clear(); nightIndex=0; persistNight(); renderRoute(); renderPandalExplorer(); renderNightMode(); });
+    document.querySelector('#night-mode-toggle')?.addEventListener('click', () => { document.querySelector('#night-mode')?.classList.remove('hidden'); renderNightMode(); document.querySelector('#night-mode')?.scrollIntoView({behavior:'smooth',block:'nearest'}); });
+    document.querySelector('#night-close')?.addEventListener('click', () => document.querySelector('#night-mode')?.classList.add('hidden'));
+    document.querySelector('#night-prev')?.addEventListener('click', () => { nightIndex=Math.max(0,nightIndex-1); renderNightMode(); });
+    document.querySelector('#night-next')?.addEventListener('click', () => { if(!routeStops.length)return; completedStops.add(routeStops[nightIndex].name); if(nightIndex<routeStops.length-1)nightIndex++; persistNight(); renderNightMode(); });
+    document.querySelector('#night-route')?.addEventListener('click', () => window.open(routeUrl(),'_blank','noopener'));
+    document.querySelector('#night-reset')?.addEventListener('click', () => { completedStops.clear(); nightIndex=0; persistNight(); renderNightMode(); });
+    window.addEventListener('scroll', () => {
+      const y=window.scrollY;
+      header?.classList.toggle('is-scrolled', y>40);
+      const hero=document.querySelector('.hero-image');
+      if(hero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) hero.style.transform=`translateY(${Math.min(y*.08,50)}px) scale(1.02)`;
+    }, {passive:true});
+  }
+
+  function boot() {
+    restoreState();
+    bindUI();
+    renderPandalExplorer();
+    initMap();
+    renderRoute();
+    renderNightMode();
+    initLightbox();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
+  else boot();
+})();
