@@ -46,7 +46,7 @@ jobs:
           bootstrap=Path('production-bootstrap.js').read_text(encoding='utf-8')
           block=bootstrap.split('const CANONICAL={',1)[1].split('};',1)[0]
           count=len(re.findall(r"^  '[^']+':\[",block,re.M))
-          if count != 28: raise SystemExit(f'Expected 28 canonical pins, found {count}')
+          if count != 35: raise SystemExit(f'Expected 35 canonical pins, found {count}')
           html=Path('index.html').read_text(encoding='utf-8')
           required=['puja-config.js','state-v3.js','production-bootstrap.js','pandal-expansion-2026.js','pandal-expansion-more-2026.js','script.js','core-data-controller-v2.js','details.js','pandal-catalog-upgrade.js','map-fallback.js','explorer-v2.js','pandal-personal-safe.js','puja-countdown.js','puja-companion-pro.js','runtime-fixes.js','puja-feature-suite.js','puja-bingo.js','puja-guides.js']
           positions=[html.index(f'src="{name}"') for name in required]
