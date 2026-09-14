@@ -14,6 +14,6 @@ function paintDetail(){const title=document.querySelector('#details-title'),mark
 let syncing=false,scheduled=false;
 const sync=()=>{if(syncing)return;syncing=true;try{detailEnhance();refresh()}finally{syncing=false;scheduled=false}};
 const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(sync)};
-function boot(){css();panel();const modal=document.querySelector('#pandal-details');if(modal)new MutationObserver(schedule).observe(modal,{childList:true,subtree:true,characterData:true});schedule();setInterval(sync,2000)}
+function boot(){css();panel();const modal=document.querySelector('#pandal-details');if(modal)new MutationObserver(schedule).observe(modal,{childList:true,subtree:true,characterData:true});schedule()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
