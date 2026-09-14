@@ -21,6 +21,12 @@
   catalog.forEach(p=>{if(imageMap[p.name])p.photo=imageMap[p.name];});
   const mapped = new Map((window.pandals || []).map(p => [p.name, p]));
   const items = catalog.map(p => ({...p, ...(mapped.get(p.name) || {})}));
+
+  // Make the expanded catalog the shared application dataset. Previously this
+  // stayed local to the catalog renderer, so Companion/Toolkit saw only the
+  // original 13 entries even though the Explorer displayed all 99 listings.
+  window.pandals = items;
+
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const mapsSearch = p => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name}, ${p.area}, Kolkata, West Bengal`)}`;
   function replaceWithCleanControl(node){if(!node||!node.parentNode)return node;const clone=node.cloneNode(true);node.parentNode.replaceChild(clone,node);return clone;}
@@ -33,7 +39,7 @@
     count.textContent=`${visible.length} pandals in the discovery catalog · ${visible.filter(p=>p.lat&&p.lng).length} verified map pins`;
     list.innerHTML=visible.length?visible.map(p=>{const pin=Boolean(p.lat&&p.lng);const image=p.photo?`<img src="${escapeHtml(p.photo)}" alt="Archive photo associated with ${escapeHtml(p.name)}" loading="lazy" onerror="this.remove()">`:'';return `<article class="pandal-card catalog-card" data-name="${escapeHtml(p.name)}" tabindex="0" aria-label="Explore ${escapeHtml(p.name)}">${image}<div class="pandal-card-body"><div class="pandal-meta">${escapeHtml(p.zone)} · ${escapeHtml(p.area)}</div><h3>${escapeHtml(p.name)}</h3><div class="rating">${pin?'● Map pin verified':'○ Discovery listing'}</div><div class="pandal-actions"><button class="catalog-map" type="button" ${pin?'':'disabled'}>${pin?'View map':'Map pin pending'}</button>${pin?`<button class="catalog-route" type="button">Add to route +</button>`:''}<a class="route" href="${mapsSearch(p)}" target="_blank" rel="noopener">Directions ↗</a></div></div></article>`;}).join(''):`<div class="empty-state"><strong>No pandals found.</strong><p>Try another neighbourhood or clear the search.</p></div>`;
     list.querySelectorAll('.catalog-map').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=items.find(x=>x.name===btn.closest('.pandal-card')?.dataset.name);if(p?.lat&&p?.lng&&window.pandals?.some(x=>x.name===p.name)&&typeof window.selectPandal==='function')window.selectPandal(window.pandals.find(x=>x.name===p.name));}));
-    list.querySelectorAll('.catalog-route').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=items.find(x=>x.name===btn.closest('.pandal-card')?.dataset.name);const original=p&&window.pandals?.find(x=>x.name===p.name);if(original&&typeof window.addToRoute==='function'){window.addToRoute(original);render();}}));
+    list.querySelectorAll('.catalog-route').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const p=items.find(x=>x.name===btn.closest('.pandal-card')?.dataset.name);const original=p&&window.pandals?.find(x=>x.name===p.name);if(original&&typeof window.addToRoute==='function'){window.addToRoute(original);render();}});
   }
   function bind(){const search=replaceWithCleanControl(document.querySelector('#pandal-search'));search?.addEventListener('input',render);document.querySelectorAll('#pandal-filters .filter-btn').forEach(btn=>{const clean=replaceWithCleanControl(btn);clean.addEventListener('click',()=>{document.querySelectorAll('#pandal-filters .filter-btn').forEach(b=>b.classList.toggle('active',b===clean));render();});});render();}
   function addCatalogNote(){const host=document.querySelector('#pandal-list')?.parentElement;if(!host||document.querySelector('#catalog-verification-note'))return;const note=document.createElement('div');note.id='catalog-verification-note';note.className='catalog-note';note.innerHTML='<strong>Verification-first map</strong><span>The discovery catalog is expanded with archival images from Wikimedia Commons. A marker is shown only when the exact pin is already verified; we do not invent coordinates. Directions for every listing open a place search.</span>';host.insertBefore(note,document.querySelector('#pandal-list'));}
