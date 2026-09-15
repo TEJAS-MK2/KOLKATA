@@ -37,7 +37,7 @@ jobs:
           grep -q 'Math.floor((START-now)/86400000)' puja-companion-pro.js
           grep -q 'Puja Toolkit' puja-feature-suite.js
           grep -q 'Puja Passport' puja-feature-suite.js
-          grep -q 'PUJA BINGO' puja-bingo.js
+          if grep -q 'PUJA BINGO' puja-bingo.js; then echo 'Retired Puja Bingo implementation is still active'; exit 1; fi
           for legacy in intro-upgrade.js pandal-personal.js puja2026-finalize.js puja2026-map-hotfix.js puja2026-qa-fix.js puja2026-suite.js puja2026-upgrade.js qa-hotfix.js qa-polish.js puja-companion.js puja-night-upgrade.js menu-fix.js filter-fix.js; do test ! -e "$legacy"; done
           if grep -R -n -E "kolkata-pujo-(favourites|visited|notes|route|completed|mode)|kolkata-puja-2026-(personal|suite)|kolkata-puja-bingo-v1" --include='*.js' . | grep -v '^./state-v3.js:'; then echo 'Legacy storage access remains outside state-v3.js'; exit 1; fi
           python3 - <<'PY'
