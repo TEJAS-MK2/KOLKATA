@@ -147,3 +147,6 @@ footer{background:#15120f;border-top-color:#3a312a}
   .hero-image,.hero-actions .primary,.pandal-card,.gallery-grid .tile,.closing .primary{transition:none!important}
   .hero:hover .hero-image,.hero-actions .primary:hover,.pandal-card:hover,.gallery-grid .tile:hover,.closing .primary:hover{transform:none!important}
 }
+
+/* Sharodiya × Neo-Kolkata redesign: visual-only overrides. Existing IDs, controls and features remain intact. */
+@import url('./redesign-lux-neo.css');
