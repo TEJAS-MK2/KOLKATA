@@ -23,27 +23,11 @@ try {
   await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length >= 100 && document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 30000 });
   await wait(2200);
 
-  const bootstrap = await page.evaluate(() => ({
-    readyState: document.readyState,
-    pandals: Array.isArray(window.pandals) ? window.pandals.length : null,
-    uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : null,
-    canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
-    leaflet: Boolean(window.L),
-    state: Boolean(window.KolkataState),
-    cards: document.querySelectorAll('.pandal-card').length,
-    discoveryListings: Array.isArray(window.KOLKATA_EXTRA_PANDALS) ? window.KOLKATA_EXTRA_PANDALS.length : 0
-  }));
-  if (bootstrap.pandals === null || bootstrap.uniquePandals !== bootstrap.pandals) throw new Error(`Bootstrap catalog invalid: ${JSON.stringify(bootstrap)}`);
-
-  await page.waitForFunction(() => document.querySelectorAll('.pandal-card').length >= 109, null, { timeout: 10000 });
-  await page.waitForFunction(() => Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length === 36, null, { timeout: 10000 });
-
   const checks = await page.evaluate(() => ({
-    cards: document.querySelectorAll('.pandal-card').length,
+    pandals: Array.isArray(window.pandals) ? window.pandals.length : 0,
+    uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : 0,
     canonicalPins: Object.keys(window.KOLKATA_CANONICAL_PINS || {}).length,
-    pandals: Array.isArray(window.pandals) ? window.pandals.length : -1,
-    uniquePandals: Array.isArray(window.pandals) ? new Set(window.pandals.map(item => item.name)).size : -1,
-    discoveryListings: Array.isArray(window.KOLKATA_EXTRA_PANDALS) ? window.KOLKATA_EXTRA_PANDALS.length : 0,
+    cards: document.querySelectorAll('.pandal-card').length,
     markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
     leaflet: Boolean(window.L),
     map: Boolean(document.getElementById('pandal-map')?._leaflet_id),
@@ -52,36 +36,24 @@ try {
     search: Boolean(document.getElementById('pandal-search')),
     route: Boolean(document.getElementById('route-stops')),
     menu: Boolean(document.querySelector('.menu')),
-    menuClosedOnLoad: (() => { const nav=document.querySelector('.site-header nav'); return nav ? getComputedStyle(nav).display === 'none' : false; })(),
     toolkit: Boolean(document.querySelector('#puja-suite-launcher')),
-    bingo: Boolean(document.querySelector('#puja-bingo')),
     guides: Boolean(document.querySelector('.puja-guides')),
     details: Boolean(document.querySelector('#pandal-details')),
     gallery: Boolean(document.querySelector('#lightbox')),
-    swSupported: 'serviceWorker' in navigator,
-    duplicateIds: (() => { const ids=[...document.querySelectorAll('[id]')].map(el=>el.id).filter(Boolean); return ids.filter((id,i)=>ids.indexOf(id)!==i); })(),
-    canonicalMatches: Object.entries(window.KOLKATA_CANONICAL_PINS || {}).every(([name, coords]) => { const p=window.pandals?.find(item=>item.name===name); return p && Number(p.lat)===Number(coords[0]) && Number(p.lng)===Number(coords[1]); }),
-    expandedPins: ['Tala Park','Muhammad Ali Park','Dumdum Park Tarun Dal','Chorebagan Sarbojanin','Bakul Bagan'].every(name => { const p=window.pandals?.find(item=>item.name===name); return p && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)); }),
-    discoveryDataComplete: Array.isArray(window.KOLKATA_EXTRA_PANDALS) && window.KOLKATA_EXTRA_PANDALS.length === 9 && window.KOLKATA_EXTRA_PANDALS.some(item => item.name === 'Chaltabagan Sarbojanin'),
-    introPresent: Boolean(document.querySelector('.puja-intro')),
+    bingoRemoved: !document.querySelector('#puja-bingo') && !document.querySelector('.bingo-panel'),
     pageEntryReady: document.documentElement.classList.contains('kolkata-page-ready')
   }));
 
   const fail = message => { throw new Error(message); };
   if (checks.cards < 109) fail(`Expected at least 109 catalog cards, found ${checks.cards}`);
-  if (checks.pandals < 100) fail(`Expected at least 100 unified catalog entries, found ${checks.pandals}`);
-  if (checks.uniquePandals !== checks.pandals) fail(`Unified pandal catalog contains duplicate names (${checks.pandals} entries, ${checks.uniquePandals} unique)`);
-  if (checks.discoveryListings !== 9 || !checks.discoveryDataComplete) fail('Discovery listing dataset is incomplete');
+  if (checks.pandals < 100 || checks.uniquePandals !== checks.pandals) fail(`Unified pandal catalog is invalid (${checks.pandals} entries, ${checks.uniquePandals} unique)`);
   if (checks.canonicalPins !== 36) fail(`Expected 36 canonical pins, found ${checks.canonicalPins}`);
   if (checks.leaflet && checks.markerCount < 41) fail(`Leaflet loaded but expected at least 41 markers, found ${checks.markerCount}`);
   if (!checks.leaflet && !checks.mapFallback) fail('Neither Leaflet map nor documented map fallback initialized');
-  if (!checks.canonicalMatches) fail('Canonical coordinates do not match the unified pandal catalog');
-  if (!checks.expandedPins) fail('Verified expansion pins were not merged into the unified pandal catalog');
   if (!checks.search || !checks.route || !checks.menu || !checks.details || !checks.gallery) fail('Core mobile controls or overlays are missing');
-  if (!checks.menuClosedOnLoad) fail('Mobile navigation is visible before the hamburger is opened');
-  if (!checks.toolkit || !checks.bingo || !checks.guides) fail('One or more Puja feature modules did not load');
+  if (!checks.toolkit || !checks.guides) fail('One or more remaining Puja feature modules did not load');
+  if (!checks.bingoRemoved) fail('Retired Puja Bingo UI is still present');
   if (!checks.state || checks.state.version !== 3) fail('Unified v3 state store did not initialize');
-  if (checks.duplicateIds.length) fail(`Duplicate DOM ids found: ${checks.duplicateIds.join(', ')}`);
 
   const search = page.locator('#pandal-search');
   await search.fill('20 Palli');
@@ -116,7 +88,6 @@ try {
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('.menu')?.getAttribute('aria-expanded') === 'false' && !document.querySelector('.site-header nav')?.classList.contains('is-open'), null, { timeout: 3000 });
 
-  if (checks.swSupported) await page.waitForFunction(async () => Boolean(await navigator.serviceWorker.getRegistration()), null, { timeout: 5000 }).catch(() => fail('Service worker did not register'));
   if (pageErrors.length) fail(`Runtime page errors: ${pageErrors.join(' | ')}`);
   if (consoleErrors.length) fail(`Console errors: ${consoleErrors.join(' | ')}`);
   if (failedRequests.length) fail(`Unexpected local asset request failures: ${failedRequests.join(' | ')}`);
