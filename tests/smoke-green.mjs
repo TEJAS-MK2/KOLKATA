@@ -20,7 +20,7 @@ try {
   });
 
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'commit', timeout: 60000 });
-  await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length >= 100 && document.querySelectorAll('.pandal-card').length >= 100, null, { timeout: 30000 });
+  await page.waitForFunction(() => Array.isArray(window.pandals) && window.pandals.length >= 100 && document.querySelectorAll('.pandal-card').length >= 109, null, { timeout: 30000 });
   await wait(2200);
 
   const checks = await page.evaluate(() => ({
