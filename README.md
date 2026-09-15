@@ -1,6 +1,6 @@
 # কলকাতা দুর্গাপূজা — ২০২৬
 
-A mobile-first Durga Puja guide and pandal explorer for Kolkata, built as a static GitHub Pages site.
+A mobile-first Durga Puja guide and pandal explorer for Kolkata, built as a static GitHub Pages site with a Vercel production mirror and Supabase-backed cloud state storage.
 
 ## Features
 
@@ -17,21 +17,32 @@ A mobile-first Durga Puja guide and pandal explorer for Kolkata, built as a stat
 - Route planner with walking, driving, transit and two-wheeler modes
 - Puja Night Mode with saved route progress
 - Pandal details, favourites, visited state and private notes
-- Puja Toolkit, Puja Passport, Puja Bingo and festival guides
+- Puja Toolkit, Puja Passport, festival guides
 - Responsive gallery and lightbox
 - Mobile navigation and smooth scrolling
 - Bengali typography and festival-inspired visual treatment
 - Accessibility and external-link hardening
 - Network-first service-worker caching with versioned core assets
+- Supabase-backed cloud persistence for the personal Puja state, with localStorage fallback
 - Wikimedia Commons archival image credits in `IMAGE_CREDITS.md`
 
 ## Verification-first map
 
 Coordinates are not guessed. The canonical registry in `production-bootstrap.js` contains the maintained verified coordinates used by the explorer, map and route planner. Additional 2026 expansion data is merged only when coordinates are explicitly available. Listings without verified coordinates remain discovery listings and do not receive a map marker.
 
-## Live site
+## Live sites
 
 **GitHub Pages:** https://tejas-mk2.github.io/KOLKATA/
+
+**Vercel:** https://kolkata-puja-2026.vercel.app/
+
+The Vercel production URL mirrors the current GitHub Pages deployment through a Vercel rewrite, keeping the public Vercel URL stable while the repository remains the source of truth.
+
+## Supabase storage
+
+The project uses the existing Supabase project in the `ap-south-1` region for lightweight personal Puja-state persistence. The browser generates a random per-device session UUID and stores the saved, visited, route, completion, mode and notes state in `public.kolkata_puja_user_state`. If Supabase is unavailable, the site continues using localStorage without blocking the explorer.
+
+Only a Supabase publishable/anon client key is used in browser code. No service-role or secret key is shipped to the client. The Supabase table is protected with Row Level Security; the current anonymous session model is intended for non-account-based device sync rather than identity or sensitive-data storage.
 
 ## Run locally
 
@@ -71,4 +82,4 @@ Source code is distributed under the **Mozilla Public License 2.0 (MPL-2.0)**. S
 
 Please read `CODE_OF_CONDUCT.md` before contributing or participating in project discussions, and `SECURITY.md` before reporting a security vulnerability.
 
-<!-- Documentation reviewed: 2026-09-14 -->
+<!-- Documentation reviewed: 2026-09-15 -->
