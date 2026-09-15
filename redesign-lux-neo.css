@@ -1,0 +1,129 @@
+/* Sharodiya × Neo-Kolkata — visual-only redesign layer.
+   Intentionally preserves the existing DOM, IDs, controls and feature surfaces. */
+:root{
+  --neo-obsidian:#0b0908;
+  --neo-ink:#15110f;
+  --neo-ivory:#f4eee4;
+  --neo-paper:#ebe2d5;
+  --neo-gold:#c8a15a;
+  --neo-vermilion:#c43b25;
+  --neo-line:rgba(21,17,15,.2);
+  --neo-dark-line:rgba(244,238,228,.18);
+}
+body{background:var(--neo-ivory);color:var(--neo-ink)}
+.site-header{height:78px;background:rgba(11,9,8,.92);border-bottom:1px solid rgba(200,161,90,.3);box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.site-header .brand,.site-header nav a{color:var(--neo-ivory)}
+.site-header .brand-bengali{font-family:var(--bengali);font-size:18px;letter-spacing:.01em}
+.site-header .brand small{color:var(--neo-gold);border-color:rgba(200,161,90,.4);background:transparent;border-radius:0;padding:4px 7px}
+.site-header nav{gap:30px}
+.site-header nav a{opacity:.72;text-transform:uppercase;letter-spacing:.13em;font-size:10px}
+.site-header nav a:hover{color:var(--neo-gold);opacity:1}
+.menu span{background:var(--neo-ivory)}
+.hero{height:92vh;min-height:680px;max-height:980px;background:var(--neo-obsidian);padding-bottom:84px}
+.hero-image{filter:contrast(1.06) saturate(.72)}
+.hero-overlay{background:linear-gradient(90deg,rgba(5,4,3,.88),rgba(5,4,3,.28) 72%,rgba(5,4,3,.08)),linear-gradient(0deg,rgba(5,4,3,.86),transparent 62%)}
+.hero-content{max-width:900px}
+.hero .eyebrow{font-size:10px;letter-spacing:.2em;color:var(--neo-gold);border-left:3px solid var(--neo-vermilion);padding-left:11px}
+.hero h1{font-family:var(--serif);font-size:clamp(68px,10vw,150px);line-height:.82;letter-spacing:-.075em;margin:20px 0 25px}
+.hero h1 em{font-family:var(--sans);font-weight:800;text-transform:uppercase;letter-spacing:-.09em;color:var(--neo-ivory);font-style:normal}
+.hero-copy{font-size:14px;letter-spacing:.01em;color:rgba(244,238,228,.7);max-width:500px}
+.hero-actions .primary{background:var(--neo-ivory);color:var(--neo-ink);border-radius:0;text-transform:uppercase;letter-spacing:.12em;font-size:10px;border:1px solid var(--neo-ivory)}
+.hero-actions .primary:hover{background:var(--neo-gold);border-color:var(--neo-gold);color:var(--neo-obsidian)}
+.text-link{font-size:10px;text-transform:uppercase;letter-spacing:.14em}
+.section{padding-top:100px;padding-bottom:100px}
+.section-label{font-size:9px;letter-spacing:.2em;color:var(--neo-vermilion)}
+.section h2{font-size:clamp(46px,6vw,82px);font-weight:500}
+.section h2 span,.section h2 i{color:var(--neo-vermilion)}
+.intro{background:var(--neo-ivory);border-bottom:1px solid var(--neo-line)}
+.intro-grid{margin-top:34px}
+.intro-text{font-size:15px;color:#514840}
+.stats{border-top:2px solid var(--neo-ink);border-bottom:1px solid var(--neo-line);padding:28px 0}
+.stats strong{font-family:var(--sans);font-size:48px;font-weight:800;letter-spacing:-.06em}
+.stats span{font-size:9px;text-transform:uppercase;letter-spacing:.12em}
+.timeline{background:var(--neo-obsidian);border-top:8px solid var(--neo-vermilion)}
+.timeline>.section-label,.timeline .section-label{color:var(--neo-gold)}
+.timeline-head{margin-top:30px}
+.timeline-head h2{color:var(--neo-ivory)}
+.days{border:1px solid var(--neo-dark-line)}
+.days article{min-height:290px;padding:25px;border-right-color:var(--neo-dark-line)}
+.days article:hover{background:rgba(200,161,90,.06);transform:none}
+.days span,.days small{color:var(--neo-gold)}
+.days b{font-size:28px}
+.days p{color:#91877b}
+.culture{background:var(--neo-paper);grid-template-columns:1fr 1fr;border-top:1px solid var(--neo-line)}
+.culture-photo{filter:contrast(1.05) saturate(.78);min-height:640px}
+.culture-card{padding:90px clamp(30px,7vw,110px);border-left:1px solid var(--neo-line)}
+.culture-card:before{content:"✦";color:var(--neo-gold);font-size:28px}
+.culture-card h2{font-size:clamp(50px,6vw,88px)}
+.culture-card p{font-size:14px;color:#514840}
+.button.outline{border-radius:0;border-width:1px 1px 1px 4px;border-color:var(--neo-ink);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.guide{background:var(--neo-ivory);border-top:8px solid var(--neo-ink)}
+.guide-head{margin-top:30px}
+.guide-head p,.gallery-head p{color:#61574e}
+.puja-quick-info>div{background:transparent;border:1px solid var(--neo-line);border-radius:0;box-shadow:none}
+.puja-quick-info>div strong{font-family:var(--sans);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.explorer-toolbar{border-top:2px solid var(--neo-ink);padding-top:16px}
+.explorer-search{border-radius:0!important;border:1px solid var(--neo-line)!important;background:rgba(255,255,255,.32)!important;box-shadow:none!important}
+.explorer-search:focus{border-color:var(--neo-vermilion)!important;box-shadow:inset 0 -2px var(--neo-vermilion)!important}
+.filter-btn,.mode-btn{border-radius:0;border-color:var(--neo-line);text-transform:uppercase;letter-spacing:.08em;font-size:9px}
+.filter-btn.active,.mode-btn.active{background:var(--neo-ink);border-color:var(--neo-ink)}
+.pandal-card{border-radius:0;background:#f8f2e9;border:1px solid var(--neo-line);box-shadow:none}
+.pandal-card:hover,.pandal-card.selected{transform:none;border-color:var(--neo-vermilion);box-shadow:8px 8px 0 rgba(196,59,37,.12)}
+.pandal-card img{height:158px;filter:grayscale(.12) contrast(1.03)}
+.pandal-card h3{font-size:18px;font-weight:800;letter-spacing:-.035em;text-transform:uppercase}
+.pin-status{border-radius:0!important;text-transform:uppercase;letter-spacing:.06em}
+.pandal-actions button,.pandal-actions a{border-radius:0;background:transparent;text-transform:uppercase;letter-spacing:.05em;font-size:9px}
+.pandal-actions .route{background:var(--neo-vermilion);border-color:var(--neo-vermilion)}
+.map-panel{border-radius:0;border:2px solid var(--neo-ink);box-shadow:10px 10px 0 rgba(21,17,15,.08)}
+.map-panel:before{content:"KOLKATA / PANDAL ATLAS";top:12px;left:12px;border-radius:0;background:var(--neo-ink);color:var(--neo-gold);font-size:8px;padding:8px 10px;letter-spacing:.16em}
+.route-planner{border-radius:0;background:var(--neo-obsidian);border:2px solid var(--neo-gold);box-shadow:10px 10px 0 rgba(21,17,15,.12)}
+.route-planner h3{font-size:24px;text-transform:uppercase;letter-spacing:-.04em}
+.route-primary,.route-secondary{border-radius:0;text-transform:uppercase;letter-spacing:.08em;font-size:9px}
+.route-primary{background:var(--neo-ivory);border-color:var(--neo-ivory)}
+.route-secondary{border-color:var(--neo-dark-line)}
+.night-mode{border-radius:0;background:#17110e;border-color:rgba(200,161,90,.35)}
+.night-primary{border-radius:0!important}
+.puja-guides,.puja-feature-suite,.puja-bingo,.puja-passport{border-radius:0!important}
+.gallery{background:var(--neo-obsidian);border-top:8px solid var(--neo-gold)}
+.gallery>.section-label{color:var(--neo-gold)}
+.gallery-head h2{color:var(--neo-ivory)}
+.gallery-grid{gap:10px}
+.gallery-grid .tile{border-radius:0;filter:grayscale(.1) saturate(.8);border:1px solid rgba(244,238,228,.14)}
+.gallery-grid .tile:hover{transform:none;filter:grayscale(0) saturate(1)}
+.closing{background:var(--neo-paper);border-top:1px solid var(--neo-line);min-height:560px}
+.closing h2{font-size:clamp(60px,8vw,110px);font-weight:500}
+.closing h2 i{color:var(--neo-vermilion)}
+.closing .primary{border-radius:0;background:var(--neo-ink);color:var(--neo-ivory);text-transform:uppercase;letter-spacing:.12em;font-size:9px}
+footer{background:var(--neo-obsidian);border-top:2px solid var(--neo-gold);color:#81766a}
+footer span:last-child{color:var(--neo-gold)}
+.lightbox button{border-radius:0;background:var(--neo-ivory)}
+@media(max-width:900px){
+ .hero{min-height:650px;height:88vh;padding-bottom:68px}
+ .section{padding-top:76px;padding-bottom:76px}
+ .culture-photo{min-height:480px}
+ .map-panel{box-shadow:6px 6px 0 rgba(21,17,15,.08)}
+}
+@media(max-width:600px){
+ .site-header{height:64px}
+ .site-header .brand-bengali{font-size:15px}
+ .site-header.menu-open nav{background:rgba(11,9,8,.98);border-color:rgba(200,161,90,.28);border-radius:0}
+ .site-header.menu-open nav a{color:var(--neo-ivory);border-radius:0}
+ .site-header.menu-open nav a:hover{background:rgba(200,161,90,.1);color:var(--neo-gold)}
+ .hero{min-height:620px;height:84vh;padding-bottom:54px}
+ .hero h1{font-size:clamp(58px,18vw,88px);line-height:.84}
+ .hero-copy{font-size:13px}
+ .section{padding:58px 18px}
+ .intro-grid,.timeline-head,.guide-head,.gallery-head{display:block}
+ .timeline-head p,.guide-head p,.gallery-head p{margin-top:18px}
+ .stats{grid-template-columns:1fr 1fr;gap:24px}
+ .stats div:last-child{grid-column:1/-1}
+ .culture{grid-template-columns:1fr}
+ .culture-photo{min-height:360px}
+ .culture-card{border-left:0;border-top:1px solid var(--neo-line);padding:58px 22px}
+ .pandal-card img{height:165px}
+ .map-panel{box-shadow:5px 5px 0 rgba(21,17,15,.1)}
+ .route-planner{padding:16px}
+ .gallery-grid{grid-template-rows:220px 220px}
+ footer{display:grid;gap:10px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
