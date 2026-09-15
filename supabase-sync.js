@@ -6,7 +6,7 @@
   const TABLE = 'kolkata_puja_user_state';
   const stateKey = () => localStorage.getItem(SESSION_KEY) || (() => { const id = crypto.randomUUID(); localStorage.setItem(SESSION_KEY, id); return id; })();
   const sessionId = stateKey();
-  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'x-kolkata-session': sessionId };
   const request = async (url, options = {}) => { const response = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } }); if (!response.ok) throw new Error(`Supabase ${response.status}`); return response.status === 204 ? null : response.json(); };
   const load = async () => {
     try {
