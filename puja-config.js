@@ -19,7 +19,7 @@
     ]),
     updates
   });
-  const esc = value => String(value ?? '').replace(/[&<>\\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;',"'":'&#39;'}[c]));
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const correctOfficialDates = () => {
     const dates = document.querySelector('.puja-2026-dates');
     if (dates) {
@@ -35,9 +35,6 @@
     if (hero) hero.textContent = 'MAHALAYA 10 OCTOBER · PUJA 17—21 OCTOBER 2026';
     const proCopy = document.querySelector('#pro-today-copy');
     if (proCopy) proCopy.textContent = 'The official 2026 Puja dates run from Maha Shashthi on 17 October through Vijaya Dashami on 21 October; Mahalaya falls on 10 October.';
-    document.querySelectorAll('.pro-guide small').forEach(el => {
-      if (el.textContent.includes('17 Oct')) el.textContent = el.textContent.replace('17 Oct', '18 Oct');
-    });
   };
   const renderUpdates = () => {
     correctOfficialDates();
