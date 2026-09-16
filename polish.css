@@ -53,6 +53,24 @@ button,a,input,select{touch-action:manipulation}
 .closing{position:relative;overflow:hidden}
 .closing h2{position:relative;z-index:1}
 footer{min-height:68px;align-items:center}
+.city-pulse{margin-top:24px;border:1px solid rgba(24,21,18,.1);border-radius:18px;background:linear-gradient(135deg,#fff,#f7f1e8);box-shadow:var(--soft-shadow);overflow:hidden}
+.city-pulse-head{display:flex;justify-content:space-between;gap:18px;align-items:end;padding:20px 20px 14px;border-bottom:1px solid rgba(24,21,18,.08)}
+.city-pulse-kicker{font:700 10px/1 DM Sans,sans-serif;letter-spacing:.16em;color:var(--red)}
+.city-pulse-head h3{margin:7px 0 0;font:600 24px/1.1 'Playfair Display',serif}
+.city-pulse-status{font-size:11px;color:var(--muted);text-align:right}
+.city-pulse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+.city-pulse-card{padding:18px;border-right:1px solid rgba(24,21,18,.08);border-bottom:1px solid rgba(24,21,18,.08);transition:background .2s ease,transform .2s ease}
+.city-pulse-card:hover{background:#fff;transform:translateY(-1px)}
+.city-pulse-card strong{display:block;font-size:15px;line-height:1.3}
+.city-pulse-card small{display:block;margin-top:7px;color:var(--red);font-size:10px;letter-spacing:.04em}
+.city-pulse-card p{margin:10px 0;font-size:12px;color:var(--muted);line-height:1.6}
+.city-pulse-card a{font-size:11px;font-weight:700;color:var(--ink)}
+.city-pulse-foot{margin:0;padding:12px 18px;font-size:10px;color:var(--muted);background:rgba(24,21,18,.025)}
+.explorer-v2-tools{border:1px solid rgba(24,21,18,.08);border-radius:12px;padding:7px;background:rgba(255,255,255,.88);box-shadow:0 8px 24px rgba(24,21,18,.06);backdrop-filter:blur(12px)}
+.tool-btn{border-radius:8px!important}
+.tool-btn.active{box-shadow:0 4px 12px rgba(24,21,18,.08)}
+.distance-badge{font-size:10px;color:var(--red);font-weight:700}
+.enhanced-save,.suite-visit,.suite-route-add{white-space:nowrap}
 /* Cinematic opening inspired by Kolkata Puja editorial sites: short, skippable, session-scoped. */
 html.puja-intro-active,html.puja-intro-active body{overflow:hidden}
 .puja-intro{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#120908;color:#f8efe4;overflow:hidden;isolation:isolate;cursor:default}
@@ -92,6 +110,9 @@ html.puja-intro-active,html.puja-intro-active body{overflow:hidden}
  .map-panel #pandal-map{min-height:430px}
  .pandal-list{max-height:560px}
  .gallery-grid{grid-template-rows:240px 240px}
+ .city-pulse-grid{grid-template-columns:1fr}
+ .city-pulse-card{border-right:0}
+ .city-pulse-status{display:none}
 }
 @media(max-width:600px){
  .site-header{padding-left:16px;padding-right:16px}
@@ -136,5 +157,9 @@ html.puja-intro-active,html.puja-intro-active body{overflow:hidden}
  .gallery-grid .tall{grid-row:auto}
  footer{flex-direction:column;gap:8px;text-align:center;padding:18px 16px}
  .map-panel{overflow:hidden}
+ .city-pulse{border-radius:14px}
+ .city-pulse-head{padding:16px}
+ .city-pulse-head h3{font-size:21px}
+ .city-pulse-card{padding:15px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}.pandal-card:hover img,.puja-guide-card:hover,.days article:hover,.puja-quick-info>div:hover{transform:none!important}.site-header nav a:after{transition:none}}
