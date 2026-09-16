@@ -8,16 +8,22 @@ A mobile-first Durga Puja guide and pandal explorer for Kolkata, built as a stat
 - Puja timeline from Mahalaya to Dashami
 - Culture and artisan storytelling
 - North, Central, South Kolkata and Salt Lake discovery catalog
-- **100-entry unified pandal catalog**
+- **101 unified pandal records / 110 rendered discovery cards in production smoke**
 - **36 canonical verified map pins**
 - Additional verified catalog pins merged from maintained 2026 expansion data
 - Discovery-only listings where an exact map pin has not been verified
 - Interactive Leaflet pandal map with graceful fallback
 - Search and neighbourhood/zone filtering
+- Explorer sorting: recommended, A–Z and nearest-to-me
+- Saved-only explorer filter with local/cloud personal state
+- Distance badges after optional browser geolocation
 - Route planner with walking, driving, transit and two-wheeler modes
+- One-tap greedy route optimization for selected verified stops
 - Puja Night Mode with saved route progress
 - Pandal details, favourites, visited state and private notes
 - Puja Toolkit, Puja Passport, festival guides
+- Live City Pulse with source-linked September 2026 Kolkata Puja updates
+- Traffic, parking and crowd-management planning notes with freshness dates
 - Responsive gallery and lightbox
 - Mobile navigation and smooth scrolling
 - Bengali typography and festival-inspired visual treatment
@@ -25,6 +31,10 @@ A mobile-first Durga Puja guide and pandal explorer for Kolkata, built as a stat
 - Network-first service-worker caching with versioned core assets
 - Supabase-backed cloud persistence for the personal Puja state, with localStorage fallback
 - Wikimedia Commons archival image credits in `IMAGE_CREDITS.md`
+
+## 2026 date verification
+
+The public AASAN Puja Permission Portal lists Mahalaya on 10 October, Maha Panchami on 16 October, Maha Shashthi on 17 October, Maha Saptami on 18 October, Maha Ashtami on 19 October, Maha Navami on 20 October and Vijaya Dashami on 21 October. The site uses the core Shashthi–Dashami dates in the planner and labels the wider state holiday window separately where relevant.
 
 ## Verification-first map
 
@@ -44,6 +54,10 @@ The project uses the existing Supabase project in the `ap-south-1` region for li
 
 Only a Supabase publishable/anon client key is used in browser code. No service-role or secret key is shipped to the client. The Supabase table is protected with Row Level Security; the current anonymous session model is intended for non-account-based device sync rather than identity or sensitive-data storage.
 
+## Live news and travel notes
+
+The City Pulse layer was refreshed on **16 September 2026** using source-linked reporting. Current items include Kolkata Police crowd-management preparations, planned retractable barriers around high-footfall areas, the preliminary Allen Park/Camac Street traffic-diversion plan, and parking changes ahead of Puja. These are planning references rather than live police or Metro feeds. Visitors should check official notices immediately before travelling.
+
 ## Run locally
 
 The project is a static site. For a simple local preview:
@@ -62,7 +76,7 @@ npx playwright install --with-deps chromium
 npm run test:smoke
 ```
 
-The smoke test exercises mobile rendering, catalog rendering, the map, search, route planner, details modal, personal state, Puja features, menu and service-worker registration. Its current production contract checks 109 rendered catalog/discovery cards, 36 canonical pins, 100 unified catalog records and 41 Leaflet markers.
+The smoke test exercises mobile rendering, catalog rendering, the map, search, route planner, details modal, personal state, Puja features, menu and service-worker registration. Its current production contract checks at least 109 rendered catalog/discovery cards, 36 canonical pins, 100+ unified catalog records and 41+ Leaflet markers.
 
 ## GitHub Pages
 
@@ -82,4 +96,4 @@ Source code is distributed under the **Mozilla Public License 2.0 (MPL-2.0)**. S
 
 Please read `CODE_OF_CONDUCT.md` before contributing or participating in project discussions, and `SECURITY.md` before reporting a security vulnerability.
 
-<!-- Documentation reviewed: 2026-09-15 -->
+<!-- Documentation reviewed: 2026-09-16 -->
