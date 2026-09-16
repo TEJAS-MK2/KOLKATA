@@ -19,11 +19,11 @@
     ]),
     updates
   });
-  const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  const esc = value => String(value ?? '').replace(/[&<>\\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;',"'":'&#39;'}[c]));
   const correctOfficialDates = () => {
     const dates = document.querySelector('.puja-2026-dates');
     if (dates) {
-      const official = [['16 Oct','Shashthi'],['18 Oct','Saptami'],['19 Oct','Ashtami'],['20 Oct','Navami'],['21 Oct','Dashami']];
+      const official = [['17 Oct','Shashthi'],['18 Oct','Saptami'],['19 Oct','Ashtami'],['20 Oct','Navami'],['21 Oct','Dashami']];
       dates.querySelectorAll('.puja-2026-date').forEach((el, i) => {
         if (!official[i]) return;
         const b = el.querySelector('b'), span = el.querySelector('span');
@@ -32,11 +32,11 @@
       });
     }
     const hero = document.querySelector('.hero .eyebrow');
-    if (hero) hero.textContent = 'MAHALAYA 10 OCTOBER · HOLIDAY WINDOW 15—26 OCTOBER 2026';
+    if (hero) hero.textContent = 'MAHALAYA 10 OCTOBER · PUJA 17—21 OCTOBER 2026';
     const proCopy = document.querySelector('#pro-today-copy');
-    if (proCopy) proCopy.textContent = 'The official 2026 Puja holiday window begins on 15 October; core ritual days run from Shashthi on 16 October through Dashami on 21 October.';
+    if (proCopy) proCopy.textContent = 'The official 2026 Puja dates run from Maha Shashthi on 17 October through Vijaya Dashami on 21 October; Mahalaya falls on 10 October.';
     document.querySelectorAll('.pro-guide small').forEach(el => {
-      if (el.textContent.includes('17 Oct')) el.textContent = el.textContent.replace('17 Oct', '16 Oct');
+      if (el.textContent.includes('17 Oct')) el.textContent = el.textContent.replace('17 Oct', '18 Oct');
     });
   };
   const renderUpdates = () => {
@@ -50,10 +50,19 @@
     section.innerHTML = updates.map(item => `<article class="puja-2026-card"><strong>${esc(item.title)}</strong><small>${esc(item.meta)}</small><p>${esc(item.text)}</p><p><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">${esc(item.sourceLabel)}</a></p></article>`).join('');
     const note = document.createElement('p');
     note.className = 'puja-2026-note';
-    note.textContent = 'Freshness check: 14 September 2026. Committee-level themes are shown only when a current announcement could be verified; local timings and access rules may still change.';
+    note.textContent = 'Freshness check: 16 September 2026. Committee-level themes are shown only when a current announcement could be verified; local timings and access rules may still change.';
     host.append(section, note);
   };
-  const boot = () => { renderUpdates(); setTimeout(correctOfficialDates, 0); setTimeout(correctOfficialDates, 1000); };
+  const loadPolishLayer = () => {
+    if (document.getElementById('site-enhancements-js')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = 'site-enhancements.css?v=20260916'; link.id = 'site-enhancements-css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'site-enhancements.js?v=20260916'; script.defer = true; script.id = 'site-enhancements-js';
+    document.body.appendChild(script);
+  };
+  const boot = () => { renderUpdates(); loadPolishLayer(); setTimeout(correctOfficialDates, 0); setTimeout(correctOfficialDates, 1000); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
   else boot();
   addEventListener('load', correctOfficialDates, {once:true});
